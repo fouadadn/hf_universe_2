@@ -3,9 +3,9 @@ import Link from "next/link"
 const layout = ({ children }) => {
     return (
         <div className="">
-            <header className="z-[9999] relative    ">
+            <header className="z-[9999] relative bg-gradient-to-b from-black to-transparent to-95%">
                 <nav className="flex justify-between py-4 mx-2 items-center">
-                    <h1 className="text-nowrap">HF Universe</h1>
+                    <Link href={'/'} className="text-nowrap text-3xl font-bold font-serif flex items-center"><span className="text-[#5c00cc] font-sans text-5xl">HF</span> <span>Stream</span> </Link>
 
                     <div className="space-x-6 ml-6 hidden md:block ">
                         <Link href={'/'}>Home</Link>

@@ -1,10 +1,16 @@
-import React from 'react'
+import TopBackdrop from "@/app/components/ShowDetails/topBackdrop"
 
-const Movie = ({params}) => {
+
+const Movie = async ({ params }) => {
+
+  const { id } = await params
+  const { type } = await params
+
   return (
     <div>
-      {params.type}
-      {params.id}
+      <div>
+        <TopBackdrop id={id} type={type} />
+      </div>
     </div>
   )
 }
