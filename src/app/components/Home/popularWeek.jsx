@@ -101,7 +101,7 @@ const PopularWeek = () => {
                     </Link>)
 
                         : Array.from(Array(20)).map((_, i) => <div key={i} className='flex items-center gap-4 animate-pulse'>
-                            <span className='text-5xl font-bold '>{i}</span>
+                            <span className='text-5xl font-bold '>{i+1}</span>
 
                             <div className='flex gap-3'>
                                 <div className='rounded-2xl w-[100px] h-[150px] bg-stone-600'>
