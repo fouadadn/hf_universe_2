@@ -59,6 +59,10 @@ const TopBackdrop = ({ id, type }) => {
 
 
       </div>
+
+      <div className='bg-red-500'>
+        <h1 className='text-2xl '>{show.title ? show.title : show.name} </h1>
+      </div>
     </div>
   )
 }

@@ -49,7 +49,7 @@ const PopularWeek = () => {
                 ]
 
                 setData(combineData)
-                // setPopular(combineData[0])
+                setPopular(combineData[0])
             }
 
             fetchPopular()
@@ -136,7 +136,7 @@ const PopularWeek = () => {
 
                         <div className='bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_right,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0'></div>
 
-                        <div className=' z-[999] absolute top-10 md:px-20 md:mt-10 space-y-1'>
+                        <div className=' z-[999] absolute top-2 md:top-10 md:px-20 md:mt-10 space-y-1'>
                             <h1 className='text-3xl font-bold'>{popular.title} </h1>
 
                             <div className='flex items-center gap-1'>
@@ -187,7 +187,7 @@ const PopularWeek = () => {
                             <div className='flex gap-3 mt-3'>
                                 <button className=' rounded-xl px-2 w-32 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600'> </button>
                                 <button className=' rounded-xl px-2 md:px-5 w-[165.65px] py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600'></button>
-                                <button className='border-[1px] rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'><Bookmark /></button>
+                                <button className=' w-[65.5px] h-[49.6px] rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600'></button>
                             </div>
                         </div>
                     </div>

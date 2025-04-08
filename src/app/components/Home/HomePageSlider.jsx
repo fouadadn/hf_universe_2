@@ -45,7 +45,7 @@ const HomePageSlider = () => {
   const show5 = data.filter(v => v.media_type !== 'person').slice(0, 5)
   // const show5 = []
   return (
-    <div className='w-full -mt-[81px] z-10'>
+    <div className='w-full -mt-[81px] z-10 text-white'>
       <Swiper
         className='relative'
         modules={[Navigation, Pagination, Autoplay]}
@@ -62,7 +62,7 @@ const HomePageSlider = () => {
         {
           show5.length > 0 ? show5.map((show) =>
             <SwiperSlide >
-              <div className='relative w-full '>
+              <div className='relative w-full h-[621px] md:h-auto '>
                 <Image src={imgSrc.toString().startsWith('https') ? `${imgSrc}${screenWidth > 800 ? show?.backdrop_path : show?.poster_path}` : imgSrc} onError={handleError}
                   alt={show?.title ? show.title : show.name}
                   // Ensures it takes full width and scales height
