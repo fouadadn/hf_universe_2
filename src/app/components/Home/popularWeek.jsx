@@ -132,12 +132,12 @@ const PopularWeek = () => {
                                 objectFit: "contain", // Use CSS to set objectFit
                                 objectPosition: "center", // Optional, if you need to control the position of the image
                             }}
-                            className='rounded-2xl relative lg:bottom-52' />
+                            className='rounded-2xl relative lg:bottom-52 w-full' />
 
                         <div className='bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_right,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0'></div>
 
-                        <div className=' z-[999] absolute top-2 md:top-10 md:px-20 md:mt-10 space-y-1'>
-                            <h1 className='text-3xl font-bold'>{popular.title} </h1>
+                        <div className=' z-[999] absolute top-5 md:top-10 md:px-20 md:mt-10 space-y-1'>
+                            <h1 className='text-xl md:text-3xl font-bold'>{popular.title} </h1>
 
                             <div className='flex items-center gap-1'>
                                 <div className='flex items-center text-sm gap-1'>
@@ -156,7 +156,7 @@ const PopularWeek = () => {
                                 </div>
 
                             </div>
-                            <p className='w-96 md:w-[56%]'>{String(popular.overview).split(' ').slice(0, 21).join(' ')} <span>{String(popular.overview).split(' ').length > 21 ? "..." : ""}</span> </p>
+                            <p className='w-80 md:w-[56%] text-xs md:text-base '>{String(popular.overview).split(' ').slice(0, 21).join(' ')} <span>{String(popular.overview).split(' ').length > 21 ? "..." : ""}</span> </p>
 
                             <div className='flex gap-3 mt-3'>
                                 <button className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]'><Play /> <span>Play Now</span> </button>

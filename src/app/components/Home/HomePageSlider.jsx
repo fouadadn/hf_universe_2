@@ -72,7 +72,8 @@ const HomePageSlider = () => {
                     objectFit: "cover", // Use CSS to set objectFit
                     objectPosition: "center", // Optional, if you need to control the position of the image
                   }}
-                  className='min-h-96 ' />
+                  // fill
+                  className='min-h-96 w-full ' />
                 {/* <img src={`https://image.tmdb.org/t/p/original/${show?.backdrop_path}` } alt="backdrop image" className='w-full brightness-90' /> */}
                 <div className='bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0'></div>
                 <div className='absolute z-[999] text-start bottom-4 lg:bottom-44 mx-4 '>

@@ -66,3 +66,7 @@ body {
 .shadow_hf{
   box-shadow: 0px 0px 0px 20px  black;
 }
+
+.nowrap{
+  text-wrap: nowrap !important;
+}

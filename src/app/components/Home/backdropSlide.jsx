@@ -32,10 +32,12 @@ const BackdropSlide = ({ media_type, is_korean }) => {
 
                 ])
 
+                console.log(shows)
+
 
                 const combineData = [
                     ...shows.map((v) => ({
-                        ...v, media_type: is_korean ? "tv" : v.media_type,
+                        ...v, media_type: media_type === "movie" ? "movie" :  "tv" ,
                         genres: v.genre_ids.map((gI) => {
                             let ob = {}
                             genres.map((g) => {

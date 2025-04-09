@@ -2,10 +2,10 @@ const Footer = () => {
     return (
         <footer className=" text-gray-300 pb-6 px-4 mt-10">
 
-            <div className="flex justify-around ">
+            <div className="flex flex-col md:flex-row justify-around ">
 
                 {/* Brand Info */}
-                <div>
+                <div className="order-1 mt-5 md:mt-0">
                     {/* <h1 className="text-2xl font-bold text-white">HF Stream</h1> */}
                     <p className="mt-2 text-2xl w-96 font-sans font-bold">
                         Stream the latest movies and series for free. Unlimited entertainment at your fingertips.

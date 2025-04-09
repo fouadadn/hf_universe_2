@@ -1,4 +1,4 @@
-import TopBackdrop from "@/app/components/ShowDetails/topBackdrop"
+import Details from "@/app/components/ShowDetails/show"
 
 
 const Movie = async ({ params }) => {
@@ -8,9 +8,7 @@ const Movie = async ({ params }) => {
 
   return (
     <div>
-      <div>
-        <TopBackdrop id={id} type={type} />
-      </div>
+        <Details id={id} type={type} />
     </div>
   )
 }
