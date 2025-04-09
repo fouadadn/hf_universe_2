@@ -8,7 +8,6 @@ import "swiper/css/navigation";
 import { useEffect, useState } from 'react';
 import { Bookmark, CirclePlay, Play } from 'lucide-react';
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
-import image from "../../../assets/black_backdrop.png"
 import Image from "next/image";
 
 const HomePageSlider = () => {
@@ -39,7 +38,7 @@ const HomePageSlider = () => {
 
 
   const handleError = () => {
-    setImgSrc(image);
+    setImgSrc("/assets/black_backdrop.png");
   };
 
   const show5 = data.filter(v => v.media_type !== 'person').slice(0, 5)

@@ -4,7 +4,6 @@ import api from "@/app/utils/axiosInstance";
 import { useEffect, useState } from "react"
 import Image from "next/image";
 import { Dot, Star } from "lucide-react";
-import image from "../../../assets/black_backdrop.png"
 import Link from "next/link";
 
 
@@ -60,7 +59,7 @@ const BackdropSlide = ({ media_type, is_korean }) => {
     }, [])
 
     const handleError = () => {
-        setImgSrc(image);
+        setImgSrc("/assets/black_backdrop.png");
     };
 
     // console.log(data)

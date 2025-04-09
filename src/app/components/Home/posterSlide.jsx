@@ -4,7 +4,6 @@ import api from '@/app/utils/axiosInstance'
 import React, { useEffect, useState } from 'react'
 import Image from "next/image";
 import { Dot, Star } from 'lucide-react';
-import image from "../../../assets/black_backdrop.png"
 import Link from 'next/link';
 
 const PosterSlide = () => {
@@ -71,7 +70,7 @@ const PosterSlide = () => {
     }, [])
 
     const handleError = () => {
-        setImgSrc(image);
+        setImgSrc("/assets/black_backdrop.png");
     };
 
 

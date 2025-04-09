@@ -1,7 +1,6 @@
 "use client"
 import api from '@/app/utils/axiosInstance';
 import React, { useEffect, useState } from 'react'
-import image from "../../../assets/black_backdrop.png"
 import Image from "next/image";
 import { Bookmark, CirclePlay, Dot, Play, UserRound } from 'lucide-react';
 
@@ -140,7 +139,7 @@ const Details = ({ id, type }) => {
                   <div className={`rounded-full overflow-hidden w-20 h-20 items-center justify-center flex bg-stone-400 `}>
                     {
                       c?.profile_path ?
-                        <img src={`https://image.tmdb.org/t/p/w300${c?.profile_path}`} className={`relative   `} alt="" />
+                        <img src={`https://image.tmdb.org/t/p/w300${c?.profile_path}`} className={`relative`} alt="" />
                         : <UserRound size={50} />
                     }
                   </div>
