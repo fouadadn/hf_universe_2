@@ -90,11 +90,11 @@ const PosterSlide = () => {
                         alt={p.provider_name}
                         // Ensures it takes full width and scales height
                         width={50}        // Set an arbitrary width
-                        height={50  }
+                        height={50}
                         style={{
                             objectFit: "cover", // Use CSS to set objectFit
                             objectPosition: "center", // Optional, if you need to control the position of the image
-                        }} className='rounded-xl w-auto h-auto z-[9999] '
+                        }} className='rounded-xl w-[50px] h-[50px] z-[9999] '
                     />
                     <div className='absolute -top-5 -bottom-5 -left-5 -right-5 backdrop-blur-xs blur-lg  bg-black/30  rounded-2xl' style={{ backgroundColor: "#00000054" }}>
 

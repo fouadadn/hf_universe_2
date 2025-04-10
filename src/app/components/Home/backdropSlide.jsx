@@ -10,7 +10,7 @@ import Link from "next/link";
 const BackdropSlide = ({ media_type, is_korean }) => {
 
     const [data, setData] = useState([]);
-    const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/original`);
+    const [imgSrc, setImgSrc] = useState("/assets/black_backdrop.png");
 
 
     useEffect(() => {
@@ -71,7 +71,7 @@ const BackdropSlide = ({ media_type, is_korean }) => {
             <div className="flex gap-10 overflow-auto hide-scrollbar mt-4">
                 {
                     data.length > 0 ? data.map((show, i) => <Link href={`/${show.media_type}/${show.id}`} key={i} className="shrink-0">
-                        <Image src={show.backdrop_path ?  `${imgSrc}${show.backdrop_path}` : image}
+                        <Image src={show.backdrop_path ?  `https://image.tmdb.org/t/p/original${show.backdrop_path}` : imgSrc}
                             alt={show?.title ? show.title : show.name}
                             width={300}
                             height={168.75}
