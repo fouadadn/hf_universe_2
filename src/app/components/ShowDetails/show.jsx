@@ -11,10 +11,12 @@ import {
   Play,
   UserRound,
 } from "lucide-react";
+import Link from "next/link";
 
 const Details = ({ id, type }) => {
   const [show, setShow] = useState({});
   const [cast, setCast] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/original`);
   const [screenWidth, setScreenWidth] = useState(0);
 
@@ -25,12 +27,16 @@ const Details = ({ id, type }) => {
         setScreenWidth(window.innerWidth);
       });
       async function fetchMovies() {
-        const [show, casts] = [
+        const [show, casts, video] = [
           (await api.get(`/${type}/${id}`)).data,
           (await api.get(`/${type}/${id}/credits`)).data?.cast,
+          (await api.get(`/${type}/${id}/videos`)).data?.results?.find(
+            (vid) => vid.type === "Trailer" && vid.site === "YouTube"
+          ),
         ];
         setShow(show);
         setCast(casts);
+        setVideos(video);
       }
       fetchMovies();
     } catch (err) {
@@ -39,11 +45,11 @@ const Details = ({ id, type }) => {
   }, []);
 
   const handleError = () => {
-    setImgSrc(image);
+    // setImgSrc(image);
   };
 
   console.log(show);
-  console.log(cast);
+  console.log(videos);
 
   function formatTime(time) {
     const hour = parseInt(time) / 60;
@@ -109,16 +115,18 @@ const Details = ({ id, type }) => {
 
             <div className="flex flex-col ">
               <div>
-              <span className={`${type === "tv" ? "block" : "hidden"}`}>
-                    {show?.release_date
-                      ? show?.release_date
-                      : show?.first_air_date}
-                  </span>
+                <span className={`${type === "tv" ? "block" : "hidden"}`}>
+                  {show?.release_date
+                    ? show?.release_date
+                    : show?.first_air_date}
+                </span>
                 <h1 className="text-3xl md:text-5xl font-bold">
                   {show?.title ? show?.title : show?.name}
                 </h1>
                 <div className="flex gap-1 ">
-                  <span className={`${type === "movie" ? "block" : "hidden"}`}>{formatTime(show?.runtime)} |</span>
+                  <span className={`${type === "movie" ? "block" : "hidden"}`}>
+                    {formatTime(show?.runtime)} |
+                  </span>
                   <span className={`${type === "tv" ? "hidden" : "block"}`}>
                     {show?.release_date
                       ? show?.release_date
@@ -141,9 +149,11 @@ const Details = ({ id, type }) => {
                 <button className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]">
                   <Play /> <span>Play Now</span>{" "}
                 </button>
-                <button className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]">
-                  <CirclePlay /> <span>Watch Trailer</span>
-                </button>
+                <Link href={`/watch/${videos?.key}`}>
+                  <button className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]">
+                    <CirclePlay /> <span>Watch Trailer</span>
+                  </button>
+                </Link>
                 <button className="border-[1px] rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200">
                   <Bookmark />
                 </button>
