@@ -89,15 +89,14 @@ const Details = ({ id, type }) => {
           {/* <img src={`https://image.tmdb.org/t/p/original/${show?.backdrop_path}` } alt="backdrop image" className='w-full brightness-90' /> */}
           <div className="bg-gradient-to-r from-black to-transparent hidden md:block bg-[linear-gradient(to_right,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0"></div>
           <div className="bg-gradient-to-r from-black to-transparent  bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0"></div>
-            <div className="relative"></div>
-          <div className="absolute z-[999] text-start bottom-4 md:bottom-10 lg:bottom-1 xl:bottom-22 mx-4  flex flex-col gap-4 items-center ">
-            <div className="hidden  2xl:block ">
+          <div className="absolute z-[999] text-start bottom-4 md:bottom-10 lg:bottom-26 mx-4  flex  gap-4 items-end ">
+            <div className="hidden lg:block ">
               <Image
                 src={`${imgSrc}${show?.poster_path}`}
                 onError={handleError}
                 alt={show?.title ? `${show?.title}` : `${show?.name}`}
                 // Ensures it takes full width and scales height
-                width={384}
+                width={284}
                 height={576}
                 style={{
                   objectFit: "cover", // Use CSS to set objectFit
@@ -108,14 +107,19 @@ const Details = ({ id, type }) => {
               />
             </div>
 
-            <div className="flex flex-col 2xl:items-center">
+            <div className="flex flex-col ">
               <div>
+              <span className={`${type === "tv" ? "block" : "hidden"}`}>
+                    {show?.release_date
+                      ? show?.release_date
+                      : show?.first_air_date}
+                  </span>
                 <h1 className="text-3xl md:text-5xl font-bold">
                   {show?.title ? show?.title : show?.name}
                 </h1>
-                <div className="flex gap-1 2xl:justify-center">
-                  <span>{formatTime(show?.runtime)} |</span>
-                  <span className="block ">
+                <div className="flex gap-1 ">
+                  <span className={`${type === "movie" ? "block" : "hidden"}`}>{formatTime(show?.runtime)} |</span>
+                  <span className={`${type === "tv" ? "hidden" : "block"}`}>
                     {show?.release_date
                       ? show?.release_date
                       : show?.first_air_date}
