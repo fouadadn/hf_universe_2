@@ -22,12 +22,13 @@
 body {
   background: black;
   color: white;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:  sans-serif;
 }
 
 
 .swiper-pagination-bullet {
-  background-color: rgba(255, 255, 255, 0.265) !important; /* Change dot color */
+  background-color: rgba(255, 255, 255, 0.265) !important;
+  /* Change dot color */
   width: 12px !important;
   height: 12px !important;
   opacity: 1 !important;
@@ -37,7 +38,8 @@ body {
 }
 
 .swiper-pagination-bullet-active {
-  background-color: white !important; /* Change active dot color */
+  background-color: white !important;
+  /* Change active dot color */
 }
 
 .swiper-pagination {
@@ -50,7 +52,7 @@ body {
 @media (max-width: 1024px) {
   .swiper-pagination {
     bottom: 105px !important;
-    
+
     display: none;
   }
 
@@ -63,12 +65,23 @@ body {
   -ms-overflow-style: none;
 }
 
-.shadow_hf{
-  box-shadow: 0px 0px 0px 20px  black;
+.shadow_hf {
+  box-shadow: 0px 0px 0px 20px black;
 }
 
-.nowrap{
+.nowrap {
   text-wrap: nowrap !important;
   /* color: #181818; */
 }
 
+
+@font-face {
+  font-family: 'GameOfThrones';
+  src: url('/fonts/GameOfThrones.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.got-title {
+  font-family: 'GameOfThrones', serif;
+}

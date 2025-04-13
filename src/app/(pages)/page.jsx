@@ -1,3 +1,5 @@
+"use client"
+
 import HomePageSlider from "../components/Home/HomePageSlider";
 import PosterSlide from "../components/Home/posterSlide";
 import PopularWeek from "../components/Home/popularWeek";
@@ -6,8 +8,10 @@ import Footer from "../components/Home/footer";
 
 export default function Home() {
 
+
   return (
-    <div className="">
+    <div className="font-sans">
+
       <div className=" xl:min-h-[115vh] ">
         <HomePageSlider />
       </div>
@@ -23,22 +27,23 @@ export default function Home() {
         </div>
 
         <div className="mt-14 mx-4">
-          <BackdropSlide media_type={"movie"} />
+          <BackdropSlide title={"Movies"} media_type={"movie"} />
         </div>
 
         <div className="mt-14 mx-4">
-          <BackdropSlide media_type={"tv"} />
+          <BackdropSlide title={"Seires"} media_type={"tv"} />
         </div>
 
         <div className="mt-14 mx-4">
-          <BackdropSlide media_type={"tv"} is_korean={true} />
+          <BackdropSlide title={"Korean Series"} media_type={"tv"} is_korean={true} />
         </div>
 
-        <hr className="mt-5 border-[0.2] border-stone-500" />
+        <hr className="border-white/30 mt-5" />
 
         <Footer />
 
       </div>
+
     </div>
   );
 }

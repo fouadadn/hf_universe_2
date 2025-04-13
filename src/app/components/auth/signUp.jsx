@@ -1,9 +1,19 @@
+"use client"
+
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const SignUp = () => {
+
+
+  const [height, setHeight] = useState(0)
+
+
+  useEffect(() => {
+    setHeight(window.innerHeight)
+  }, [])
   return (
-    <div className="flex justify-center items-center h-[90vh] ">
+    <div className="flex justify-center font-sans items-center duration-300" style={{ height: height }}>
       <form className="border-[0.5px] border-white/20 p-10 rounded-4xl bg-stone-700/30 w-96 md:w-[500px] ">
         <div className="flex items-center justify-between">
           <div>
@@ -18,11 +28,11 @@ const SignUp = () => {
               Register to enjoy features
             </span>
           </div>
-          <div>
-            <button className="border-white/30 border rounded-lg px-4 py-2 ">
+          <Link href={'/'}>
+            <button className="border-white/30 border rounded-lg px-4 py-2 cursor-pointer">
               Close
             </button>
-          </div>
+          </Link>
         </div>
         <div className="flex flex-col gap-3 mt-2">
           <div className="flex flex-col">
@@ -78,8 +88,8 @@ const SignUp = () => {
         </div>
 
         <div className="mt-2">
-          <button className="hover:bg-stone-700/50 hover:text-white w-full bg-white text-black rounded-xl py-2 font-bold duration-200 cursor-pointer">
-            Login
+          <button className="hover:bg-stone-700/50 hover:text-white w-full bg-white text-stone-700 rounded-xl py-2 font-bold duration-200 cursor-pointer">
+            Sign Up
           </button>
         </div>
 

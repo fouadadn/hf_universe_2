@@ -11,6 +11,7 @@ const Movie = async ({ params }) => {
         <Details id={id} type={type} />
     </div>
   )
+  
 }
 
 export default Movie
