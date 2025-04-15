@@ -8,7 +8,9 @@ import {
   ChevronRight,
   CirclePlay,
   Dot,
+  EthernetPort,
   Play,
+  Star,
   UserRound,
 } from "lucide-react";
 import Link from "next/link";
@@ -23,6 +25,7 @@ const Details = ({ id, type }) => {
   const [videos, setVideos] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [similares, setSimilares] = useState([]);
+  const [selectedSeason, setSelectedSeason] = useState(1)
   const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/original`);
   const [screenWidth, setScreenWidth] = useState(0);
 
@@ -40,8 +43,8 @@ const Details = ({ id, type }) => {
           (await api.get(`/${type}/${id}/videos`)).data?.results,
           (await api.get(`/${type}/${id}/recommendations`)).data?.results,
           (await api.get(`/${type}/${id}/similar`)).data?.results,
+          // (await api.get(`/${type}/${id}/watch/providers`)).data,
         ];
-        // console.log(recommendationss)
         const filtredVideos = video?.find(
           (vid) => vid.type === "Trailer" && vid.site === "YouTube"
         )
@@ -51,6 +54,7 @@ const Details = ({ id, type }) => {
         setVideos(filtredVideos);
         setRecommendations(recommendationss)
         setSimilares(similar)
+
       }
       fetchMovies();
     } catch (err) {
@@ -58,15 +62,22 @@ const Details = ({ id, type }) => {
     }
   }, []);
 
+  useEffect(() => {
+    async function fetchSeasonData() {
+      const season = (await api.get(`/tv/${id}/season/${selectedSeason}`)).data
+      console.log(season)
+    }
 
+    if (type === "tv") {
+      fetchSeasonData()
+    }
+
+  }, [selectedSeason])
 
 
   const handleError = () => {
     // setImgSrc(image);
   };
-
-  // console.log(show);
-  // console.log(videos);
 
   function formatTime(time) {
     const hour = parseInt(time) / 60;
@@ -85,12 +96,15 @@ const Details = ({ id, type }) => {
     }
   };
 
-  // console.log(id)
+  // console.log(selectedSeason)
+
 
 
   return (
     <>
       <div className="-mt-32">
+
+        {/* backdrop and poster of the show  */}
         {show?.id ? (
           <div className="relative w-full h-[621px] md:h-auto overflow-hidden">
             <Image
@@ -114,7 +128,7 @@ const Details = ({ id, type }) => {
             {/* <img src={`https://image.tmdb.org/t/p/original/${show?.backdrop_path}` } alt="backdrop image" className='w-full brightness-90' /> */}
             <div className="bg-gradient-to-r from-black to-transparent hidden md:block bg-[linear-gradient(to_right,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0"></div>
             <div className="bg-gradient-to-r from-black to-transparent flex justify-center items-center bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0">
-              <Link href={`/stream/${type}/${id}`} className="bg-[#5c00cc] p-6 rounded-full cursor-pointer">
+              <Link href={type === "movie" ? `/stream/${type}/${id}` : '#seasons'} className="bg-[#5c00cc] p-6 rounded-full cursor-pointer">
                 <Play size={70} className="relative left-1" />
               </Link>
             </div>
@@ -169,7 +183,7 @@ const Details = ({ id, type }) => {
                   ))}
                 </div>
                 <div className="flex gap-3 mt-2">
-                  <Link href={`/stream/${type}/${id}`} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]">
+                  <Link href={type === "movie" ? `/stream/${type}/${id}` : '#seasons'} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]">
                     <Play /> <span>Play Now</span>{" "}
                   </Link>
                   <Link href={`/watch/${videos?.key}`}>
@@ -177,7 +191,7 @@ const Details = ({ id, type }) => {
                       <CirclePlay /> <span>Watch Trailer</span>
                     </button>
                   </Link>
-                  <button className="border-[1px] rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200">
+                  <button style={{ backgroundColor: "#ffffff20" }} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200">
                     <Bookmark />
                   </button>
                 </div>
@@ -191,6 +205,8 @@ const Details = ({ id, type }) => {
         )}
 
         <div className="mx-4 mt-2">
+
+          {/* stoty line  */}
           <div>
             <h2 className="font-bold text-2xl">Story line</h2>
             {show?.id ? (
@@ -204,6 +220,7 @@ const Details = ({ id, type }) => {
             )}
           </div>
 
+
           <h2 className="font-bold text-2xl mt-5">Cast</h2>
           {
             <div className="">
@@ -213,13 +230,15 @@ const Details = ({ id, type }) => {
                 {cast?.length > 0
                   ? cast?.map((c, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <div
-                        className={`rounded-full overflow-hidden w-20 h-20 items-center justify-center flex bg-stone-400 `}>
+
+                      <div style={{ overflow: "hidden", zIndex: "222" }}
+                        className={`rounded-full  w-20 h-20 items-center justify-center flex bg-stone-400 `}>
                         {c?.profile_path ? (
                           <img
+                            // style={{borderRadius: '300%'}}
                             src={`https://image.tmdb.org/t/p/w300${c?.profile_path}`}
-                            className={`relative`}
-                            alt=""
+                            className={`relative `}
+                            alt={c?.name}
                           />
                         ) : (
                           <UserRound size={50} />
@@ -264,20 +283,173 @@ const Details = ({ id, type }) => {
           }
         </div>
 
+        {
+          type === 'tv' &&
+          <div className="mx-4 font-bold mt-5" id="seasons">
+            <h2 className="text-2xl ">Seasons</h2>
+
+            <div className="flex gap-3 mt-2 overflow-x-scroll hide-scrollbar">
+              {
+                show?.seasons?.length > 0 ? show?.seasons?.map((s, i) => !(s?.season_number === 0) &&
+                  <Link key={i} href={`/tv/${id}/season/${s?.season_number}`} onClick={() => setSelectedSeason(s?.season_number)} className="shrink-0 cursor-pointer">
+                    <div className="overflow-hidden rounded-xl">
+                      <img src={`https://image.tmdb.org/t/p/w500${s?.poster_path}`} className=" w-44 scale-110 hover:scale-100 duration-300" alt="" />
+                    </div>
+                    <div className="text-center">
+                      <span>
+                        Season {s?.season_number}
+                      </span>
+                    </div>
+                  </Link>) :
+                  Array?.from(Array(10)).map((_, i) => <div key={i} className="shrink-0 w-44 h-[264px] gri rounded-xl animate-pulse">
+                  </div>)
+              }
+            </div>
+          </div>
+        }
+
         <div className="mx-4">
           <BackdropSlide title={'Recommendations'} is_korean={false} media_type={type} show={recommendations} />
+          <div>
+            {show?.id ? (
+              <div className=" md:h-96 overflow-hidden mt-16 rounded-2xl relative">
+                {/* <Link href={`/${show.media_type}/${show.id}`}> */}
+                <Image
+                  src={`https://image.tmdb.org/t/p/original${show.backdrop_path}`}
+                  alt={show?.title ? `${show.title}` : `${show.name}`}
+                  // Ensures it takes full width and scales height
+                  width={1920} // Set an arbitrary width
+                  height={150}
+                  style={{
+                    objectFit: "contain", // Use CSS to set objectFit
+                    objectPosition: "center", // Optional, if you need to control the position of the image
+                  }}
+                  className="rounded-2xl relative lg:bottom-52 w-full"
+                />
+
+                <div className="bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_right,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0"></div>
+
+                <div className=" z-[999] absolute top-5 md:top-10 md:px-20 md:mt-10 space-y-1">
+                  <h1 className="text-xl md:text-3xl font-bold">
+                    {show?.title ? show?.title : show?.name}{" "}
+                  </h1>
+
+                  <div className="flex items-center gap-1">
+                    <div className="flex items-center text-sm gap-1">
+                      <Star fill="gold" stroke="gold" size={15} />
+
+                      <div>
+                        <span className="font-semibold">
+                          {parseFloat(show.vote_average).toFixed(1)}{" "}
+                        </span>
+                      </div>
+                    </div>
+                    <span>|</span>
+                    <div className="flex text-stone-400" style={{ color: "#a6a09b" }}>
+                      {/* <Film className='' stroke='gray' /> */}
+                      {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
+                        <span
+                          key={i}
+                          className="flex items-center text-nowrap flex-nowrap">
+                          <span>{g.name}</span>{" "}
+                          <Dot
+                            className={`${i + 1 === arr.length ? "hidden" : "inline"
+                              } -mx-1`}
+                          />
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  {/* <p className="w-80 md:w-[56%] text-xs md:text-base ">
+                      {String(show.overview).split(" ").slice(0, 21).join(" ")}{" "}
+                      <span>
+                        {String(show.overview).split(" ").length > 21 ? "..." : ""}
+                      </span>{" "}
+                    </p> */}
+                  <div className="flex">
+                    <h2>Countries : </h2>
+                    {show?.production_countries?.map((c, i, arr) =>
+                      <div key={i} className="flex gap-1" >
+                        <span className="ml-1">{c?.name}</span>
+                        <span className={`${arr.length > i + 1 ? "inline" : "hidden"} `} > | </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-1 items-center " >
+                    <div className="md:mt-2">
+                      <h2 className="text-3xl md:text-4xl font-sans font-extrabold">{show?.tagline ? show?.tagline : "No tagline!"} </h2>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h2 className="whitespace-nowrap">Networks :</h2>
+                    <div className="flex gap-2 flex-wrap">
+                      {show?.production_companies?.slice(0, 3)?.map((pc, i) => {
+                        return (pc?.logo_path ?
+                          <div key={i} className="bg-white w-24 py-2 rounded px-1">
+                            <img className="w-full aspect-[3] object-contain" src={`https://image.tmdb.org/t/p/w200${pc.logo_path}`} alt={pc?.name} />
+                          </div> : '')
+
+                      }
+                      )}
+                    </div>
+                  </div>
+
+                  {/* <div className="flex gap-3 mt-3">
+                      <button className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]">
+                        <Play /> <span>Play Now</span>{" "}
+                      </button>
+                      <button className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]">
+                        <CirclePlay /> <span>Watch Trailer</span>
+                      </button>
+                      <button className="border-[1px] rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200">
+                        <Bookmark />
+                      </button>
+                    </div> */}
+
+                </div>
+                {/* </Link> */}
+              </div>
+            ) : (
+              <div className="h-80 md:h-96 overflow-hidden mt-16 rounded-2xl relative bg-stone-600 animate-pulse ">
+                <div className="bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_right,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0"></div>
+
+                <div className=" z-[999] absolute top-10 md:px-20 mt-10 space-y-1">
+                  <h1 className="text-3xl font-bold bg-stone-600 W-32 h-8 rounded">
+                    {" "}
+                  </h1>
+
+                  <div className="bg-stone-600 w-40 rounded mt-3 h-4"></div>
+                  <div className="w-96 md:w-[56%]">
+                    <div className="W-full h-4 rounded bg-stone-600 my-1"></div>
+                    <div className="W-[75%] h-4 rounded bg-stone-600 my-1"></div>
+                    <div className="W-full h-4 rounded bg-stone-600 my-1"></div>
+                  </div>
+
+                  <div className="flex gap-3 mt-3">
+                    <button className=" rounded-xl px-2 w-32 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600">
+                      {" "}
+                    </button>
+                    <button className=" rounded-xl px-2 md:px-5 w-[165.65px] py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600"></button>
+                    <button className=" w-[65.5px] h-[49.6px] rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600"></button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
           <BackdropSlide title={`Similare ${type} for you`} is_korean={false} media_type={type} show={similares} />
         </div>
 
-
-
-
-
       </div>
-      <hr className="border-white/30 mt-6" />
+      <hr className="mt-6" style={{ borderColor: "#ffffff30" }} />
       <Footer />
     </>
   );
 };
 
 export default Details;
+
+
+
+// golt lik qchrif bghit n3N9EK 

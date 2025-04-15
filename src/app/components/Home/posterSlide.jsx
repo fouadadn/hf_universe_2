@@ -90,8 +90,8 @@ const PosterSlide = () => {
   return (
     <>
       <div className="relative">
-        <div className="h-6 w-full absolute bg-black -top-4 z-[99999]"></div>
-        <div className="h-6 bg-black w-full relative top-20 z-[99999]"></div>
+        <div className="h-6 w-full absolute bg-black -top-4 z-[999]"></div>
+        <div className="h-6 bg-black w-full relative top-20 z-[999]"></div>
       </div>
       <div className="overflow-auto gap-5 -mt-8 flex hide-scrollbar pb-10 pt-5">
         {providers?.length > 0

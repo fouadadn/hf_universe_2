@@ -25,7 +25,7 @@ const Footer = () => {
 
             </div>
 
-            <div className=" mt-8 pt-4 text-center text-sm text-gray-500">
+            <div className=" mt-8 pt-4 text-center text-sm " style={{color: "#6a7282"}}>
                 © {new Date().getFullYear()} HF Stream. All rights reserved.
             </div>
         </footer>

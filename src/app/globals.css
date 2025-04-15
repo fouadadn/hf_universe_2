@@ -16,13 +16,19 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    
   }
+}
+
+html{
+  scroll-behavior: smooth;
 }
 
 body {
   background: black;
   color: white;
   font-family:  sans-serif;
+  
 }
 
 
@@ -84,4 +90,17 @@ body {
 
 .got-title {
   font-family: 'GameOfThrones', serif;
+}
+.glbo {
+  left: 0.25rem;
+  transform: scaleX(-1);
+  position: relative; /* or absolute/fixed, depending on your layout */
+}
+
+.gri{
+  background-color: #57534d;
+}
+
+.griho:hover{
+  background-color: #57534d;
 }

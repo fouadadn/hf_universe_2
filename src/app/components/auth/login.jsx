@@ -13,7 +13,7 @@ const Login = () => {
   }, [])
   return (
     <div className="flex justify-center font-sans items-center duration-300" style={{ height: height }}>
-      <form className="border-[0.5px] border-white/20 p-10 rounded-4xl bg-stone-700/30 w-96 md:w-[500px] ">
+      <form style={{backgroundColor: "#44403b30" , border: "0.2px solid #ffffff35"}} className="border-[0.5px] border-white/20 p-10 rounded-4xl bg-stone-700/30 w-96 md:w-[500px] ">
         <div className="flex items-center justify-between">
           <div>
             <Link
@@ -26,7 +26,7 @@ const Login = () => {
             <span className="text-xs text-stone-500 relative bottom-3">Login to your account</span>
           </div>
           <Link href={'/'}>
-            <button className="border-white/30 border rounded-lg px-4 py-2 cursor-pointer">Close</button>
+            <button style={{ border: "0.2px solid #ffffff35"}} className="border-white/30 border rounded-lg px-4 py-2 cursor-pointer">Close</button>
           </Link>
         </div>
         <div className="flex flex-col gap-3 mt-2">
@@ -38,8 +38,8 @@ const Login = () => {
               type="email"
               id="email"
               placeholder="Email"
-              className="outline-0 border-[1px] border-white/20 rounded-lg px-5 py-3 mt-1 bg-black"
-            />
+              className="outline-0 border border-white/30 rounded-lg px-5 py-3 mt-1 bg-black"
+              style={{ border: "1px solid #ffffff55" }} />
           </div>
 
           <div className="flex flex-col">
@@ -47,6 +47,7 @@ const Login = () => {
               Password
             </label>
             <input
+              style={{ border: "1px solid #ffffff55" }}
               type="password"
               placeholder="password"
               className="outline-0 border-[1px] border-white/20 rounded-lg px-5 py-3 mt-1 bg-black"

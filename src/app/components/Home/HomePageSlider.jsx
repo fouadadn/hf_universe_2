@@ -89,7 +89,7 @@ const HomePageSlider = () => {
                   // fill
                   className='min-h-96 w-full ' />
                 {/* <img src={`https://image.tmdb.org/t/p/original/${show?.backdrop_path}` } alt="backdrop image" className='w-full brightness-90' /> */}
-                <Link href={`/${show?.media_type}/${show?.id}`} className='bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0'></Link>
+                <Link href={`/${show?.media_type}/${show?.id}`}  className='bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0'></Link>
                 <div className='absolute z-[999] text-start bottom-4 lg:bottom-44 mx-4 '>
                   <span className='bg-black px-3 py-1 rounded-full mb-5 inline-block capitalize'>{show.media_type}</span>
                   <h1 className='text-3xl md:text-5xl font-bold'>{show?.title ? show.title : show.name}</h1>
@@ -98,7 +98,7 @@ const HomePageSlider = () => {
                   <div className='flex gap-3'>
                     <Link href={`stream/${show?.media_type}/${show?.id}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]'><Play /> <span>Play Now</span> </Link>
                     <Link href={`/watch/${show?.trailler?.key}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]'><CirclePlay /> <span>Watch Trailer</span></Link>
-                    <button className='border-[1px] rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'><Bookmark /></button>
+                    <button style={{backgroundColor: "#ffffff20"}} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'><Bookmark /></button>
                   </div>
                 </div>
 

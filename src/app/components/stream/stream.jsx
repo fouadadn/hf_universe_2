@@ -2,27 +2,54 @@
 import { Server } from 'lucide-react'
 import React, { useState } from 'react'
 
-const Stream = ({ id, type }) => {
+const Stream = ({ id, type, season, episode }) => {
     console.log(id)
     const [displayServers, setDisplayServers] = useState(false)
-    const [selectedServer, setSelectedServer] = useState(localStorage.server ?{url : `${JSON.parse(localStorage.server).url}${id}` , server : JSON.parse(localStorage.server).server } : { url: `https://moviesapi.club/movie/${id}`, server: 2 })
+    const [selectedServer, setSelectedServer] = useState(localStorage.server ?
+        {
+            url: type === "movie" ? `${JSON.parse(localStorage.server).url}${id}` :
+                JSON.parse(localStorage.server).server === 1 ?
+                    `${JSON.parse(localStorage.server).url}${id}-${season}-${episode}` :
+                    `${JSON.parse(localStorage.server).url}${id}/${season}-${episode}`
+            ,
+            server: JSON.parse(localStorage.server).server
+        } :
+        {
+            url: type === "movie" ? `https://moviesapi.club/movie/${id}` : `https://moviesapi.club/tv/${id}-${season}-${episode}`,
+            server: 1
+        }
+    )
 
     const handleChangeServerToServer1 = () => {
-        setSelectedServer({ url: `https://moviesapi.club/movie/${id}`, server: 1 })
-        localStorage.setItem('server', JSON.stringify({ url: `https://moviesapi.club/movie/`, server: 1 }))
+        if (type === "movie") {
+            setSelectedServer({ url: `https://moviesapi.club/movie/${id}`, server: 1 })
+            localStorage.setItem('server', JSON.stringify({ url: `https://moviesapi.club/movie/`, server: 1 }))
+        } else {
+            setSelectedServer({ url: `https://moviesapi.club/tv/${id}-${season}-${episode}`, server: 1 })
+            localStorage.setItem('server', JSON.stringify({ url: `https://moviesapi.club/tv/`, server: 1 }))
+
+        }
+
     }
+
     const handleChangeServerToServer2 = () => {
-        setSelectedServer({ url: `https://vidsrc.xyz/embed/movie/${id}`, server: 2 })
-        localStorage.setItem('server', JSON.stringify({ url: `https://vidsrc.xyz/embed/movie/`, server: 2 }))
 
+        if (type === "movie") {
+            setSelectedServer({ url: `https://vidsrc.xyz/embed/movie/${id}`, server: 2 })
+            localStorage.setItem('server', JSON.stringify({ url: `https://moviesapi.club/movie/`, server: 2 }))
+        } else {
+            setSelectedServer({ url: `https://vidsrc.xyz/embed/tv/${id}/${season}-${episode}`, server: 2 })
+            localStorage.setItem('server', JSON.stringify({ url: `https://vidsrc.xyz/embed/tv`, server: 2 }))
+
+        }
     }
-
 
     document.body.onclick = () => {
         setDisplayServers(false)
     }
 
-    // console.log(selectedServer)
+    console.log(selectedServer.url)
+
     return (
         <div>
             <div >

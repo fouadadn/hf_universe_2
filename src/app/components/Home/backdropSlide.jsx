@@ -119,7 +119,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
   // console.log(showCombineData)
 
   return (
-    <div className="mt-20">
+    <div className="mt-20 relative z-10">
       <h1 className="text-3xl font-bold">
         {title}
       </h1>
@@ -131,22 +131,24 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
               href={`/${show.media_type}/${show.id}`}
               key={i}
               className="shrink-0">
-              <Image
-                src={
-                  show.backdrop_path
-                    ? `https://image.tmdb.org/t/p/w500${show.backdrop_path}`
-                    : imgSrc
-                }
-                alt={show?.title ? show.title : show.name}
-                width={300}
-                height={168.75}
-                style={{
-                  objectFit: "cover",
-                  objectPosition: "center",
-                }}
-                className="rounded-2xl"
-                onError={handleError}
-              />
+              <div className="h-[168.6px] ">
+                <Image
+                  src={
+                    show.backdrop_path
+                      ? `https://image.tmdb.org/t/p/w500${show.backdrop_path}`
+                      : imgSrc
+                  }
+                  alt={show?.title ? show.title : show.name}
+                  width={300}
+                  height={168.75}
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: "center",
+                  }}
+                  className="rounded-2xl"
+                  onError={handleError}
+                />
+              </div>
 
               <div className="mt-3 w-[300px] ">
                 <h2 className="font-bold">
