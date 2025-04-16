@@ -14,7 +14,6 @@ const page = async ({ params }) => {
     return (
         <div>
             <Stream id={id} type={type} season={season} episode={episode} lengthParams={paramsArr?.length} />
-
         </div>
     )
 }

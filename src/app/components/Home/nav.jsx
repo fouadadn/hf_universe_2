@@ -63,7 +63,7 @@ const Nav = () => {
                         <span>Stream</span>{" "}
                     </Link>
 
-                    <div className="space-x-6 ml-6 hidden md:block ">
+                    <div className="space-x-6 ml-6 hidden lg:block ">
                         <Link href={"/"}>Home</Link>
                         <Link href={"/"}>Discover</Link>
                         <Link href={"/"}>Movie Release</Link>
@@ -133,7 +133,7 @@ const Nav = () => {
 
                         </div>
 
-                        <div className="gap-2 hidden md:flex    ">
+                        <div className="gap-2 hidden lg:flex    ">
                             <Link href={"/auth/sign-up"} className=' '>
                                 <button className="border-[1px] rounded-xl px-3 py-[7px] cursor-pointer whitespace-nowrap">
                                     Sign Up
@@ -146,7 +146,7 @@ const Nav = () => {
                             </Link>
                         </div>
 
-                        <Link href={'/auth/login'} className={`${searchOpen ? "hidden" : "block"}  md:hidden cursor-pointer`}>
+                        <Link href={'/auth/login'} className={`${searchOpen ? "hidden" : "block"}  lg:hidden cursor-pointer`}>
                             <CircleUserRound />
                         </Link>
                     </div>

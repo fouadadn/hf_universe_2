@@ -84,7 +84,7 @@ const PopularWeek = () => {
     catch (err) {
       console.log(err)
     }
-  }, [popular])
+  }, [popular.id])
 
   const scrollRef = useRef(null);
 
@@ -94,7 +94,7 @@ const PopularWeek = () => {
     }
   };
 
-  console.log(popular)
+  // console.log(popular)
 
   return (
     <div>

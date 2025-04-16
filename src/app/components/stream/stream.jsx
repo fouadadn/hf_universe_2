@@ -1,11 +1,12 @@
 "use client"
 import { Server } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation';
 
 const Stream = ({ id, type, season, episode }) => {
     console.log(id)
     const [displayServers, setDisplayServers] = useState(false)
-    const [selectedServer, setSelectedServer] = useState(localStorage.server ?
+    const [selectedServer, setSelectedServer] = useState(localStorage && localStorage?.server ?
         {
             url: type === "movie" ? `${JSON.parse(localStorage.server).url}${id}` :
                 JSON.parse(localStorage.server).server === 1 ?
@@ -50,10 +51,43 @@ const Stream = ({ id, type, season, episode }) => {
 
     console.log(selectedServer.url)
 
+    // const pathname = usePathname();
+    // const fullUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+
+    // console.log(fullUrl)
+
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const refreshPage = () => {
+        router.push(pathname); // or router.refresh()
+    };
+
+
+    const iframeRef = useRef(null);
+
+    useEffect(() => {
+        const iframe = iframeRef.current;
+
+        if (!iframe) return;
+
+        const handleClick = () => {
+            alert('iframe clicked!');
+        };
+
+        iframe.addEventListener('mousedown', handleClick);
+
+        return () => {
+            iframe.removeEventListener('mousedown', handleClick);
+        };
+    }, []);
+
+
     return (
         <div>
-            <div >
-                <iframe id="iframe" className="absolute top-0 bottom-0 right-0 left-0 w-[100%] h-[100%] "
+            <div  >
+                <iframe ref={iframeRef} id="myIframe" className="absolute top-0 bottom-0 right-0 left-0 w-[100%] h-[100%] "
                     src={selectedServer.url} scrolling="no" frameBorder="0" allowFullScreen ></iframe>
 
             </div>

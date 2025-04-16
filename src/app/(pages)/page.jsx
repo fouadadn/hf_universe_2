@@ -17,24 +17,24 @@ export default function Home() {
       </div>
 
       <div className="bg-black mt-6 lg:-mt-28 z-[9999] relative ">
-        <div className=" mx-4">
+        <div className=" ">
           <PosterSlide />
         </div>
 
-        <div className="mt-20 mx-4">
+        <div className="mt-20 ">
           <h1 className="text-3xl font-bold mt-14">Popular of the week</h1>
           <PopularWeek />
         </div>
 
-        <div className="mt-14 mx-4">
+        <div className="mt-14">
           <BackdropSlide title={"Movies"} media_type={"movie"} />
         </div>
 
-        <div className="mt-14 mx-4">
+        <div className="mt-14 ">
           <BackdropSlide title={"Seires"} media_type={"tv"} />
         </div>
 
-        <div className="mt-14 mx-4">
+        <div className="mt-14 ">
           <BackdropSlide title={"Korean Series"} media_type={"tv"} is_korean={true} />
         </div>
 
