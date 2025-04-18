@@ -1,10 +1,10 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 const TvContext = createContext();
 
 export const TvProvider = ({ children }) => {
-    const [id, setId] = useState(window.localStorage && window.localStorage.id ? window.localStorage.id : 0); // e.g., { dark: 97680 }
+    const [id, setId] = useState(0); // e.g., { dark: 97680 }
     
     function changeId(id) {
         localStorage.id = id

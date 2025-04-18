@@ -4,32 +4,32 @@ import React, { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation';
 import { useTvContext } from '@/app/context/idContext';
 
-const Stream = ({ type, season, episode }) => {
+const Stream = ({ type, season, episode, id }) => {
 
-    const { id } = useTvContext()
+    // const { id } = useTvContext()
     const [displayServers, setDisplayServers] = useState(false)
     const [selectedServer, setSelectedServer] = useState(localStorage && localStorage?.server ?
         {
             url: type === "movie" ? `${JSON.parse(localStorage.server).url}${id}` :
                 JSON.parse(localStorage.server).server === 1 ?
-                    `${JSON.parse(localStorage.server).url}${id}-${season}-${episode}` :
-                    `${JSON.parse(localStorage.server).url}${id}/${season}-${episode}`
+                    `${JSON.parse(localStorage.server).url}/${type}/${id}-${season}-${episode}`:
+                    `${JSON.parse(localStorage.server).url}/${type}/${id}/${season}-${episode}`
             ,
             server: JSON.parse(localStorage.server).server
         } :
         {
-            url: type === "movie" ? `https://moviesapi.club/movie/${id}` : `https://moviesapi.club/tv/${id}-${season}-${episode}`,
+            url: type === "movie" ? `https://moviesapi.club/${type}/${id}` : `https://moviesapi.club/${type}/${id}-${season}-${episode}`,
             server: 1
         }
     )
 
     const handleChangeServerToServer1 = () => {
         if (type === "movie") {
-            setSelectedServer({ url: `https://moviesapi.club/movie/${id}`, server: 1 })
-            localStorage.setItem('server', JSON.stringify({ url: `https://moviesapi.club/movie/`, server: 1 }))
+            setSelectedServer({ url: `https://moviesapi.club/${type}/${id}`, server: 1 })
+            localStorage.setItem('server', JSON.stringify({ url: `https://moviesapi.club`, server: 1 }))
         } else {
-            setSelectedServer({ url: `https://moviesapi.club/tv/${id}-${season}-${episode}`, server: 1 })
-            localStorage.setItem('server', JSON.stringify({ url: `https://moviesapi.club/tv/`, server: 1 }))
+            setSelectedServer({ url: `https://moviesapi.club/${type}/${id}-${season}-${episode}`, server: 1 })
+            localStorage.setItem('server', JSON.stringify({ url: `https://moviesapi.club`, server: 1 }))
 
         }
 
@@ -38,11 +38,11 @@ const Stream = ({ type, season, episode }) => {
     const handleChangeServerToServer2 = () => {
 
         if (type === "movie") {
-            setSelectedServer({ url: `https://vidsrc.xyz/embed/movie/${id}`, server: 2 })
-            localStorage.setItem('server', JSON.stringify({ url: `https://moviesapi.club/movie/`, server: 2 }))
+            setSelectedServer({ url: `https://vidsrc.xyz/embed/${type}/${id}`, server: 2 })
+            localStorage.setItem('server', JSON.stringify({ url: `https://moviesapi.club`, server: 2 }))
         } else {
-            setSelectedServer({ url: `https://vidsrc.xyz/embed/tv/${id}/${season}-${episode}`, server: 2 })
-            localStorage.setItem('server', JSON.stringify({ url: `https://vidsrc.xyz/embed/tv`, server: 2 }))
+            setSelectedServer({ url: `https://vidsrc.xyz/embed/${type}/${id}/${season}-${episode}`, server: 2 })
+            localStorage.setItem('server', JSON.stringify({ url: `https://vidsrc.xyz/embed`, server: 2 }))
 
         }
     }
@@ -59,37 +59,11 @@ const Stream = ({ type, season, episode }) => {
 
     // console.log(fullUrl)
 
-    const router = useRouter();
-    const pathname = usePathname();
-
-    const refreshPage = () => {
-        router.push(pathname); // or router.refresh()
-    };
-
-
-    const iframeRef = useRef(null);
-
-    useEffect(() => {
-        const iframe = iframeRef.current;
-
-        if (!iframe) return;
-
-        const handleClick = () => {
-            alert('iframe clicked!');
-        };
-
-        iframe.addEventListener('mousedown', handleClick);
-
-        return () => {
-            iframe.removeEventListener('mousedown', handleClick);
-        };
-    }, []);
-
 
     return (
         <div>
             <div  >
-                <iframe ref={iframeRef} id="myIframe" className="absolute top-0 bottom-0 right-0 left-0 w-[100%] h-[100%] "
+                <iframe id="myIframe" className="absolute top-0 bottom-0 right-0 left-0 w-[100%] h-[100%] "
                     src={selectedServer.url} scrolling="no" frameBorder="0" allowFullScreen ></iframe>
 
             </div>

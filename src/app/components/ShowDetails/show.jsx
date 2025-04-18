@@ -1,6 +1,6 @@
 'use client';
 import api from "@/app/utils/axiosInstance";
-import React, { useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   Bookmark,
@@ -34,14 +34,15 @@ const Details = ({ slug, type }) => {
   const [seasonInfo, setSeasonInfo] = useState({})
   const [episodes, setEpisodes] = useState([])
   const { id, setId } = useTvContext()
+  const [rerender , setRerender] = useState(1)
 
   function slugify(str) {
-    return  str
-    .toLowerCase()
-    .normalize('NFD')                      // handle accents
-    .replace(/[\u0300-\u036f]/g, '')       // remove accents
-    .replace(/[^a-z0-9]+/g, '-')           // replace non-alphanumeric with hyphens
-    .replace(/^-+|-+$/g, ''); 
+    return str
+      .toLowerCase()
+      .normalize('NFD')                      // handle accents
+      .replace(/[\u0300-\u036f]/g, '')       // remove accents
+      .replace(/[^a-z0-9]+/g, '-')           // replace non-alphanumeric with hyphens
+      .replace(/^-+|-+$/g, '');
   }
 
 
@@ -61,7 +62,7 @@ const Details = ({ slug, type }) => {
 
         const movie = await getItemBySlug(slug, type)
 
-        const [ show , casts, video, recommendationss, similar] = [
+        const [show, casts, video, recommendationss, similar] = [
 
           (await api.get(`/${type}/${movie?.id}`)).data,
           (await api.get(`/${type}/${movie?.id}/credits`)).data?.cast,
@@ -75,16 +76,13 @@ const Details = ({ slug, type }) => {
         )
 
 
-
-
-        // getItemBySlug(slug, type)
-
-
         setShow(show);
         setCast(casts);
         setVideos(filtredVideos);
         setRecommendations(recommendationss)
         setSimilares(similar)
+
+        setRerender(rerender +1)
       }
 
       fetchMovies();
@@ -94,7 +92,28 @@ const Details = ({ slug, type }) => {
     }
   }, [slug]);
 
-  console.log(show)
+  useEffect(() => {
+    async function fetchSeasonData() {
+      const [season, video] = [
+        (await api.get(`/tv/${show?.id}/season/${selectedSeason}`)).data,
+        (await api.get(`/tv/${show?.id}/season/${selectedSeason}/videos`)),
+      ]
+console.log(show?.id)
+      const trailer = video.data?.results?.find(
+        (vid) => vid.type === "Trailer" && vid.site === "YouTube"
+      );
+
+      setSeasonInfo({ ...season, trailler: trailer })
+      setEpisodes(season?.episodes)
+    }
+
+    if (type === "tv") {
+      fetchSeasonData()
+    }
+
+  }, [selectedSeason , slug ,rerender])
+
+  // console.log(show)
   // else {
   //   useEffect(() => {
   //     const fetchMovie = async () => {
@@ -152,26 +171,7 @@ const Details = ({ slug, type }) => {
     });
   }, [])
 
-  useEffect(() => {
-    async function fetchSeasonData() {
-      const [season, video] = [
-        (await api.get(`/tv/${id}/season/${selectedSeason}`)).data,
-        (await api.get(`/tv/${id}/season/${selectedSeason}/videos`)),
-      ]
 
-      const trailer = video.data?.results?.find(
-        (vid) => vid.type === "Trailer" && vid.site === "YouTube"
-      );
-
-      setSeasonInfo({ ...season, trailler: trailer })
-      setEpisodes(season?.episodes)
-    }
-
-    if (type === "tv") {
-      fetchSeasonData()
-    }
-
-  }, [selectedSeason])
 
 
   const handleError = () => {
