@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import api from "@/app/utils/axiosInstance";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -15,12 +15,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import BackdropSlide from "../Home/backdropSlide";
-import Seasons from "./components/seasons";
+// import Seasons from "./components/seasons";
 import Footer from "../Home/footer";
+import { useTvContext } from "@/app/context/idContext";
+import { useRouter } from "next/navigation";
 
 
 
-const Details = ({ id, type }) => {
+const Details = ({ slug, type }) => {
   const [show, setShow] = useState({});
   const [cast, setCast] = useState([]);
   const [videos, setVideos] = useState([]);
@@ -31,39 +33,124 @@ const Details = ({ id, type }) => {
   const [screenWidth, setScreenWidth] = useState(0);
   const [seasonInfo, setSeasonInfo] = useState({})
   const [episodes, setEpisodes] = useState([])
+  const { id, setId } = useTvContext()
+
+  function slugify(str) {
+    return  str
+    .toLowerCase()
+    .normalize('NFD')                      // handle accents
+    .replace(/[\u0300-\u036f]/g, '')       // remove accents
+    .replace(/[^a-z0-9]+/g, '-')           // replace non-alphanumeric with hyphens
+    .replace(/^-+|-+$/g, ''); 
+  }
+
 
   useEffect(() => {
     try {
-      setScreenWidth(window.innerWidth);
-      window.addEventListener("resize", () => {
-        setScreenWidth(window.innerWidth);
-      });
+      async function getItemBySlug(slug, type) {
+
+        const query = slug.replace(/-/g, ' '); // convert slug back to a normal name
+        const data = (await api.get(`/search/${type}?query=${encodeURIComponent(query)}`)).data
+
+        const match = data.results.find((item) => slugify(item.title || item.name) === slug);
+
+        return match;
+      }
 
       async function fetchMovies() {
-        const [show, casts, video, recommendationss, similar] = [
-          (await api.get(`/${type}/${id}`)).data,
-          (await api.get(`/${type}/${id}/credits`)).data?.cast,
-          (await api.get(`/${type}/${id}/videos`)).data?.results,
-          (await api.get(`/${type}/${id}/recommendations`)).data?.results,
-          (await api.get(`/${type}/${id}/similar`)).data?.results,
+
+        const movie = await getItemBySlug(slug, type)
+
+        const [ show , casts, video, recommendationss, similar] = [
+
+          (await api.get(`/${type}/${movie?.id}`)).data,
+          (await api.get(`/${type}/${movie?.id}/credits`)).data?.cast,
+          (await api.get(`/${type}/${movie?.id}/videos`)).data?.results,
+          (await api.get(`/${type}/${movie?.id}/recommendations`)).data?.results,
+          (await api.get(`/${type}/${movie?.id}/similar`)).data?.results,
           // (await api.get(`/${type}/${id}/watch/providers`)).data,
         ];
         const filtredVideos = video?.find(
           (vid) => vid.type === "Trailer" && vid.site === "YouTube"
         )
 
+
+
+
+        // getItemBySlug(slug, type)
+
+
         setShow(show);
         setCast(casts);
         setVideos(filtredVideos);
         setRecommendations(recommendationss)
         setSimilares(similar)
-
       }
+
       fetchMovies();
+
     } catch (err) {
       console.log(err);
     }
-  }, []);
+  }, [slug]);
+
+  console.log(show)
+  // else {
+  //   useEffect(() => {
+  //     const fetchMovie = async () => {
+  //       const search = (await api.get(`/search/multi?query=${String(slug).split('-').join(' ')}`))?.data?.results
+  //         ?.filter((show) => show.media_type !== "person")?.sort((a, b) => b.popularity - a.popularity)
+
+  //       // console.log(search)
+
+
+  //       const [casts, video, recommendationss, similar] = [
+  //         (await api.get(`/${type}/${id}/credits`)).data?.cast,
+  //         (await api.get(`/${type}/${id}/videos`)).data?.results,
+  //         (await api.get(`/${type}/${id}/recommendations`)).data?.results,
+  //         (await api.get(`/${type}/${id}/similar`)).data?.results,
+  //         // (await api.get(`/${type}/${id}/watch/providers`)).data,
+  //       ];
+  //       const filtredVideos = video?.find(
+  //         (vid) => vid.type === "Trailer" && vid.site === "YouTube"
+  //       )
+
+
+  //       setCast(casts);
+  //       setVideos(filtredVideos);
+  //       setRecommendations(recommendationss)
+  //       setSimilares(similar)
+  //       // Match exactly
+  //       const movie = search.filter(
+  //         (item) => {
+  //           return item.title ? item.title : item.name !== String(slug).split('-').join(' ') && item.media_type !== type && item.poster_path !== null
+  //         }
+  //       );
+
+  //       const filteredShow = movie.filter((item) => item.title ? String(item.title).toLocaleLowerCase() : String(item.name).toLocaleLowerCase() !== String(slug).split('-').join(' '))
+  //       const findMovie = filteredShow.find((e) => e.title ? String(e.title).toLocaleLowerCase() : String(e.name).toLocaleLowerCase() === String(slug).split('-').join(' '))
+
+  //       console.log(findMovie)
+  //       const m = (await api.get(`/${findMovie?.media_type}/${findMovie?.id}`)).data
+
+
+  //       if (movie) {
+  //         setShow(m); // show it
+  //       } else {
+  //         // handle not found
+  //       }
+  //     };
+
+  //     if (slug) fetchMovie();
+  //   }, [slug]);
+  // }
+
+  useEffect(() => {
+    setScreenWidth(window.innerWidth);
+    window.addEventListener("resize", () => {
+      setScreenWidth(window.innerWidth);
+    });
+  }, [])
 
   useEffect(() => {
     async function fetchSeasonData() {
@@ -71,8 +158,6 @@ const Details = ({ id, type }) => {
         (await api.get(`/tv/${id}/season/${selectedSeason}`)).data,
         (await api.get(`/tv/${id}/season/${selectedSeason}/videos`)),
       ]
-
-      console.log(video)
 
       const trailer = video.data?.results?.find(
         (vid) => vid.type === "Trailer" && vid.site === "YouTube"
@@ -146,10 +231,6 @@ const Details = ({ id, type }) => {
       clearInterval(interval)
     }
   }, [])
-
-
-
-  console.log(seasonInfo)
 
 
   return (

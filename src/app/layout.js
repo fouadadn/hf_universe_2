@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "HF stream",
   description: "Stream movies and TV shows for free on HF Stream. Enjoy the latest content without the hassle of subscriptions. Watch instantly, anywhere, anytime!",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -22,6 +25,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <meta name="google-site-verification" content="wTLaJlDKLrjuono-nL7RCoY69PgVhk9EvnEydCDs9_E" />
+        {/* <link rel="icon" href="/favicon.ico" />*/}
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Analytics />

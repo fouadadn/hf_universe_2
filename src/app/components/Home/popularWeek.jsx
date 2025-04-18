@@ -14,10 +14,14 @@ import {
   Star,
 } from "lucide-react";
 import Link from "next/link";
+import { useTvContext } from "@/app/context/idContext";
 
 const PopularWeek = () => {
   const [data, setData] = useState([]);
   const [popular, setPopular] = useState({});
+  const { id, changeId , slugify} = useTvContext()
+
+
 
   useEffect(() => {
     try {
@@ -94,15 +98,14 @@ const PopularWeek = () => {
     }
   };
 
-  // console.log(popular)
-
   return (
     <div>
       <div className="flex overflow-auto hide-scrollbar gap-16 mt-4" ref={scrollRef}>
         {data.length > 0
           ? data.map((show, i) => (
             <Link
-              href={`/${show.media_type}/${show.id}`}
+              href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
+              onClick={() => changeId(show?.id)}
               className="shrink-0 flex items-center gap-4 "
               key={i}>
               <span className="text-5xl font-bold">{i + 1}</span>
@@ -252,7 +255,7 @@ const PopularWeek = () => {
               <Link href={`/watch/${popular?.trailler?.key}`} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]">
                 <CirclePlay /> <span>Watch Trailer</span>
               </Link>
-              <button style={{backgroundColor: "#ffffff20"}} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200">
+              <button style={{ backgroundColor: "#ffffff20" }} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200">
                 <Bookmark />
               </button>
             </div>

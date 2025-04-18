@@ -5,12 +5,15 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Dot, Star } from "lucide-react";
 import Link from "next/link";
+import { useTvContext } from "@/app/context/idContext";
 
 const PosterSlide = () => {
   const [media, setMedia] = useState([]);
   const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/w500`);
   const [providers, setProviders] = useState([]);
   const popularProviderIds = [8, 9, 337, 15, 384, 283, 387, 526]; //80 AMC
+  const { id, changeId } = useTvContext()
+
 
   useEffect(() => {
     try {
@@ -125,7 +128,6 @@ const PosterSlide = () => {
     return () => el.removeEventListener('scroll', checkScroll)
   }, [])
 
-
   return (
     <>
       <div className="relative">
@@ -137,7 +139,6 @@ const PosterSlide = () => {
           ? providers.map((p, i) => (
             <div key={p?.provider_id}>
               <div
-
                 className="shrink-0 h-[64px] relative flex items-center gap-3 w-62 bg-stone-500/30 rounded-2xl px-2 py-1 shadow-xl shadow-white/15 bg-cover"
                 style={{
                   backgroundImage: `url("https://image.tmdb.org/t/p/original${p?.logo_path}")`,
@@ -185,7 +186,8 @@ const PosterSlide = () => {
           {media.length > 0
             ? media.map((show, i) => (
               <Link
-                href={`/${show.media_type}/${show.id}`}
+                href={`/${show.media_type}/${show.title ? String(show?.title).toLocaleLowerCase().split(' ').join('-') : String(show?.name).toLocaleLowerCase().split(' ').join('-')}`}
+                onClick={() => changeId(show?.id)}
                 key={i}
                 className="shrink-0 relative">
                 <div className="absolute top-0 bottom-0 right-0 left-0 bg-gradient-to-t from-black to-transparent to-45%">
@@ -236,7 +238,7 @@ const PosterSlide = () => {
                     objectFit: "cover", // Use CSS to set objectFit
                     objectPosition: "center", // Optional, if you need to control the position of the image
                   }}
-                  className="rounded-xl w-auto h-auto"
+                  className="rounded-xl "
                   onError={handleError}
                 />
               </Link>

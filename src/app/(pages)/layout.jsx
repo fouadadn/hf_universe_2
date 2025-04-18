@@ -1,9 +1,14 @@
+"use client"
+
 import Nav from "../components/Home/nav";
+import { TvProvider } from "../context/idContext";
 const layout = ({ children }) => {
   return (
     <div className="">
-      <Nav />
-      {children}
+      <TvProvider>
+        <Nav />
+        {children}
+      </TvProvider>
     </div>
   );
 };

@@ -10,6 +10,7 @@ import { Bookmark, CirclePlay, Play } from 'lucide-react';
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import Image from "next/image";
 import Link from 'next/link';
+import { useTvContext } from '@/app/context/idContext';
 
 const HomePageSlider = () => {
 
@@ -17,6 +18,8 @@ const HomePageSlider = () => {
   const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/original`);
   const [screenWidth, setScreenWidth] = useState(0)
   const [show5WithTrailler, setShow5WithTrailler] = useState([])
+  const { id, changeId } = useTvContext()
+
 
 
   useEffect(() => {
@@ -50,7 +53,6 @@ const HomePageSlider = () => {
     });
 
   }, [])
-
 
   const handleError = () => {
     setImgSrc("/assets/black_backdrop.png");
@@ -87,18 +89,25 @@ const HomePageSlider = () => {
                     objectPosition: "center", // Optional, if you need to control the position of the image
                   }}
                   // fill
-                  className='min-h-96 w-full ' />
+                  className='min-h-96 ' />
                 {/* <img src={`https://image.tmdb.org/t/p/original/${show?.backdrop_path}` } alt="backdrop image" className='w-full brightness-90' /> */}
-                <Link href={`/${show?.media_type}/${show?.id}`}  className='bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0'></Link>
+                <Link
+                  href={`/${show.media_type}/${show.title ? String(show?.title).toLocaleLowerCase().split(' ').join('-') : String(show?.name).toLocaleLowerCase().split(' ').join('-')}`}
+                  onClick={() => changeId(show?.id)}
+                  className='bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0'></Link>
                 <div className='absolute z-[999] text-start bottom-4 lg:bottom-44 mx-4 '>
                   <span className='bg-black px-3 py-1 rounded-full mb-5 inline-block capitalize'>{show.media_type}</span>
                   <h1 className='text-3xl md:text-5xl font-bold'>{show?.title ? show.title : show.name}</h1>
                   <span className='block md:mt-2'>{show.release_date ? show.release_date : show.first_air_date} </span>
                   <p className='w-[350px] md:w-[460px] text-sm mb-2'>{String(show.overview).split(' ').slice(0, 40).length < String(show.overview).split(" ").length ? `${String(show.overview).split(' ').slice(0, 20).join(" ")} ...` : show.overview}</p>
                   <div className='flex gap-3'>
-                    <Link href={`stream/${show?.media_type}/${show?.id}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]'><Play /> <span>Play Now</span> </Link>
+                    <Link
+                      href={`/${show.media_type}/${show.title ? String(show?.title).toLocaleLowerCase().split(' ').join('-') : String(show?.name).toLocaleLowerCase().split(' ').join('-')}`}
+                      onClick={() => changeId(show?.id)}
+
+                      className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]'><Play /> <span>Play Now</span> </Link>
                     <Link href={`/watch/${show?.trailler?.key}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]'><CirclePlay /> <span>Watch Trailer</span></Link>
-                    <button style={{backgroundColor: "#ffffff20"}} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'><Bookmark /></button>
+                    <button style={{ backgroundColor: "#ffffff20" }} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'><Bookmark /></button>
                   </div>
                 </div>
 

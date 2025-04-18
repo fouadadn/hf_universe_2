@@ -2,9 +2,11 @@
 import { Server } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation';
+import { useTvContext } from '@/app/context/idContext';
 
-const Stream = ({ id, type, season, episode }) => {
-    console.log(id)
+const Stream = ({ type, season, episode }) => {
+
+    const { id } = useTvContext()
     const [displayServers, setDisplayServers] = useState(false)
     const [selectedServer, setSelectedServer] = useState(localStorage && localStorage?.server ?
         {

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Dot, Star, TriangleAlert } from "lucide-react";
 import Link from "next/link";
+import { useTvContext } from "@/app/context/idContext";
 
 const BackdropSlide = ({ media_type, is_korean, show, title }) => {
   const [data, setData] = useState([]);
@@ -12,6 +13,8 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
   const [genres, setGenres] = useState([]);
   const [imgSrc, setImgSrc] = useState("/assets/black_backdrop.png");
   const [isfound, setIsFound] = useState(true)
+  const { id, changeId , slugify} = useTvContext()
+
 
 
 
@@ -141,6 +144,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
   }, [])
 
   // console.log(showCombineData)
+  
 
   return (
     <div className="mt-20 relative group">
@@ -152,7 +156,8 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
         {(showCombineData.length ? showCombineData : data).length > 0
           && (showCombineData.length > 0 ? showCombineData : data).map((show, i) => (
             <Link
-              href={`/${show.media_type}/${show.id}`}
+              href={`/${show.media_type}/${show.title ? slugify(show?.title): slugify(show?.name)}`}
+              onClick={() => changeId(show?.id)}
               key={i}
               className="shrink-0">
               <div className="h-[168.6px] ">
@@ -228,7 +233,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
         }
 
         {
-          !isfound ? <div className="flex justify-center w-full">
+          !isfound && !(showCombineData.length ? showCombineData : data).length > 0 ? <div className="flex justify-center w-full">
 
             <div className="flex gap-2 items-center ">
               <TriangleAlert />

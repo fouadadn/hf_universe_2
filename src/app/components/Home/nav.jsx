@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { CircleUserRound, Dot, Search, X } from "lucide-react";
 import Link from "next/link";
 import api from '@/app/utils/axiosInstance';
+import { useTvContext } from '@/app/context/idContext';
 
 const Nav = () => {
 
@@ -13,6 +14,8 @@ const Nav = () => {
     const [displaysearchData, setDisplaysearchData] = useState(false)
     const [noResults, setNoResults] = useState(false)
     const inpurRef = useRef(null)
+    const { id, changeId } = useTvContext()
+
 
     useEffect(() => {
         try {
@@ -108,8 +111,10 @@ const Nav = () => {
                                 <div className='flex flex-col gap-2  px-3 h-[70vh] md:h-96'>
                                     {
                                         searchData?.length > 0 ? searchData?.map((show, i) =>
-                                            <Link key={i} onClick={() => { setDisplaysearchData(false); setSearchQuery(''); setSearchOpen(false) }} href={`/${show?.media_type}/${show?.id}`} 
-                                            className='flex gap-2'>
+                                            <Link key={i}
+                                                onClick={() => { setDisplaysearchData(false); setSearchQuery(''); setSearchOpen(false); changeId(show?.id) }}
+                                                href={`/${show.media_type}/${show.title ? String(show?.title).toLocaleLowerCase().split(' ').join('-') : String(show?.name).toLocaleLowerCase().split(' ').join('-')}`}
+                                                className='flex gap-2'>
                                                 <img src={`https://image.tmdb.org/t/p/w500${show?.poster_path}`} className=' h-[94.08px] w-16 rounded-lg' alt="" />
 
                                                 <div>
