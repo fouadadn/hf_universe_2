@@ -14,7 +14,7 @@ const Nav = () => {
     const [displaysearchData, setDisplaysearchData] = useState(false)
     const [noResults, setNoResults] = useState(false)
     const inpurRef = useRef(null)
-    const { id, changeId } = useTvContext()
+    const { id, changeId , slugify ,  setArrows , providerName} = useTvContext()
 
 
     useEffect(() => {
@@ -68,7 +68,7 @@ const Nav = () => {
 
                     <div className="space-x-6 ml-6 hidden lg:block ">
                         <Link href={"/"}>Home</Link>
-                        <Link href={"/"}>Discover</Link>
+                        <Link href={`/discover/${slugify(providerName)}`}>Discover</Link>
                         <Link href={"/"}>Movie Release</Link>
                         <Link href={"/"}>About</Link>
                     </div>
@@ -112,8 +112,8 @@ const Nav = () => {
                                     {
                                         searchData?.length > 0 ? searchData?.map((show, i) =>
                                             <Link key={i}
-                                                onClick={() => { setDisplaysearchData(false); setSearchQuery(''); setSearchOpen(false); changeId(show?.id) }}
-                                                href={`/${show.media_type}/${show.title ? String(show?.title).toLocaleLowerCase().split(' ').join('-') : String(show?.name).toLocaleLowerCase().split(' ').join('-')}`}
+                                                onClick={() => { setDisplaysearchData(false); setSearchQuery(''); setSearchOpen(false); changeId(show?.id); setArrows(false) }}
+                                                href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
                                                 className='flex gap-2'>
                                                 <img src={`https://image.tmdb.org/t/p/w500${show?.poster_path}`} className=' h-[94.08px] w-16 rounded-lg' alt="" />
 

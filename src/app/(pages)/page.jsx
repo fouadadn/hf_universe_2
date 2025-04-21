@@ -34,7 +34,7 @@ export default function Home() {
           <BackdropSlide title={"Seires"} media_type={"tv"} />
         </div>
 
-        <div className="mt-14 ">
+        <div className="mt-14">
           <BackdropSlide title={"Korean Series"} media_type={"tv"} is_korean={true} />
         </div>
 

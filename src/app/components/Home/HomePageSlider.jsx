@@ -12,13 +12,13 @@ import Image from "next/image";
 import Link from 'next/link';
 import { useTvContext } from '@/app/context/idContext';
 
-const HomePageSlider = () => {
+const HomePageSlider = ({ shows }) => {
 
   const [data, setData] = useState([]);
   const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/original`);
   const [screenWidth, setScreenWidth] = useState(0)
   const [show5WithTrailler, setShow5WithTrailler] = useState([])
-  const { id, changeId } = useTvContext()
+  const { id, changeId, providerId } = useTvContext()
 
 
 
@@ -26,10 +26,10 @@ const HomePageSlider = () => {
     try {
       async function fetchMovies() {
         const datas = (await api.get("/trending/all/day")).data.results;
-        setData(datas)
+        setData(shows ? shows : datas)
 
         const results = await Promise.all(
-          datas.filter(v => v.media_type !== 'person').slice(0, 5)?.map(async (v) => {
+          (shows ? shows : datas).filter(v => v.media_type !== 'person').slice(0, 5)?.map(async (v) => {
             const response = await api.get(`/${v?.media_type}/${v?.id}/videos`);
             const trailer = response.data?.results?.find(
               (vid) => vid.type === "Trailer" && vid.site === "YouTube"
@@ -38,7 +38,6 @@ const HomePageSlider = () => {
             return { ...v, trailler: trailer };
           })
         );
-
         setShow5WithTrailler(results);
       }
       fetchMovies()
@@ -52,20 +51,19 @@ const HomePageSlider = () => {
 
     });
 
-  }, [])
+  }, [shows, providerId])
 
   const handleError = () => {
     setImgSrc("/assets/black_backdrop.png");
   };
 
-  // console.log(show5WithTrailler)
 
   return (
     <div className='w-full -mt-[81px] z-10 text-white'>
       <Swiper
         className='relative'
         modules={[Navigation, Pagination, Autoplay]}
-        autoplay={{ delay: 50000, disableOnInteraction: false }}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
         spaceBetween={1}
         slidesPerView={1}
         pagination={{ clickable: true }}
@@ -76,7 +74,7 @@ const HomePageSlider = () => {
       // }}
       >
         {
-          show5WithTrailler.length > 0 ? show5WithTrailler.map((show) =>
+          (show5WithTrailler.length > 0 ? show5WithTrailler : data).length > 0 ? (show5WithTrailler.length > 0 ? show5WithTrailler : data.slice(0, 5)).map((show) =>
             <SwiperSlide >
               <div className='relative w-full h-[621px] md:h-auto '>
                 <Image src={imgSrc.toString().startsWith('https') ? `${imgSrc}${screenWidth > 800 ? show?.backdrop_path : show?.poster_path}` : imgSrc} onError={handleError}

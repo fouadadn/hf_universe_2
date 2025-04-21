@@ -7,12 +7,12 @@ import { ChevronLeft, ChevronRight, Dot, Star } from "lucide-react";
 import Link from "next/link";
 import { useTvContext } from "@/app/context/idContext";
 
-const PosterSlide = () => {
+const PosterSlide = ({ movie, tv }) => {
   const [media, setMedia] = useState([]);
   const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/w500`);
   const [providers, setProviders] = useState([]);
-  const popularProviderIds = [8, 9, 337, 15, 384, 283, 387, 526]; //80 AMC
-  const { id, changeId } = useTvContext()
+  const popularProviderIds = [8, 9, 337, 15, 283, 387, 526 , 350 , 531]; //80 AMC
+  const { id, changeId, setArrows, slugify, changeProviderId } = useTvContext()
 
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const PosterSlide = () => {
         setProviders(movieProviders);
 
         const combineData = [
-          ...movies.map((v) => ({
+          ...(movie ? movie : movies).map((v) => ({
             ...v,
             media_type: "movie",
             genres: v.genre_ids.map((gI) => {
@@ -50,7 +50,7 @@ const PosterSlide = () => {
               return ob;
             }),
           })),
-          ...shows.map((v) => ({
+          ...(tv ? tv : shows).map((v) => ({
             ...v,
             media_type: "tv",
             genres: v.genre_ids.map((gI) => {
@@ -63,11 +63,7 @@ const PosterSlide = () => {
               return ob;
             }),
           })),
-        ].sort(
-          (a, b) =>
-            new Date(b.release_date || b.first_air_date) -
-            new Date(a.release_date || a.first_air_date)
-        );
+        ]
 
         setMedia(combineData);
       }
@@ -76,25 +72,12 @@ const PosterSlide = () => {
     } catch (err) {
       console.log(err);
     }
-  }, []);
+  }, [movie, tv]);
 
   const handleError = () => {
     setImgSrc("/assets/black_backdrop.png");
   };
 
-  // const scrollRef = useRef(null);
-
-  // const scroll = (scrollOffset) => {
-  //   if (scrollRef.current) {
-  //     scrollRef.current.scrollBy({ left: scrollOffset, behavior: "smooth" });
-  //   }
-  //   console.log(scrollRef.current.scrollWidth)
-
-  // };
-
-  // if (scrollRef.current) {
-  //   console.log(scrollRef.current.offsetWidth)
-  // }
 
   const scrollRef = useRef(null)
   const [showLeft, setShowLeft] = useState(false)
@@ -131,13 +114,18 @@ const PosterSlide = () => {
   return (
     <>
       <div className="relative">
-        <div className="h-6 w-full absolute bg-black -top-4 z-[999]"></div>
-        <div className="h-6 bg-black w-full relative top-20 z-[999]"></div>
+        {
+          tv && movie ? "" :
+            <>
+              <div className="h-6 w-full absolute bg-black -top-4 z-[999]"></div>
+              <div className="h-6 bg-black w-full relative top-20 z-[999]"></div>
+            </>
+        }
       </div>
-      <div className="overflow-auto gap-5 -mt-8 flex hide-scrollbar pb-10 pt-5">
+      {tv && movie ? "" : <div className="overflow-auto gap-5 -mt-8 flex hide-scrollbar pb-10 pt-5">
         {providers?.length > 0
           ? providers.map((p, i) => (
-            <div key={p?.provider_id}>
+            <Link href={`/discover/${slugify(p?.provider_name)}`} key={p?.provider_id} onClick={() => { changeProviderId(p?.provider_id) }}>
               <div
                 className="shrink-0 h-[64px] relative flex items-center gap-3 w-62 bg-stone-500/30 rounded-2xl px-2 py-1 shadow-xl shadow-white/15 bg-cover"
                 style={{
@@ -169,15 +157,17 @@ const PosterSlide = () => {
                   <h2 className="text-xl font-bold ">{p.provider_name} </h2>
                 </div>
               </div>
-            </div>
+            </Link>
           ))
           : Array.from(Array(8)).map((_, i) => (
             <div
               key={i}
               className="w-62 rounded-2xl h-[64px] bg-stone-600 shrink-0"></div>
           ))}
-      </div>
-      <h1 className="text-3xl font-bold mt-7">Just Release</h1>
+      </div>}
+
+
+      <h1 className="text-3xl font-bold mt-">Just Release</h1>
 
       <div className="relative group ">
         <div className="flex gap-6 overflow-auto mt-3 hide-scrollbar"
@@ -186,8 +176,8 @@ const PosterSlide = () => {
           {media.length > 0
             ? media.map((show, i) => (
               <Link
-                href={`/${show.media_type}/${show.title ? String(show?.title).toLocaleLowerCase().split(' ').join('-') : String(show?.name).toLocaleLowerCase().split(' ').join('-')}`}
-                onClick={() => changeId(show?.id)}
+                href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name).toLocaleLowerCase().split(' ').join('-')}`}
+                onClick={() => { changeId(show?.id); setArrows(false) }}
                 key={i}
                 className="shrink-0 relative">
                 <div className="absolute top-0 bottom-0 right-0 left-0 bg-gradient-to-t from-black to-transparent to-45%">

@@ -16,10 +16,10 @@ import {
 import Link from "next/link";
 import { useTvContext } from "@/app/context/idContext";
 
-const PopularWeek = () => {
+const PopularWeek = ({ shows }) => {
   const [data, setData] = useState([]);
   const [popular, setPopular] = useState({});
-  const { id, changeId , slugify} = useTvContext()
+  const { id, changeId, slugify, setArrows } = useTvContext()
 
 
 
@@ -35,7 +35,7 @@ const PopularWeek = () => {
         ];
 
         const combineData = [
-          ...popular.map((v) => ({
+          ...(shows ? shows : popular).map((v) => ({
             ...v,
             genres: v.genre_ids.map((gI) => {
               let ob = {};
@@ -68,27 +68,32 @@ const PopularWeek = () => {
     } catch (err) {
       console.log(err);
     }
-  }, []);
+  }, [shows]);
 
   useEffect(() => {
     try {
       async function fetchTraillerForPupular() {
-        if (popular.id) {
-          const response = await api.get(`/${popular?.media_type}/${popular?.id}/videos`);
-          // console.log(popular.id)
-          const trailer = response.data?.results?.find(
-            (vid) => vid.type === "Trailer" && vid.site === "YouTube"
-          );
 
-          setPopular({ ...popular, trailler: trailer })
+        if (shows?.id && popular.id) {
+          if (shows ? shows : popular.id) {
+            const response = await api.get(`/${(shows ? shows : popular)?.media_type}/${(shows ? shows : popular)?.id}/videos`);
+            // console.log(popular.id)
+            const trailer = response.data?.results?.find(
+              (vid) => vid.type === "Trailer" && vid.site === "YouTube"
+            );
+
+            setPopular({ ...popular, trailler: trailer })
+          }
         }
+
+
       }
       fetchTraillerForPupular()
     }
     catch (err) {
       console.log(err)
     }
-  }, [popular.id])
+  }, [popular?.id, shows])
 
   const scrollRef = useRef(null);
 
@@ -105,7 +110,7 @@ const PopularWeek = () => {
           ? data.map((show, i) => (
             <Link
               href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
-              onClick={() => changeId(show?.id)}
+              onClick={() => { changeId(show?.id); setArrows(false) }}
               className="shrink-0 flex items-center gap-4 "
               key={i}>
               <span className="text-5xl font-bold">{i + 1}</span>

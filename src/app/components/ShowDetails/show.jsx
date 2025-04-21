@@ -18,7 +18,7 @@ import BackdropSlide from "../Home/backdropSlide";
 // import Seasons from "./components/seasons";
 import Footer from "../Home/footer";
 import { useTvContext } from "@/app/context/idContext";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 
 
@@ -33,17 +33,11 @@ const Details = ({ slug, type }) => {
   const [screenWidth, setScreenWidth] = useState(0);
   const [seasonInfo, setSeasonInfo] = useState({})
   const [episodes, setEpisodes] = useState([])
-  const { id, setId } = useTvContext()
-  const [rerender , setRerender] = useState(1)
-
-  function slugify(str) {
-    return str
-      .toLowerCase()
-      .normalize('NFD')                      // handle accents
-      .replace(/[\u0300-\u036f]/g, '')       // remove accents
-      .replace(/[^a-z0-9]+/g, '-')           // replace non-alphanumeric with hyphens
-      .replace(/^-+|-+$/g, '');
-  }
+  const { id, setId, arrows, setArrows, slugify } = useTvContext()
+  const [rerender, setRerender] = useState(1)
+  const scrollRef = useRef(null)
+  const [showLeft, setShowLeft] = useState(false)
+  const [showRight, setShowRight] = useState(false)
 
 
   useEffect(() => {
@@ -60,123 +54,71 @@ const Details = ({ slug, type }) => {
 
       async function fetchMovies() {
 
-        const movie = await getItemBySlug(slug, type)
+        if (id) {
+          const movie = await getItemBySlug(slug, type)
+          const [show, casts, video, recommendationss, similar] = [
+            (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}`)).data,
+            (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/credits`)).data?.cast,
+            (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/videos`)).data?.results,
+            (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/recommendations`)).data?.results,
+            (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/similar`)).data?.results,
+            // (await api.get(`/${type}/${id}/watch/providers`)).data,
+          ];
+          const filtredVideos = video?.find(
+            (vid) => vid.type === "Trailer" && vid.site === "YouTube"
+          )
 
-        const [show, casts, video, recommendationss, similar] = [
 
-          (await api.get(`/${type}/${movie?.id}`)).data,
-          (await api.get(`/${type}/${movie?.id}/credits`)).data?.cast,
-          (await api.get(`/${type}/${movie?.id}/videos`)).data?.results,
-          (await api.get(`/${type}/${movie?.id}/recommendations`)).data?.results,
-          (await api.get(`/${type}/${movie?.id}/similar`)).data?.results,
-          // (await api.get(`/${type}/${id}/watch/providers`)).data,
-        ];
-        const filtredVideos = video?.find(
-          (vid) => vid.type === "Trailer" && vid.site === "YouTube"
-        )
+          setShow(show);
+          setCast(casts);
+          setVideos(filtredVideos);
+          setRecommendations(recommendationss)
+          setSimilares(similar)
+          setRerender(rerender + 1)
+        }
 
 
-        setShow(show);
-        setCast(casts);
-        setVideos(filtredVideos);
-        setRecommendations(recommendationss)
-        setSimilares(similar)
-
-        setRerender(rerender +1)
       }
 
       fetchMovies();
 
+      const onPopState = (event) => {
+        // console.log('User used back/forward navigation!');
+        setArrows(true)
+      };
+
+      window.onpopstate = onPopState;
+
     } catch (err) {
       console.log(err);
     }
-  }, [slug]);
+  }, [slug, id]);
 
   useEffect(() => {
-    async function fetchSeasonData() {
-      const [season, video] = [
-        (await api.get(`/tv/${show?.id}/season/${selectedSeason}`)).data,
-        (await api.get(`/tv/${show?.id}/season/${selectedSeason}/videos`)),
-      ]
-console.log(show?.id)
-      const trailer = video.data?.results?.find(
-        (vid) => vid.type === "Trailer" && vid.site === "YouTube"
-      );
+    try {
+      async function fetchSeasonData() {
+        if (show?.id) {
+          const [season, video] = [
+            (await api.get(`/tv/${show?.id}/season/${selectedSeason}`)).data,
+            (await api.get(`/tv/${show?.id}/season/${selectedSeason}/videos`)),
+          ]
+          const trailer = video.data?.results?.find(
+            (vid) => vid.type === "Trailer" && vid.site === "YouTube"
+          );
 
-      setSeasonInfo({ ...season, trailler: trailer })
-      setEpisodes(season?.episodes)
+          setSeasonInfo({ ...season, trailler: trailer })
+          setEpisodes(season?.episodes)
+        }
+      }
+
+      if (type === "tv") {
+        fetchSeasonData()
+      }
+    } catch (err) {
+      console.log(err)
     }
 
-    if (type === "tv") {
-      fetchSeasonData()
-    }
-
-  }, [selectedSeason , slug ,rerender])
-
-  // console.log(show)
-  // else {
-  //   useEffect(() => {
-  //     const fetchMovie = async () => {
-  //       const search = (await api.get(`/search/multi?query=${String(slug).split('-').join(' ')}`))?.data?.results
-  //         ?.filter((show) => show.media_type !== "person")?.sort((a, b) => b.popularity - a.popularity)
-
-  //       // console.log(search)
-
-
-  //       const [casts, video, recommendationss, similar] = [
-  //         (await api.get(`/${type}/${id}/credits`)).data?.cast,
-  //         (await api.get(`/${type}/${id}/videos`)).data?.results,
-  //         (await api.get(`/${type}/${id}/recommendations`)).data?.results,
-  //         (await api.get(`/${type}/${id}/similar`)).data?.results,
-  //         // (await api.get(`/${type}/${id}/watch/providers`)).data,
-  //       ];
-  //       const filtredVideos = video?.find(
-  //         (vid) => vid.type === "Trailer" && vid.site === "YouTube"
-  //       )
-
-
-  //       setCast(casts);
-  //       setVideos(filtredVideos);
-  //       setRecommendations(recommendationss)
-  //       setSimilares(similar)
-  //       // Match exactly
-  //       const movie = search.filter(
-  //         (item) => {
-  //           return item.title ? item.title : item.name !== String(slug).split('-').join(' ') && item.media_type !== type && item.poster_path !== null
-  //         }
-  //       );
-
-  //       const filteredShow = movie.filter((item) => item.title ? String(item.title).toLocaleLowerCase() : String(item.name).toLocaleLowerCase() !== String(slug).split('-').join(' '))
-  //       const findMovie = filteredShow.find((e) => e.title ? String(e.title).toLocaleLowerCase() : String(e.name).toLocaleLowerCase() === String(slug).split('-').join(' '))
-
-  //       console.log(findMovie)
-  //       const m = (await api.get(`/${findMovie?.media_type}/${findMovie?.id}`)).data
-
-
-  //       if (movie) {
-  //         setShow(m); // show it
-  //       } else {
-  //         // handle not found
-  //       }
-  //     };
-
-  //     if (slug) fetchMovie();
-  //   }, [slug]);
-  // }
-
-  useEffect(() => {
-    setScreenWidth(window.innerWidth);
-    window.addEventListener("resize", () => {
-      setScreenWidth(window.innerWidth);
-    });
-  }, [])
-
-
-
-
-  const handleError = () => {
-    // setImgSrc(image);
-  };
+  }, [selectedSeason, slug, rerender])
 
   function formatTime(time) {
     const hour = parseInt(time) / 60;
@@ -186,11 +128,6 @@ console.log(show?.id)
     }
     return `${parseInt(hour)}h${parseInt(min)}min`;
   }
-
-
-  const scrollRef = useRef(null)
-  const [showLeft, setShowLeft] = useState(false)
-  const [showRight, setShowRight] = useState(false)
 
   const checkScroll = () => {
     const el = scrollRef.current
@@ -225,12 +162,29 @@ console.log(show?.id)
     // Optional: re-check when content loads (for dynamic content)
     const interval = setInterval(checkScroll, 500)
 
+    setScreenWidth(window.innerWidth);
+    window.addEventListener("resize", () => {
+      setScreenWidth(window.innerWidth);
+    });
+
     return () => {
       el.removeEventListener('scroll', checkScroll)
       window.removeEventListener('resize', checkScroll)
       clearInterval(interval)
     }
   }, [])
+
+  function compareDate(dateString) {
+    const date = new Date();
+    const release = new Date(dateString);
+
+    if (release > date) {
+      return false
+    } else {
+      return true
+    }
+  }
+
 
 
   return (
@@ -247,7 +201,6 @@ console.log(show?.id)
                   }`
                   : imgSrc
               }
-              onError={handleError}
               alt={show?.title ? `${show?.title}` : `${show?.name}`}
               width={1920}
               height={1080}
@@ -270,7 +223,6 @@ console.log(show?.id)
               <div className="hidden lg:block ">
                 <Image
                   src={`${imgSrc}${show?.poster_path}`}
-                  onError={handleError}
                   alt={show?.title ? `${show?.title}` : `${show?.name}`}
                   // Ensures it takes full width and scales height
                   width={284}
@@ -290,6 +242,7 @@ console.log(show?.id)
                       ? show?.release_date
                       : show?.first_air_date}
                   </span>
+
                   <h1 className="text-3xl md:text-5xl font-bold">
                     {show?.title ? show?.title : show?.name}
                   </h1>
@@ -316,7 +269,9 @@ console.log(show?.id)
                   ))}
                 </div>
                 <div className="flex gap-3 mt-2">
-                  <Link href={type === "movie" ? `/stream/${type}/${id}` : '#seasons'} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]">
+                  <Link href={type === "movie" ? `/stream/${type}/${id}` : '#seasons'} className={`${compareDate(show?.release_date
+                    ? show?.release_date
+                    : show?.first_air_date) ? "block" : 'hidden'} rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]`}>
                     <Play /> <span>Play Now</span>{" "}
                   </Link>
                   <Link href={`/watch/${videos?.key}`}>

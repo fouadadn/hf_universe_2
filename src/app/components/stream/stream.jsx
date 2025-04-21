@@ -12,7 +12,7 @@ const Stream = ({ type, season, episode, id }) => {
         {
             url: type === "movie" ? `${JSON.parse(localStorage.server).url}${id}` :
                 JSON.parse(localStorage.server).server === 1 ?
-                    `${JSON.parse(localStorage.server).url}/${type}/${id}-${season}-${episode}`:
+                    `${JSON.parse(localStorage.server).url}/${type}/${id}-${season}-${episode}` :
                     `${JSON.parse(localStorage.server).url}/${type}/${id}/${season}-${episode}`
             ,
             server: JSON.parse(localStorage.server).server
@@ -22,6 +22,9 @@ const Stream = ({ type, season, episode, id }) => {
             server: 1
         }
     )
+
+
+    
 
     const handleChangeServerToServer1 = () => {
         if (type === "movie") {
@@ -47,25 +50,15 @@ const Stream = ({ type, season, episode, id }) => {
         }
     }
 
-    document.body.onclick = () => {
-        setDisplayServers(false)
-    }
-
-    console.log(selectedServer.url)
-
-    // const pathname = usePathname();
-    // const fullUrl = typeof window !== 'undefined' ? window.location.href : '';
-
-
-    // console.log(fullUrl)
-
+    // document.body.onclick = () => {
+    //     setDisplayServers(false)
+    // }
 
     return (
         <div>
             <div  >
                 <iframe id="myIframe" className="absolute top-0 bottom-0 right-0 left-0 w-[100%] h-[100%] "
                     src={selectedServer.url} scrolling="no" frameBorder="0" allowFullScreen ></iframe>
-
             </div>
 
 

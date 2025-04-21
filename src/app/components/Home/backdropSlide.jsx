@@ -13,7 +13,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
   const [genres, setGenres] = useState([]);
   const [imgSrc, setImgSrc] = useState("/assets/black_backdrop.png");
   const [isfound, setIsFound] = useState(true)
-  const { id, changeId , slugify} = useTvContext()
+  const { id, changeId , slugify , setArrows} = useTvContext()
 
 
 
@@ -130,7 +130,6 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
     const el = scrollRef.current
     if (!el) return
 
-    const scrollAmount = 200
     el.scrollBy({ left: direction === 'right' ? window?.innerWidth : -window?.innerWidth, behavior: 'smooth' })
   }
 
@@ -147,7 +146,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
   
 
   return (
-    <div className="mt-20 relative group">
+    <div className=" relative group">
       <h1 className="text-3xl font-bold">
         {title}
       </h1>
@@ -157,7 +156,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
           && (showCombineData.length > 0 ? showCombineData : data).map((show, i) => (
             <Link
               href={`/${show.media_type}/${show.title ? slugify(show?.title): slugify(show?.name)}`}
-              onClick={() => changeId(show?.id)}
+              onClick={() =>{ changeId(show?.id) ; setArrows(false)}}
               key={i}
               className="shrink-0">
               <div className="h-[168.6px] ">
@@ -181,7 +180,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
 
               <div className="mt-3 w-[300px] ">
                 <h2 className="font-bold">
-                  {media_type === "tv" ? show.name : show.title}
+                  {media_type === "tv" ? String( show.name).split(' ').slice(0 , 7).join(' ') : String(show.title).split(' ').slice(0 , 7).join(' ')}
                 </h2>
                 <div className="mt- flex items-center gap-1">
                   <div className="flex gap-1 items-center">
