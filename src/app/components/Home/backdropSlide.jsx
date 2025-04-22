@@ -219,11 +219,11 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
             }, 3000);
             return (
               <div key={i} className="animate-pulse">
-                <div className="w-[300px] h-[168.75px] rounded-2xl bg-stone-600"></div>
+                <div className="w-[300px] h-[168.75px] rounded-2xl bg-stone-600 gri"></div>
 
                 <div>
-                  <span className="w-32 h-4 rounded bg-stone-600 block mt-3"></span>
-                  <span className="w-48 h-4 rounded bg-stone-600 block mt-2"></span>
+                  <span className="w-32 h-4 rounded bg-stone-600 block mt-3 gri"></span>
+                  <span className="w-48 h-4 rounded bg-stone-600 block mt-2 gri"></span>
                 </div>
               </div>
             )

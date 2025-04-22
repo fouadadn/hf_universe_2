@@ -171,13 +171,13 @@ const PopularWeek = ({ shows }) => {
               <span className="text-5xl font-bold ">{i + 1}</span>
 
               <div className="flex gap-3">
-                <div className="rounded-2xl w-[100px] h-[150px] bg-stone-600"></div>
+                <div className="rounded-2xl w-[100px] h-[150px] bg-stone-600 gri"></div>
 
                 <div className="mt-4">
-                  <span className="border-[1px] border-stone-600 rounded-lg px-3 py-1 mb-2 inline-block w-10 h-6 bg-stone-600"></span>
-                  <span className="font-semibold text-xl w-32 h-6 bg-stone-600 block rounded"></span>
-                  <span className="font-semibold text-xl w-24 h-6 bg-stone-600 block rounded mt-2"></span>
-                  <span className="font-semibold text-xl w-32 h-6 bg-stone-600 block rounded mt-2"></span>
+                  <span className="border-[1px] border-stone-600 gri rounded-lg px-3 py-1 mb-2 inline-block w-10 h-6 bg-stone-600"></span>
+                  <span className="font-semibold text-xl w-32 h-6 bg-stone-600 gri block rounded"></span>
+                  <span className="font-semibold text-xl w-24 h-6 bg-stone-600 gri block rounded mt-2"></span>
+                  <span className="font-semibold text-xl w-32 h-6 bg-stone-600 gri block rounded mt-2"></span>
                 </div>
               </div>
             </div>
@@ -268,27 +268,27 @@ const PopularWeek = ({ shows }) => {
           {/* </Link> */}
         </div>
       ) : (
-        <div className="h-80 md:h-96 overflow-hidden mt-16 rounded-2xl relative bg-stone-600 animate-pulse ">
+        <div className="h-80 md:h-96 overflow-hidden mt-16 rounded-2xl relative bg-stone-600 gri animate-pulse ">
           <div className="bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_right,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0"></div>
 
           <div className=" z-[999] absolute top-10 md:px-20 mt-10 space-y-1">
-            <h1 className="text-3xl font-bold bg-stone-600 W-32 h-8 rounded">
+            <h1 className="text-3xl font-bold bg-stone-600 gri W-32 h-8 rounded">
               {" "}
             </h1>
 
-            <div className="bg-stone-600 w-40 rounded mt-3 h-4"></div>
+            <div className="bg-stone-600 gri w-40 rounded mt-3 h-4"></div>
             <div className="w-96 md:w-[56%]">
-              <div className="W-full h-4 rounded bg-stone-600 my-1"></div>
-              <div className="W-[75%] h-4 rounded bg-stone-600 my-1"></div>
-              <div className="W-full h-4 rounded bg-stone-600 my-1"></div>
+              <div className="W-full h-4 rounded bg-stone-600 gri my-1"></div>
+              <div className="W-[75%] h-4 rounded bg-stone-600 gri my-1"></div>
+              <div className="W-full h-4 rounded bg-stone-600 gri my-1"></div>
             </div>
 
             <div className="flex gap-3 mt-3">
-              <button className=" rounded-xl px-2 w-32 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600">
+              <button className=" rounded-xl px-2 w-32 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 gri bg-stone-600">
                 {" "}
               </button>
-              <button className=" rounded-xl px-2 md:px-5 w-[165.65px] py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600"></button>
-              <button className=" w-[65.5px] h-[49.6px] rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600"></button>
+              <button className=" rounded-xl px-2 md:px-5 w-[165.65px] py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 gri bg-stone-600"></button>
+              <button className=" w-[65.5px] h-[49.6px] rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 gri bg-stone-600"></button>
             </div>
           </div>
         </div>

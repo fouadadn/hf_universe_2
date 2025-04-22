@@ -301,9 +301,9 @@ const Details = ({ slug, type }) => {
               <p className="mt-2">{show?.overview} </p>
             ) : (
               <div className="mt-2 animate-pulse">
-                <span className="bg-stone-600 w-full h-4 rounded-md block"></span>
-                <span className="bg-stone-600 w-full h-4 mt-1 rounded-md block"></span>
-                <span className="bg-stone-600 w-[70%] mt-1 rounded-md h-4 block"></span>
+                <span className="bg-stone-600 gri w-full h-4 rounded-md block"></span>
+                <span className="bg-stone-600 gri w-full h-4 mt-1 rounded-md block"></span>
+                <span className="bg-stone-600 gri w-[70%] mt-1 rounded-md h-4 block"></span>
               </div>
             )}
           </div>
@@ -346,10 +346,10 @@ const Details = ({ slug, type }) => {
                       key={i}
                       className="flex gap-2 animate-pulse items-center">
                       <div
-                        className={`rounded-full shrink-0 w-20 h-20  items-center justify-center flex bg-stone-600 `}></div>
+                        className={`rounded-full shrink-0 w-20 h-20  items-center justify-center flex bg-stone-600 gri `}></div>
                       <div>
-                        <h2 className="w-44 bg-stone-600 h-5 rounded-md"></h2>
-                        <h3 className="w-32 mt-2 bg-stone-600 h-5 rounded-md"></h3>
+                        <h2 className="w-44 bg-stone-600 gri h-5 rounded-md"></h2>
+                        <h3 className="w-32 mt-2 bg-stone-600 gri h-5 rounded-md"></h3>
                       </div>
                     </div>
                   ))}
@@ -459,7 +459,9 @@ const Details = ({ slug, type }) => {
         }
 
         <div className="mx-4">
-          <BackdropSlide title={'Recommendations'} is_korean={false} media_type={type} show={recommendations} />
+          <div className="mt-16">
+            <BackdropSlide title={'Recommendations'} is_korean={false} media_type={type} show={recommendations} />
+          </div>
           <div>
             {show?.id ? (
               <div className=" md:h-96 overflow-hidden mt-16 rounded-2xl relative">
@@ -474,12 +476,12 @@ const Details = ({ slug, type }) => {
                     objectFit: "contain", // Use CSS to set objectFit
                     objectPosition: "center", // Optional, if you need to control the position of the image
                   }}
-                  className="rounded-2xl relative lg:bottom-52 w-full"
+                  className="rounded-2xl relative lg:bottom-42 w-full"
                 />
 
                 <div className="bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_right,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0"></div>
 
-                <div className=" z-[999] absolute top-5 md:top-10 md:px-20 md:mt-10 space-y-1">
+                <div className=" z-[999] absolute top-2 md:top-10 md:px-20 md:mt-10 space-y-1">
                   <h1 className="text-xl md:text-3xl font-bold">
                     {show?.title ? show?.title : show?.name} {type === 'tv' && `: ${seasonInfo?.name}`}
                   </h1>
@@ -517,10 +519,10 @@ const Details = ({ slug, type }) => {
                       </span>{" "}
                     </p> */}
                   <div className="flex">
-                    <h2>Countries : </h2>
+                    <h2 className="whitespace-nowrap">Countries : </h2>
                     {show?.production_countries?.map((c, i, arr) =>
-                      <div key={i} className="flex gap-1" >
-                        <span className="ml-1">{c?.name}</span>
+                      <div key={i} className="flex gap-1 " >
+                        <span className="ml-1 whitespace-nowrap">{c?.name}</span>
                         <span className={`${arr.length > i + 1 ? "inline" : "hidden"} `} > | </span>
                       </div>
                     )}
@@ -528,7 +530,7 @@ const Details = ({ slug, type }) => {
 
                   <div className="flex gap-1 items-center " >
                     <div className="md:mt-2">
-                      <h2 className="text-3xl md:text-4xl font-sans font-extrabold">{show?.tagline ? show?.tagline : "No tagline!"} </h2>
+                      <h2 className="text-xl md:text-4xl font-sans font-extrabold">{show?.tagline ? show?.tagline : "No tagline!"} </h2>
                     </div>
                   </div>
 
@@ -566,33 +568,35 @@ const Details = ({ slug, type }) => {
                 {/* </Link> */}
               </div>
             ) : (
-              <div className="h-80 md:h-96 overflow-hidden mt-16 rounded-2xl relative bg-stone-600 animate-pulse ">
+              <div className="h-80 md:h-96 overflow-hidden mt-16 rounded-2xl relative bg-stone-600 gri animate-pulse ">
                 <div className="bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_right,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0"></div>
 
                 <div className=" z-[999] absolute top-10 md:px-20 mt-10 space-y-1">
-                  <h1 className="text-3xl font-bold bg-stone-600 W-32 h-8 rounded">
+                  <h1 className="text-3xl font-bold bg-stone-600 gri W-32 h-8 rounded">
                     {" "}
                   </h1>
 
-                  <div className="bg-stone-600 w-40 rounded mt-3 h-4"></div>
+                  <div className="bg-stone-600 gri w-40 rounded mt-3 h-4"></div>
                   <div className="w-96 md:w-[56%]">
-                    <div className="W-full h-4 rounded bg-stone-600 my-1"></div>
-                    <div className="W-[75%] h-4 rounded bg-stone-600 my-1"></div>
-                    <div className="W-full h-4 rounded bg-stone-600 my-1"></div>
+                    <div className="W-full h-4 rounded bg-stone-600 gri my-1"></div>
+                    <div className="W-[75%] h-4 rounded bg-stone-600 gri my-1"></div>
+                    <div className="W-full h-4 rounded bg-stone-600 gri my-1"></div>
                   </div>
 
                   <div className="flex gap-3 mt-3">
-                    <button className=" rounded-xl px-2 w-32 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600">
+                    <button className=" rounded-xl px-2 w-32 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600 gri">
                       {" "}
                     </button>
-                    <button className=" rounded-xl px-2 md:px-5 w-[165.65px] py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600"></button>
-                    <button className=" w-[65.5px] h-[49.6px] rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600"></button>
+                    <button className=" rounded-xl px-2 md:px-5 w-[165.65px] py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600 gri"></button>
+                    <button className=" w-[65.5px] h-[49.6px] rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-stone-600 gri"></button>
                   </div>
                 </div>
               </div>
             )}
           </div>
-          <BackdropSlide title={`Similare ${type} for you`} is_korean={false} media_type={type} show={similares} />
+          <div className="mt-16">
+            <BackdropSlide title={`Similare ${type} for you`} is_korean={false} media_type={type} show={similares} />
+          </div>
         </div>
 
       </div>

@@ -1,10 +1,11 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from 'react'
-import { CircleUserRound, Dot, Search, X } from "lucide-react";
+import { CircleUserRound, Dot, Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import api from '@/app/utils/axiosInstance';
 import { useTvContext } from '@/app/context/idContext';
+import { usePathname } from 'next/navigation';
 
 const Nav = () => {
 
@@ -14,7 +15,11 @@ const Nav = () => {
     const [displaysearchData, setDisplaysearchData] = useState(false)
     const [noResults, setNoResults] = useState(false)
     const inpurRef = useRef(null)
-    const { id, changeId , slugify ,  setArrows , providerName} = useTvContext()
+    const { id, changeId, slugify, setArrows, providerName } = useTvContext()
+    const [showLink, setShowLinks] = useState(false)
+    const path = usePathname();
+
+    console.log(String(path))
 
 
     useEffect(() => {
@@ -66,11 +71,11 @@ const Nav = () => {
                         <span>Stream</span>{" "}
                     </Link>
 
-                    <div className="space-x-6 ml-6 hidden lg:block ">
-                        <Link href={"/"}>Home</Link>
-                        <Link href={`/discover/${slugify(providerName)}`}>Discover</Link>
-                        <Link href={"/"}>Movie Release</Link>
-                        <Link href={"/"}>About</Link>
+                    <div className={`hidden md:block space-x-6 ml-6 `}>
+                        <Link className={`hover:underline ${String(path) === '/' ? "text-gray-300 underline" : "text-white"}`} href={"/"}>Home</Link>
+                        <Link className={`hover:underline ${String(path).includes('/discover') ? "text-gray-300 underline" : "text-white"}`} href={`/discover/${slugify(providerName)}`}>Discover</Link>
+                        <Link className={`hover:underline ${String(path).includes('/movierelease') ? "text-gray-300 underline" : "text-white"}`} href={"/movierelease"}>Movie Release</Link>
+                        <Link className={`hover:underline ${String(path).includes('/about') ? "text-gray-300 underline" : "text-white"}`} href={"/about"}>About</Link>
                     </div>
 
                     <div className="w-full md:w-fit flex items-center gap-4  ">
@@ -138,7 +143,7 @@ const Nav = () => {
 
                         </div>
 
-                        <div className="gap-2 hidden lg:flex    ">
+                        <div className="gap-2 hidden lg:flex ">
                             <Link href={"/auth/sign-up"} className=' '>
                                 <button className="border-[1px] rounded-xl px-3 py-[7px] cursor-pointer whitespace-nowrap">
                                     Sign Up
@@ -154,10 +159,25 @@ const Nav = () => {
                         <Link href={'/auth/login'} className={`${searchOpen ? "hidden" : "block"}  lg:hidden cursor-pointer`}>
                             <CircleUserRound />
                         </Link>
+
+                        <button onClick={() => setShowLinks(!showLink)} className='cursor-pointer'>
+                            <Menu size={28} className={`${searchOpen || showLink ? "hidden " : "inline"} block lg:hidden shrink-0`} />
+                            <X size={28} className={`${searchOpen || !showLink ? "hidden" : "inline"} block lg:hidden shrink-0`} />
+                        </button>
                     </div>
                 </nav>
             </header>
             <div className={`${displaysearchData ? 'block' : "hidden"} z-[9999] fixed top-0 bottom-0 right-0 left-0   `} onClick={() => { setDisplaysearchData(false); setSearchOpen(false) }}></div>
+
+            <div className={`${showLink ? 'top-[70px] opacity-100 lg:top-0 lg:opacity-0' : "top-0 opacity-0"} ${searchOpen ? "hidden" : "block"} flex justify-center w-full duration-200   absolute z-50 `} >
+
+                <div className='gap-6 flex rounded-xl px-3 py-1 ' style={{ backgroundColor: "#00000080" }}>
+                    <Link className={`hover:underline ${String(path) === '/' ? "text-gray-300 underline" : "text-white"}`} href={"/"}>Home</Link>
+                    <Link className={`hover:underline ${String(path).includes('/discover') ? "text-gray-300 underline" : "text-white"}`} href={`/discover/${slugify(providerName)}`}>Discover</Link>
+                    <Link className={`hover:underline ${String(path).includes('/movierelease') ? "text-gray-300 underline" : "text-white"}`} href={"/movierelease"}>Movie Release</Link>
+                    <Link className={`hover:underline ${String(path).includes('/about') ? "text-gray-300 underline" : "text-white"}`} href={"/about"}>About</Link>
+                </div>
+            </div>
         </>
     )
 }

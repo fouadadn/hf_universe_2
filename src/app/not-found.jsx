@@ -9,7 +9,7 @@ const NotFound = () => {
     return (
         <>
             <div className='brightness-40  absolute top-0 right-0 bottom-0 left-0' 
-            style={{ backgroundImage: 'url(https://img.freepik.com/photos-gratuite/ancienne-chapelle-dans-mystere-monochrome-foret-fantasmagorique-genere-par-ia_188544-38492.jpg?t=st=1744386156~exp=1744389756~hmac=f3abf6c926cbb9be662aa10bfb25450d7c1f3afa6e5a07e2a5b9ef4691338f01&w=1380)',
+            style={{ backgroundImage: 'url(/assets/throne.jpeg)',
              backgroundRepeat: 'no-repeat', backgroundSize: "cover" }}>
                 {/* <Nav /> */}
 

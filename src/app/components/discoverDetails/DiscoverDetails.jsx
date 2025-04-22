@@ -40,9 +40,6 @@ export default function DiscoverDetails({ provider }) {
         fetchData()
     }, [])
 
-
-    console.log("providerID", providerId)
-
     useEffect(() => {
         async function fetchData() {
             const movie = (await api.get(`/discover/movie?with_watch_providers=${providerId}&watch_region=US&sort_by=popularity.desc&primary_release_year=${date.getFullYear()}`)).data.results;

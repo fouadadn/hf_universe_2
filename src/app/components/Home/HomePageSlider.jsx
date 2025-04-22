@@ -18,7 +18,7 @@ const HomePageSlider = ({ shows }) => {
   const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/original`);
   const [screenWidth, setScreenWidth] = useState(0)
   const [show5WithTrailler, setShow5WithTrailler] = useState([])
-  const { id, changeId, providerId } = useTvContext()
+  const { id, changeId, providerId , slugify} = useTvContext()
 
 
 
@@ -90,7 +90,7 @@ const HomePageSlider = ({ shows }) => {
                   className='min-h-96 ' />
                 {/* <img src={`https://image.tmdb.org/t/p/original/${show?.backdrop_path}` } alt="backdrop image" className='w-full brightness-90' /> */}
                 <Link
-                  href={`/${show.media_type}/${show.title ? String(show?.title).toLocaleLowerCase().split(' ').join('-') : String(show?.name).toLocaleLowerCase().split(' ').join('-')}`}
+                  href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
                   onClick={() => changeId(show?.id)}
                   className='bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0'></Link>
                 <div className='absolute z-[999] text-start bottom-4 lg:bottom-44 mx-4 '>

@@ -7,7 +7,7 @@ const Footer = () => {
                 {/* Brand Info */}
                 <div className="order-1 mt-5 md:mt-0">
                     {/* <h1 className="text-2xl font-bold text-white">HF Stream</h1> */}
-                    <p className="mt-2 text-2xl w-96 font-sans font-bold">
+                    <p className="mt-2 text-xl sm:text-2xl max-w-96 font-sans font-bold">
                         Stream the latest movies and series for free. Unlimited entertainment at your fingertips.
                     </p>
                 </div>

@@ -162,7 +162,7 @@ const PosterSlide = ({ movie, tv }) => {
           : Array.from(Array(8)).map((_, i) => (
             <div
               key={i}
-              className="w-62 rounded-2xl h-[64px] bg-stone-600 shrink-0"></div>
+              className="w-62 rounded-2xl h-[64px] bg-stone-600 gri shrink-0"></div>
           ))}
       </div>}
 
@@ -236,7 +236,7 @@ const PosterSlide = ({ movie, tv }) => {
             : Array.from(Array(20)).map((_, i) => (
               <div
                 key={i}
-                className="w-[250px] h-[375px] bg-stone-600 shrink-0 rounded-xl animate-pulse"></div>
+                className="w-[250px] h-[375px] bg-stone-600 shrink-0 rounded-xl animate-pulse gri"></div>
             ))}
 
 
