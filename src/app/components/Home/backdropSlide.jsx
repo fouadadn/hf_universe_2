@@ -160,7 +160,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
               key={i}
               className="shrink-0">
               <div className="h-[168.6px] ">
-                <Image
+                <img
                   src={
                     show.backdrop_path
                       ? `https://image.tmdb.org/t/p/w500${show.backdrop_path}`

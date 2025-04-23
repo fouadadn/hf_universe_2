@@ -77,7 +77,7 @@ const HomePageSlider = ({ shows }) => {
           (show5WithTrailler.length > 0 ? show5WithTrailler : data).length > 0 ? (show5WithTrailler.length > 0 ? show5WithTrailler : data.slice(0, 5)).map((show) =>
             <SwiperSlide >
               <div className='relative w-full h-[621px] md:h-auto '>
-                <Image src={imgSrc.toString().startsWith('https') ? `${imgSrc}${screenWidth > 800 ? show?.backdrop_path : show?.poster_path}` : imgSrc} onError={handleError}
+                <img src={imgSrc.toString().startsWith('https') ? `${imgSrc}${screenWidth > 800 ? show?.backdrop_path : show?.poster_path}` : imgSrc} onError={handleError}
                   alt={show?.title ? show.title : show.name}
                   // Ensures it takes full width and scales height
                   width={1920}        // Set an arbitrary width

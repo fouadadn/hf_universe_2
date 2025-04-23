@@ -114,7 +114,7 @@ const PopularWeek = ({ shows }) => {
               className="shrink-0 flex items-center gap-4 "
               key={i}>
               <span className="text-5xl font-bold">{i + 1}</span>
-              <Image
+              <img
                 src={`https://image.tmdb.org/t/p/w300${show.poster_path}`}
                 alt={show?.title ? show.title : show.name}
                 // Ensures it takes full width and scales height

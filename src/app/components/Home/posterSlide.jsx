@@ -133,12 +133,10 @@ const PosterSlide = ({ movie, tv }) => {
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",
                 }}>
-                <Image
+                <img
                   src={`https://image.tmdb.org/t/p/original${p?.logo_path}`}
                   alt={p.provider_name}
                   // Ensures it takes full width and scales height
-                  width={50} // Set an arbitrary width
-                  height={50}
                   style={{
                     objectFit: "cover", // Use CSS to set objectFit
                     objectPosition: "center", // Optional, if you need to control the position of the image
@@ -214,7 +212,7 @@ const PosterSlide = ({ movie, tv }) => {
 
                   </div>
                 </div>
-                <Image
+                <img
                   src={
                     imgSrc.toString().startsWith("https")
                       ? `${imgSrc}${show?.poster_path}`
@@ -229,7 +227,7 @@ const PosterSlide = ({ movie, tv }) => {
                     objectPosition: "center", // Optional, if you need to control the position of the image
                   }}
                   className="rounded-xl "
-                  onError={handleError}
+                  // onError={handleError}
                 />
               </Link>
             ))
