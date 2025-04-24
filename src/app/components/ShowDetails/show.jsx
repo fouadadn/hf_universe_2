@@ -19,6 +19,8 @@ import BackdropSlide from "../Home/backdropSlide";
 import Footer from "../Home/footer";
 import { useTvContext } from "@/app/context/idContext";
 import { usePathname, useRouter } from "next/navigation";
+import Head from 'next/head';
+
 
 
 
@@ -76,8 +78,6 @@ const Details = ({ slug, type }) => {
           setSimilares(similar)
           setRerender(rerender + 1)
         }
-
-
       }
 
       fetchMovies();
@@ -184,6 +184,8 @@ const Details = ({ slug, type }) => {
       return true
     }
   }
+
+  console.log(show)
 
 
 
@@ -384,7 +386,8 @@ const Details = ({ slug, type }) => {
               <div className='relative group '>
                 <div ref={scrollRef} className={`mx-4 flex gap-3 mt-2 overflow-x-scroll hide-scrollbar`}>
                   {
-                    show?.seasons?.length > 0 ? show?.seasons?.map((s, i) => !(s?.season_number === 0) &&
+                    show?.seasons?.length > 0 ? show?.seasons?.map((s, i) => !(s?.season_number === 0 ) &&
+                    s?.air_date &&
                       <button key={i} onClick={() => { setSelectedSeason(s?.season_number); selectedSeason !== s?.season_number && setEpisodes([]) }} className="shrink-0 cursor-pointer">
                         <div className="overflow-hidden rounded-xl">
                           <img src={`https://image.tmdb.org/t/p/w500${s?.poster_path}`} className=" w-44 scale-110 hover:scale-100 duration-300" alt="" />
@@ -421,7 +424,6 @@ const Details = ({ slug, type }) => {
               </div>
 
             </div>
-
             <div className="mx-4 font-bold mt-16">
               <h2 className="text-2xl " id="episodes">Episodes of Season {selectedSeason}: </h2>
 
@@ -454,8 +456,6 @@ const Details = ({ slug, type }) => {
               </div>
             </div>
           </div>
-
-
         }
 
         <div className="mx-4">
@@ -607,6 +607,9 @@ const Details = ({ slug, type }) => {
 };
 
 export default Details;
+
+
+
 
 
 

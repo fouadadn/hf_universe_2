@@ -61,7 +61,7 @@ const HomePageSlider = ({ shows }) => {
   return (
     <div className='w-full -mt-[81px] z-10 text-white'>
       <Swiper
-        className='relative'
+        className='relative pb-5'
         modules={[Navigation, Pagination, Autoplay]}
         autoplay={{ delay: 5000, disableOnInteraction: false }}
         spaceBetween={1}

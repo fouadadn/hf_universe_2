@@ -174,7 +174,7 @@ const PosterSlide = ({ movie, tv }) => {
           {media.length > 0
             ? media.map((show, i) => (
               <Link
-                href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name).toLocaleLowerCase().split(' ').join('-')}`}
+                href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
                 onClick={() => { changeId(show?.id); setArrows(false) }}
                 key={i}
                 className="shrink-0 relative">

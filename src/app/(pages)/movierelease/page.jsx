@@ -1,6 +1,8 @@
 "use client"
 import Footer from '@/app/components/Home/footer';
+import { useTvContext } from '@/app/context/idContext';
 import api from '@/app/utils/axiosInstance';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 
 const Movie = () => {
@@ -11,6 +13,7 @@ const Movie = () => {
   const [page, setPage] = useState(2)
   const date = new Date();
   const currentMonth = date.getMonth() + 1
+  const { changeId, setArrows } = useTvContext()
 
   const monthsWithIndex = {
     1: "January",
@@ -99,7 +102,10 @@ const Movie = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2  gap-6 mt-4">
             {
               thisMonth.length > 0 ? thisMonth.map((movie) => (
-                <div key={movie.id} className=" text-white rounded-lg p-2 shadow-md justify-items-start flex items-center gap-2">
+                <Link
+                  href={`movie/${movie.title}`}
+                  onClick={() => { changeId(movie?.id); setArrows(false) }}
+                  key={movie.id} className=" text-white rounded-lg p-2 shadow-md justify-items-start flex items-center gap-2">
                   <div className='bg-white h-12 w-12 rounded-full flex items-center justify-center'>
                     <span className='text-black text-2xl font-bold'>{String(movie.release_date)?.split('-')[2]}</span>
                   </div>
@@ -114,7 +120,7 @@ const Movie = () => {
                     <h2 className="text-lg font-semibold mt-2">{movie.title}</h2>
                     <p className="text-sm text-gray-400" style={{ color: "#99a1af" }}>Release: {movie.release_date}</p>
                   </div>
-                </div>
+                </Link>
               ))
                 : Array.from(Array(15)).map((_, i) => <div key={i} className='flex gap-3 items-center animate-pulse'>
                   <div className='w-14 h-14 rounded-full gri'>
@@ -143,7 +149,10 @@ const Movie = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2  gap-6 mt-4">
             {
               nextMonth.length > 0 ? nextMonth.map((movie) => (
-                <div key={movie.id} className=" text-white rounded-lg p-2 shadow-md justify-items-start flex items-center gap-2 ">
+                <Link
+                  href={`movie/${movie.title}`}
+                  onClick={() => { changeId(movie?.id); setArrows(false) }}
+                  key={movie.id} className=" text-white rounded-lg p-2 shadow-md justify-items-start flex items-center gap-2 ">
                   <div className='bg-white h-12 w-12 rounded-full flex items-center justify-center shrink-0'>
                     <span className='text-black text-2xl font-bold'>{String(movie.release_date)?.split('-')[2]}</span>
                   </div>
@@ -158,7 +167,7 @@ const Movie = () => {
                     <h2 className="text-lg font-semibold mt-2">{movie.title}</h2>
                     <p className="text-sm text-gray-400" style={{ color: "#99a1af" }}>Release: {movie.release_date}</p>
                   </div>
-                </div>
+                </Link>
               )) : Array.from(Array(15)).map((_, i) => <div key={i} className='flex gap-3 items-center animate-pulse'>
                 <div className='h-14 w-14 rounded-full gri'>
 
