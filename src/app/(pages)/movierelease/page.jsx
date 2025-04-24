@@ -13,7 +13,7 @@ const Movie = () => {
   const [page, setPage] = useState(2)
   const date = new Date();
   const currentMonth = date.getMonth() + 1
-  const { changeId, setArrows } = useTvContext()
+  const { changeId, setArrows, slugify } = useTvContext()
 
   const monthsWithIndex = {
     1: "January",
@@ -103,7 +103,7 @@ const Movie = () => {
             {
               thisMonth.length > 0 ? thisMonth.map((movie) => (
                 <Link
-                  href={`movie/${movie.title}`}
+                  href={`movie/${slugify(movie.title)}`}
                   onClick={() => { changeId(movie?.id); setArrows(false) }}
                   key={movie.id} className=" text-white rounded-lg p-2 shadow-md justify-items-start flex items-center gap-2">
                   <div className='bg-white h-12 w-12 rounded-full flex items-center justify-center'>
@@ -150,7 +150,7 @@ const Movie = () => {
             {
               nextMonth.length > 0 ? nextMonth.map((movie) => (
                 <Link
-                  href={`movie/${movie.title}`}
+                  href={`movie/${slugify(movie.title)}`}
                   onClick={() => { changeId(movie?.id); setArrows(false) }}
                   key={movie.id} className=" text-white rounded-lg p-2 shadow-md justify-items-start flex items-center gap-2 ">
                   <div className='bg-white h-12 w-12 rounded-full flex items-center justify-center shrink-0'>
