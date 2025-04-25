@@ -2,19 +2,46 @@
 
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth"
+import { authe } from "@/app/firebase";
+import { useTvContext } from "@/app/context/idContext";
 
 const SignUp = () => {
 
-
+  const { currentUser, setCurrentUser } = useTvContext();
   const [height, setHeight] = useState(0)
-
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    password_confirmation: ''
+  })
 
   useEffect(() => {
     setHeight(window.innerHeight)
   }, [])
+
+  const signUp = async (email, password) => {
+
+    if (!formData.username || !formData.email || !formData.password || !formData.password_confirmation) {
+      return alert('all fields required')
+    }
+
+    if (formData.password !== formData.password_confirmation) {
+      return alert('passwords does not match')
+    }
+
+    const userCredential = await createUserWithEmailAndPassword(authe, email, password)
+    const token = await userCredential.user.getIdToken()
+    localStorage.setItem('GToken', JSON.stringify(token))
+  }
+
   return (
     <div className="flex justify-center font-sans items-center duration-300" style={{ height: height }}>
-      <form style={{backgroundColor: "#44403b30" ,  border: "0.2px solid #ffffff35"}} className="border-[0.5px] border-white/20 p-10 rounded-4xl bg-stone-700/30 w-96 md:w-[500px] ">
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        signUp(formData.email, formData.password)
+      }} style={{ backgroundColor: "#44403b30", border: "0.2px solid #ffffff35" }} className="border-[0.5px] border-white/20 p-10 rounded-4xl bg-stone-700/30 w-96 md:w-[500px] ">
         <div className="flex items-center justify-between">
           <div>
             <Link
@@ -29,7 +56,7 @@ const SignUp = () => {
             </span>
           </div>
           <Link href={'/'}>
-            <button style={{ border: "0.2px solid #ffffff35"}} className="border-white/30 border rounded-lg px-4 py-2 cursor-pointer">
+            <button style={{ border: "0.2px solid #ffffff35" }} className="border-white/30 border rounded-lg px-4 py-2 cursor-pointer">
               Close
             </button>
           </Link>
@@ -40,7 +67,8 @@ const SignUp = () => {
               Username
             </label>
             <input
-            style={{border: "1px solid #ffffff55" }}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              style={{ border: "1px solid #ffffff55" }}
               type="text"
               id="username"
               placeholder="Username"
@@ -53,7 +81,8 @@ const SignUp = () => {
               Email
             </label>
             <input
-            style={{border: "1px solid #ffffff55" }}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              style={{ border: "1px solid #ffffff55" }}
               type="email"
               id="email"
               placeholder="Email"
@@ -66,7 +95,8 @@ const SignUp = () => {
               Password
             </label>
             <input
-            style={{border: "1px solid #ffffff55" }}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              style={{ border: "1px solid #ffffff55" }}
               type="password"
               placeholder="password"
               className="outline-0 border-[1px] border-white/20 rounded-lg px-5 py-3 mt-1 bg-black"
@@ -78,7 +108,8 @@ const SignUp = () => {
               Password
             </label>
             <input
-            style={{border: "1px solid #ffffff55" }}
+              onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
+              style={{ border: "1px solid #ffffff55" }}
               type="password"
               placeholder="Confirm password"
               className="outline-0 border-[1px] border-white/20 rounded-lg px-5 py-3 mt-1 bg-black"
@@ -92,7 +123,7 @@ const SignUp = () => {
         </div>
 
         <div className="mt-2">
-          <button style={{color: "#44403b"}} className="hover:bg-stone-700/50 hover:text-white w-full bg-white text-stone-700 rounded-xl py-2 font-bold duration-200 cursor-pointer">
+          <button className="hover:bg-stone-700/50 hover:text-white w-full text-stone-700 bg-white  rounded-xl py-2 font-bold duration-200 cursor-pointer">
             Sign Up
           </button>
         </div>

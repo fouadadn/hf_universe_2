@@ -6,6 +6,8 @@ import Link from "next/link";
 import api from '@/app/utils/axiosInstance';
 import { useTvContext } from '@/app/context/idContext';
 import { usePathname } from 'next/navigation';
+import { signOut } from 'firebase/auth';
+import { authe } from '@/app/firebase';
 
 const Nav = () => {
 
@@ -15,12 +17,9 @@ const Nav = () => {
     const [displaysearchData, setDisplaysearchData] = useState(false)
     const [noResults, setNoResults] = useState(false)
     const inpurRef = useRef(null)
-    const { id, changeId, slugify, setArrows, providerName } = useTvContext()
+    const { id, changeId, slugify, setArrows, providerName, currentUser } = useTvContext()
     const [showLink, setShowLinks] = useState(false)
     const path = usePathname();
-
-    console.log(String(path))
-
 
     useEffect(() => {
         try {
@@ -58,6 +57,16 @@ const Nav = () => {
     }
 
     const [isFocused, setIsFocused] = useState(false);
+
+
+    const handleSignOut = async () => {
+        try {
+            await signOut(authe)
+            console.log('User signed out')
+        } catch (error) {
+            console.error('Error signing out:', error)
+        }
+    }
 
 
     return (
@@ -144,16 +153,24 @@ const Nav = () => {
                         </div>
 
                         <div className="gap-2 hidden lg:flex ">
-                            <Link href={"/auth/sign-up"} className=' '>
-                                <button className="border-[1px] rounded-xl px-3 py-[7px] cursor-pointer whitespace-nowrap">
-                                    Sign Up
+                            {!currentUser ?
+                                <>
+                                    <Link href={"/auth/sign-up"} className=' '>
+                                        <button className="border-[1px] rounded-xl px-3 py-[7px] cursor-pointer whitespace-nowrap">
+                                            Sign Up
+                                        </button>
+                                    </Link>
+                                    <Link href={"/auth/login"} className=''>
+                                        <button className=" rounded-xl px-3 py-[7px] bg-[#5c00cc] cursor-pointer" >
+                                            Login
+                                        </button>
+                                    </Link>
+                                </> :
+                                <button onClick={handleSignOut} className="whitespace-nowrap rounded-xl px-3 py-[7px] bg-[#5c00cc] cursor-pointer" >
+                                    Log Out
                                 </button>
-                            </Link>
-                            <Link href={"/auth/login"} className=''>
-                                <button className=" rounded-xl px-3 py-[7px] bg-[#5c00cc] cursor-pointer" >
-                                    Login
-                                </button>
-                            </Link>
+
+                            }
                         </div>
 
                         <Link href={'/auth/login'} className={`${searchOpen ? "hidden" : "block"}  lg:hidden cursor-pointer`}>
