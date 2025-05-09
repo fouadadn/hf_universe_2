@@ -6,15 +6,15 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, Dot, Star, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useTvContext } from "@/app/context/idContext";
+import axios from "axios";
 
-const BackdropSlide = ({ media_type, is_korean, show, title }) => {
+const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" }) => {
   const [data, setData] = useState([]);
   const [showCombineData, setShowCombineData] = useState([]);
   const [genres, setGenres] = useState([]);
   const [imgSrc, setImgSrc] = useState("/assets/black_backdrop.png");
   const [isfound, setIsFound] = useState(true)
-  const { id, changeId , slugify , setArrows} = useTvContext()
-
+  const { id, changeId, slugify, setArrows } = useTvContext()
 
 
 
@@ -143,22 +143,24 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
   }, [])
 
   // console.log(showCombineData)
-  
+
 
   return (
     <div className=" relative group">
-      <h1 className="text-3xl font-bold">
+      <h1 className="text-3xl font-bold mx-2">
         {title}
       </h1>
 
-      <div className="flex gap-6 overflow-auto hide-scrollbar mt-4" ref={scrollRef}>
+      <div className="flex gap-6 overflow-auto hide-scrollbar mt-4 p-2" ref={scrollRef}>
         {(showCombineData.length ? showCombineData : data).length > 0
-          && (showCombineData.length > 0 ? showCombineData : data).map((show, i) => (
+          && (showCombineData.length > 0 ? showCombineData : data)
+          .map((show, i) => (
+            show.backdrop_path &&
             <Link
-              href={`/${show.media_type}/${show.title ? slugify(show?.title): slugify(show?.name)}`}
-              onClick={() =>{ changeId(show?.id) ; setArrows(false)}}
+              href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
+              onClick={() => { changeId(show?.id); setArrows(false) }}
               key={i}
-              className="shrink-0">
+              className="shrink-0 hover:scale-105 duration-200">
               <div className="h-[168.6px] ">
                 <img
                   src={
@@ -180,7 +182,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title }) => {
 
               <div className="mt-3 w-[300px] ">
                 <h2 className="font-bold">
-                  {media_type === "tv" ? String( show.name).split(' ').slice(0 , 7).join(' ') : String(show.title).split(' ').slice(0 , 7).join(' ')}
+                  {media_type === "tv" ? String(show.name).split(' ').slice(0, 7).join(' ') : String(show.title).split(' ').slice(0, 7).join(' ')}
                 </h2>
                 <div className="mt- flex items-center gap-1">
                   <div className="flex gap-1 items-center">

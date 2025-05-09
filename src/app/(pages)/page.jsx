@@ -5,8 +5,11 @@ import PosterSlide from "../components/Home/posterSlide";
 import PopularWeek from "../components/Home/popularWeek";
 import BackdropSlide from "../components/Home/backdropSlide";
 import Footer from "../components/Home/footer";
+import Whishlist from "../components/Home/whishlistcomp";
+import { useTvContext } from "../context/idContext";
 
 export default function Home() {
+  const { currentUser } = useTvContext();
 
 
   return (
@@ -17,16 +20,24 @@ export default function Home() {
       </div>
 
       <div className="bg-black mt-6 lg:-mt-28 z-[9999] relative ">
-        <div className=" ">
+
+        <div className="mx-2 ">
           <PosterSlide />
         </div>
 
-        <div className="mt-20 ">
+        <div className={`${currentUser ? "block" : "hidden"} mt-10`}>
+          <h2 className="text-3xl font-bold mx-2">Your Watchlist</h2>
+          <div className="-mt-16 -mb-10">
+            <Whishlist check={true} />
+          </div>
+        </div>
+
+        <div className="mt-20 mx-2">
           <h1 className="text-3xl font-bold mt-14">Popular of the week</h1>
           <PopularWeek />
         </div>
 
-        <div className="mt-14">
+        <div className="mt-14 ">
           <BackdropSlide title={"Movies"} media_type={"movie"} />
         </div>
 
@@ -34,7 +45,7 @@ export default function Home() {
           <BackdropSlide title={"Seires"} media_type={"tv"} />
         </div>
 
-        <div className="mt-14">
+        <div className="mt-14 ">
           <BackdropSlide title={"Korean Series"} media_type={"tv"} is_korean={true} />
         </div>
 

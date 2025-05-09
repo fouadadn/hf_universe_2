@@ -8,19 +8,22 @@ import {
   ChevronRight,
   CirclePlay,
   Dot,
-  EthernetPort,
   Play,
   Star,
   UserRound,
 } from "lucide-react";
 import Link from "next/link";
 import BackdropSlide from "../Home/backdropSlide";
-// import Seasons from "./components/seasons";
 import Footer from "../Home/footer";
 import { useTvContext } from "@/app/context/idContext";
-import { usePathname, useRouter } from "next/navigation";
-import Head from 'next/head';
-
+import { useRouter } from "next/navigation";
+import useAddToWishList from "@/app/Hooks/useAddToWishList";
+import { GoBookmarkSlash } from "react-icons/go";
+import UseDeleteFromWishList from "@/app/Hooks/useDeleteFromWishList";
+import authe from "@/app/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import axios from "axios";
+import apiForHf from "@/app/utils/axiosInstanceForHfApi";
 
 
 
@@ -35,63 +38,80 @@ const Details = ({ slug, type }) => {
   const [screenWidth, setScreenWidth] = useState(0);
   const [seasonInfo, setSeasonInfo] = useState({})
   const [episodes, setEpisodes] = useState([])
-  const { id, setId, arrows, setArrows, slugify } = useTvContext()
+  const { id, setId, arrows, setArrows, slugify, currentUser } = useTvContext()
   const [rerender, setRerender] = useState(1)
   const scrollRef = useRef(null)
   const [showLeft, setShowLeft] = useState(false)
   const [showRight, setShowRight] = useState(false)
+  const router = useRouter()
+
+  const UseAddToWishList = useAddToWishList()
+  const useDeleteFromWishList = UseDeleteFromWishList()
 
 
   useEffect(() => {
-    try {
-      async function getItemBySlug(slug, type) {
+    const unsubscribe = onAuthStateChanged(authe, async (user) => {
 
-        const query = slug.replace(/-/g, ' '); // convert slug back to a normal name
-        const data = (await api.get(`/search/${type}?query=${encodeURIComponent(query)}`)).data
+      try {
+        async function getItemBySlug(slug, type) {
 
-        const match = data.results.find((item) => slugify(item.title || item.name) === slug);
+          const query = slug.replace(/-/g, ' '); // convert slug back to a normal name
+          const data = (await api.get(`/search/${type}?query=${encodeURIComponent(query)}`)).data
 
-        return match;
-      }
+          const match = data.results.find((item) => slugify(item.title || item.name) === slug);
 
-      async function fetchMovies() {
-
-        if (id) {
-          const movie = await getItemBySlug(slug, type)
-          const [show, casts, video, recommendationss, similar] = [
-            (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}`)).data,
-            (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/credits`)).data?.cast,
-            (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/videos`)).data?.results,
-            (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/recommendations`)).data?.results,
-            (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/similar`)).data?.results,
-            // (await api.get(`/${type}/${id}/watch/providers`)).data,
-          ];
-          const filtredVideos = video?.find(
-            (vid) => vid.type === "Trailer" && vid.site === "YouTube"
-          )
-
-
-          setShow(show);
-          setCast(casts);
-          setVideos(filtredVideos);
-          setRecommendations(recommendationss)
-          setSimilares(similar)
-          setRerender(rerender + 1)
+          return match;
         }
+
+        async function fetchMovies() {
+
+          if (id) {
+            const movie = await getItemBySlug(slug, type)
+            const [show, casts, video, recommendationss, similar] = [
+              (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}`)).data,
+              (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/credits`)).data?.cast,
+              (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/videos`)).data?.results,
+              (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/recommendations`)).data?.results,
+              (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/similar`)).data?.results,
+              // (await api.get(`/${type}/${id}/watch/providers`)).data,
+            ];
+            const filtredVideos = video?.find(
+              (vid) => vid.type === "Trailer" && vid.site === "YouTube"
+            )
+
+            const token = await user?.getIdToken(true);
+
+            const res = user && (await apiForHf.get(`/api/wishlist/check/${show.id}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              }
+            })).data
+
+            setShow({ ...show, ifSaved: res });
+            setCast(casts);
+            setVideos(filtredVideos);
+            setRecommendations(recommendationss)
+            setSimilares(similar)
+            setRerender(rerender + 1)
+          }
+        }
+
+        fetchMovies();
+
+        const onPopState = (event) => {
+          setArrows(true)
+        };
+        window.onpopstate = onPopState;
+      } catch (err) {
+        console.log(err);
       }
+    })
 
-      fetchMovies();
-
-      const onPopState = (event) => {
-        // console.log('User used back/forward navigation!');
-        setArrows(true)
-      };
-
-      window.onpopstate = onPopState;
-
-    } catch (err) {
-      console.log(err);
-    }
+    return () => {
+      unsubscribe();
+    };
   }, [slug, id]);
 
   useEffect(() => {
@@ -185,10 +205,6 @@ const Details = ({ slug, type }) => {
     }
   }
 
-  console.log(show)
-
-
-
   return (
     <>
       <div className="-mt-32">
@@ -281,8 +297,25 @@ const Details = ({ slug, type }) => {
                       <CirclePlay /> <span>Watch Trailer</span>
                     </button>
                   </Link>
-                  <button style={{ backgroundColor: "#ffffff20" }} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200">
-                    <Bookmark />
+                  <button onClick={
+                    () => {
+                      if (currentUser) {
+                        if (show?.ifSaved) {
+                          useDeleteFromWishList(show?.id)
+                          setShow({ ...show, ifSaved: false })
+                        } else {
+                          UseAddToWishList(show?.id, show?.title ? show?.title : show?.name, show?.backdrop_path, show?.genres, show?.vote_average, type, show?.poster_path)
+                          setShow({ ...show, ifSaved: true }
+                          );
+                        }
+                      } else {
+                        router.push('/auth/sign-up')
+                      }
+                    }
+                  } style={{ backgroundColor: "#ffffff20" }} className='cursor-pointer rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'>
+                    {
+                      show?.ifSaved ? <GoBookmarkSlash size={24} /> : <Bookmark />}
+
                   </button>
                 </div>
               </div>
@@ -386,8 +419,8 @@ const Details = ({ slug, type }) => {
               <div className='relative group '>
                 <div ref={scrollRef} className={`mx-4 flex gap-3 mt-2 overflow-x-scroll hide-scrollbar`}>
                   {
-                    show?.seasons?.length > 0 ? show?.seasons?.map((s, i) => !(s?.season_number === 0 ) &&
-                    s?.air_date &&
+                    show?.seasons?.length > 0 ? show?.seasons?.map((s, i) => !(s?.season_number === 0) &&
+                      s?.air_date &&
                       <button key={i} onClick={() => { setSelectedSeason(s?.season_number); selectedSeason !== s?.season_number && setEpisodes([]) }} className="shrink-0 cursor-pointer">
                         <div className="overflow-hidden rounded-xl">
                           <img src={`https://image.tmdb.org/t/p/w500${s?.poster_path}`} className=" w-44 scale-110 hover:scale-100 duration-300" alt="" />
@@ -430,16 +463,29 @@ const Details = ({ slug, type }) => {
               <div className="flex gap-3 mt-2 flex-wrap justify-center mx-6  hide-scrollbar">
                 {
                   episodes?.length > 0 ? episodes?.map((p, i) =>
-                    <Link href={`/stream/tv/${show?.id}/${seasonInfo?.season_number}/${p?.episode_number}`} key={i}
-                      className="relative shrink-0 cursor-pointer overflow-hidden w-full md:w-72 ">
-                      <div className="overflow-hidden rounded-xl">
-                        <img src={`https://image.tmdb.org/t/p/w500${p?.still_path}`}
-                          className="w-full  md:h-[161.85px]  md:w-72 scale-110 hover:scale-100 duration-300" alt="" />
+                    <Link style={{ pointerEvents: `${!compareDate(p?.air_date) && "none"}` }} href={`/stream/tv/${show?.id}/${seasonInfo?.season_number}/${p?.episode_number}`} key={i}
+                      className={` relative shrink-0 rounded-xl cursor-pointer overflow-hidden w-full md:w-72 `}>
+                      <div className={`${!compareDate(p?.air_date) && "bg-stone-800"} overflow-hidden rounded-xl`}>
+                        {
+                          compareDate(p?.air_date) ?
+                            <img src={`https://image.tmdb.org/t/p/w500${p?.still_path}`}
+                              className="w-full  md:h-[161.85px]  md:w-72 scale-110 hover:scale-100 duration-300" alt="" /> :
+                            <div className="w-full flex justify-center items-center  md:h-[161.85px]  md:w-72 duration-300 py-10">
+                              <div className="flex flex-col items-center">
+                                <span>coming soon</span>
+                                <span className="text-xs text-stone-400">{p?.air_date}</span>
+                              </div>
+                            </div>
+                        }
+
                       </div>
                       <div className="text-center mt-1">
-                        <span>
-                          {p?.name}
-                        </span>
+                        {
+                          compareDate(p?.air_date) &&
+                          <span>
+                            {p?.name}
+                          </span>
+                        }
                       </div>
 
                       <div className=" text-sm absolute z-50 top-0 right-0  px-2 py-[2px] text-start rounded-bl-md"
@@ -599,7 +645,7 @@ const Details = ({ slug, type }) => {
           </div>
         </div>
 
-      </div>
+      </div >
       <hr className="mt-6" style={{ borderColor: "#ffffff30" }} />
       <Footer />
     </>

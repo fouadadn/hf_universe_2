@@ -1,13 +1,14 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from 'react'
-import { CircleUserRound, Dot, Menu, Search, X } from "lucide-react";
+import { ChevronDown, CircleUserRound, Dot, Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import api from '@/app/utils/axiosInstance';
 import { useTvContext } from '@/app/context/idContext';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'firebase/auth';
-import { authe } from '@/app/firebase';
+import authe from '@/app/firebase';
+import Footer from './footer';
 
 const Nav = () => {
 
@@ -20,6 +21,7 @@ const Nav = () => {
     const { id, changeId, slugify, setArrows, providerName, currentUser } = useTvContext()
     const [showLink, setShowLinks] = useState(false)
     const path = usePathname();
+    const [dispayAccount, setDisplayAccount] = useState(false)
 
     useEffect(() => {
         try {
@@ -33,7 +35,6 @@ const Nav = () => {
         } catch (err) {
             console.log(err)
         }
-
         // document.body.onclick = () => {
         //     setSearchOpen(false)
         // }
@@ -60,14 +61,19 @@ const Nav = () => {
 
 
     const handleSignOut = async () => {
+        setDisplayAccount(false)
         try {
             await signOut(authe)
             console.log('User signed out')
         } catch (error) {
             console.error('Error signing out:', error)
         }
+
+
     }
 
+
+    // console.log(currentUser)
 
     return (
         <>
@@ -84,16 +90,17 @@ const Nav = () => {
                         <Link className={`hover:underline ${String(path) === '/' ? "text-gray-300 underline" : "text-white"}`} href={"/"}>Home</Link>
                         <Link className={`hover:underline ${String(path).includes('/discover') ? "text-gray-300 underline" : "text-white"}`} href={`/discover/${slugify(providerName)}`}>Discover</Link>
                         <Link className={`hover:underline ${String(path).includes('/movierelease') ? "text-gray-300 underline" : "text-white"}`} href={"/movierelease"}>Movie Release</Link>
-                        <Link className={`hover:underline ${String(path).includes('/about') ? "text-gray-300 underline" : "text-white"}`} href={"/about"}>About</Link>
+                        <Link className={`hover:underline ${String(path).includes('/your-watchlist') ? "text-gray-300 underline" : "text-white"}`} href={currentUser ? `/${slugify("your-watchlist")}` : "/auth/login"}>your list</Link>
                     </div>
 
-                    <div className="w-full md:w-fit flex items-center gap-4  ">
+                    <div className="w-full md:w-fit flex items-center gap-4">
+
                         <div className={`${searchOpen ? "mb-2" : ""} relative w-[100%] `}>
                             <div onClick={() => setDisplaysearchData(true)} className={`relative -top-5  ${searchOpen ? 'top-0 mt-2 md:mb-2 left-2 h-10 md:h-fit' : "glbo"}   pr-3 `}>
                                 <div className={` ${searchOpen ? "md:absolute -top-5 right-1 -mt-3 md:mt-0" : "absolute"}
                           overflow-hidden ${searchOpen ? `bg-[#21262a] w-full` : "bg-transparent"}
                           hover:bg-[#21262a]  flex duration-300 rounded-full p-2 w-10    
-                           ${searchOpen ? "w-60 md:w-72 hover:w-full md:hover:w-72" : "hover:w-full md:hover:w-72   "}  cursor-pointer `}>
+                           ${searchOpen ? "w-60 md:w-72 hover:w-full md:hover:w-72" : "hover:w-full md:hover:w-72"}  cursor-pointer`}>
 
                                     <div className={`relative z-50 w-6 h-6 ${searchOpen ? "order-2" : "order-1"}`} onClick={() => { handleSearchClick() }} >
                                         <div className=''>
@@ -107,6 +114,7 @@ const Nav = () => {
                                         <input value={searchQuery} onChange={(e) => {
                                             setNoResults(false)
                                             setSearchData([]);
+                                            setDisplayAccount(false)
                                             setSearchQuery(e.target.value);
                                             setTimeout(() => {
                                                 if (!searchData.lenghth > 0) {
@@ -125,6 +133,7 @@ const Nav = () => {
                                 <div className='flex flex-col gap-2  px-3 h-[70vh] md:h-96'>
                                     {
                                         searchData?.length > 0 ? searchData?.map((show, i) =>
+                                            show.poster_path &&
                                             <Link key={i}
                                                 onClick={() => { setDisplaysearchData(false); setSearchQuery(''); setSearchOpen(false); changeId(show?.id); setArrows(false) }}
                                                 href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
@@ -152,8 +161,26 @@ const Nav = () => {
 
                         </div>
 
-                        <div className="gap-2 hidden lg:flex ">
-                            {!currentUser ?
+                        <div className={`${searchOpen ? "hidden" : "block"} gap-2 hidden lg:flex relative`}>
+                            {currentUser?.uid ?
+
+                                <button
+                                    onClick={
+                                        () => {
+                                            setDisplayAccount(!dispayAccount)
+                                        }
+                                    }
+                                    className="whitespace-nowrap rounded-full  gri cursor-pointer flex items-center p-1 gap-1"
+                                    style={{ backgroundColor: "#21262a50" }}
+                                >
+                                    <div className={` bg-[#21262a] w-9 h-9  rounded-full`}>
+                                        <span className='text-2xl uppercase relative top-[2px] '>{String(currentUser?.displayName)?.split('')[0]}</span>
+                                    </div>
+
+                                    <span className={`${dispayAccount ? "rotate-180" : "rotate-0"} duration-200`}>
+                                        <ChevronDown size={20} />
+                                    </span>
+                                </button> :
                                 <>
                                     <Link href={"/auth/sign-up"} className=' '>
                                         <button className="border-[1px] rounded-xl px-3 py-[7px] cursor-pointer whitespace-nowrap">
@@ -165,19 +192,67 @@ const Nav = () => {
                                             Login
                                         </button>
                                     </Link>
-                                </> :
-                                <button onClick={handleSignOut} className="whitespace-nowrap rounded-xl px-3 py-[7px] bg-[#5c00cc] cursor-pointer" >
-                                    Log Out
-                                </button>
+                                </>
+
 
                             }
+
+                            <div className={`${dispayAccount ? "flex" : "hidden"} w-52  py-2 absolute right-0 top-12 rounded-xl  flex-col z-[999999] `} style={{ backgroundColor: "#21262a" }}>
+                                <div className='px-3 uppercase font-semibold text-lg text-stone-300' style={{ color: "#d6d3d1" }}>
+                                    {currentUser?.displayName}
+                                </div>
+                                <div className='flex flex-col  pb-2 mt-2'>
+                                    <a href="" className='hover:bg-gray-600 duration-200 px-3'>My Account</a>
+                                    <a href="/your-Wwtchlist" className='hover:bg-gray-600 duration-200 px-3'>your Watchlist </a>
+                                </div>
+
+                                <hr style={{ borderColor: "#ffffff30" }} />
+                                <button onClick={handleSignOut} className='cursor-pointer text-start hover:bg-gray-600 duration-200 px-3 mt-2'>Sign Out </button>
+
+                            </div>
                         </div>
 
-                        <Link href={'/auth/login'} className={`${searchOpen ? "hidden" : "block"}  lg:hidden cursor-pointer`}>
-                            <CircleUserRound />
-                        </Link>
+                        <div className={`${searchOpen ? "hidden" : "block"}  lg:hidden cursor-pointer relative `}>
+                            {currentUser ? <button
+                                onClick={
+                                    () => {
+                                        setDisplayAccount(!dispayAccount)
+                                        setShowLinks(false)
+                                    }
+                                }
+                                className="whitespace-nowrap rounded-full  gri cursor-pointer flex items-center p-1 gap-1"
+                                style={{ backgroundColor: "#21262a50" }}
+                            >
+                                <div className={` bg-[#21262a] w-9 h-9  rounded-full`}>
+                                    <span className='text-2xl uppercase relative top-[2px] '>{String(currentUser?.displayName)?.split('')[0]}</span>
+                                </div>
 
-                        <button onClick={() => setShowLinks(!showLink)} className='cursor-pointer'>
+                                <span className={`${dispayAccount ? "rotate-180" : "rotate-0"} duration-200`}>
+                                    <ChevronDown size={20} />
+                                </span>
+                            </button> :
+                                <Link href={'/auth/login'}>
+                                    <CircleUserRound />
+                                </Link>
+                            }
+
+
+                            <div className={`${dispayAccount ? "flex" : "hidden"} w-52  py-2 absolute right-0 top-12 rounded-xl z-[999999]  flex-col `} style={{ backgroundColor: "#21262a" }}>
+                                <div className='px-3 uppercase font-semibold text-lg' style={{ color: "#d6d3d1" }}>
+                                    {currentUser?.displayName}
+                                </div>
+                                <div className='flex flex-col  pb-2 mt-2'>
+                                    <a href="" className='hover:bg-gray-600 duration-200 px-3'>My Account</a>
+                                    <a href="/your-watchlist" className='hover:bg-gray-600 duration-200 px-3'>your Watchlist </a>
+                                </div>
+
+                                <hr style={{ borderColor: "#ffffff30" }} />
+                                <button onClick={handleSignOut} className='cursor-pointer text-start hover:bg-gray-600 duration-200 px-3 mt-2'>Sign Out </button>
+
+                            </div>
+                        </div>
+
+                        <button onClick={() => { setShowLinks(!showLink); setDisplayAccount(false) }} className={`${searchOpen ? "hidden " : "inline"} cursor-pointer `}>
                             <Menu size={28} className={`${searchOpen || showLink ? "hidden " : "inline"} block lg:hidden shrink-0`} />
                             <X size={28} className={`${searchOpen || !showLink ? "hidden" : "inline"} block lg:hidden shrink-0`} />
                         </button>
@@ -188,11 +263,11 @@ const Nav = () => {
 
             <div className={`${showLink ? 'top-[70px] opacity-100 lg:top-0 lg:opacity-0' : "top-0 opacity-0"} ${searchOpen ? "hidden" : "block"} flex justify-center w-full duration-200   absolute z-50 `} >
 
-                <div className='gap-6 flex rounded-xl px-3 py-1 ' style={{ backgroundColor: "#00000080" }}>
+                <div className='gap-6 flex rounded-xl px-3 py-1 ' style={{ backgroundColor: "#00000080" }} onClick={() => setShowLinks(false)}>
                     <Link className={`hover:underline ${String(path) === '/' ? "text-gray-300 underline" : "text-white"}`} href={"/"}>Home</Link>
                     <Link className={`hover:underline ${String(path).includes('/discover') ? "text-gray-300 underline" : "text-white"}`} href={`/discover/${slugify(providerName)}`}>Discover</Link>
                     <Link className={`hover:underline ${String(path).includes('/movierelease') ? "text-gray-300 underline" : "text-white"}`} href={"/movierelease"}>Movie Release</Link>
-                    <Link className={`hover:underline ${String(path).includes('/about') ? "text-gray-300 underline" : "text-white"}`} href={"/about"}>About</Link>
+                    <Link className={`hover:underline ${String(path).includes('/your-watchlist') ? "text-gray-300 underline" : "text-white"}`} href={"/your-watchlist"}>your list</Link>
                 </div>
             </div>
         </>

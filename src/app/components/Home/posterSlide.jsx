@@ -11,7 +11,7 @@ const PosterSlide = ({ movie, tv }) => {
   const [media, setMedia] = useState([]);
   const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/w500`);
   const [providers, setProviders] = useState([]);
-  const popularProviderIds = [8, 9, 337, 15, 283, 387, 526 , 350 , 531]; //80 AMC
+  const popularProviderIds = [8, 9, 337, 15, 283, 387, 526, 350, 531]; //80 AMC
   const { id, changeId, setArrows, slugify, changeProviderId } = useTvContext()
 
 
@@ -182,7 +182,7 @@ const PosterSlide = ({ movie, tv }) => {
                   <div className="absolute bottom-0 z-50">
                     <div className="px-5 pb-3">
                       <h2 className=" font-semibold">
-                        {show.title ? show.title : show.name}
+                        {show.title ? String(show.title).split(' ').slice(0, 3).join(' ') : String(show.name).split(' ').slice(0, 3).join(' ')}
                       </h2>
                       <div className="flex items-center text-sm gap-1">
                         <Star fill="gold" stroke="gold" size={15} />
@@ -227,7 +227,7 @@ const PosterSlide = ({ movie, tv }) => {
                     objectPosition: "center", // Optional, if you need to control the position of the image
                   }}
                   className="rounded-xl "
-                  // onError={handleError}
+                // onError={handleError}
                 />
               </Link>
             ))
@@ -235,13 +235,14 @@ const PosterSlide = ({ movie, tv }) => {
               <div
                 key={i}
                 className="w-[250px] h-[375px] bg-stone-600 shrink-0 rounded-xl animate-pulse gri"></div>
-            ))}
+            ))
+            }
 
 
         </div>
 
         <div className="opacity-0 group-hover:opacity-100 duration-300 hidden md:block">
-          <div className={`${showLeft ? "opacity-100" : "opacity-0"} duration-400 w-24 bg-[linear-gradient(to_right,black_5%,transparent_60%)] z-[999999] h-[375px] top-0 absolute flex items-center `}>
+          <div className={`${showLeft ? "opacity-100" : "opacity-0"} duration-400 w-24 bg-[linear-gradient(to_right,black_5%,transparent_60%)] z-[999] h-[375px] top-0 absolute flex items-center `}>
             <div
               onClick={() => scroll("left")}
               className={`text-3xl  font-bold border-[1px] bg-white rounded-full p-[1px] ml-2 cursor-pointer `}>
@@ -249,7 +250,7 @@ const PosterSlide = ({ movie, tv }) => {
             </div>
           </div>
 
-          <div className={`${showRight ? "opacity-100" : "opacity-0"} duration-400 w-24 bg-[linear-gradient(to_left,black_5%,transparent_60%)] z-[999999] h-[375px] top-0 right-0 absolute flex items-center justify-end`}>
+          <div className={`${showRight ? "opacity-100" : "opacity-0"} duration-400 w-24 bg-[linear-gradient(to_left,black_5%,transparent_60%)] z-[999] h-[375px] top-0 right-0 absolute flex items-center justify-end`}>
             <div
               onClick={() => scroll("right")}
               className={`text-3xl  font-bold border-[1px] bg-white mr-2 rounded-full p-[1px] cursor-pointer `}>

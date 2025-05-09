@@ -11,6 +11,14 @@ import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import Image from "next/image";
 import Link from 'next/link';
 import { useTvContext } from '@/app/context/idContext';
+import { useRouter } from 'next/navigation';
+import useAddToWishList from '@/app/Hooks/useAddToWishList';
+import { GoBookmarkSlash } from "react-icons/go";
+import axios from 'axios';
+import authe from '@/app/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import useDeleteFromWishList from '@/app/Hooks/useDeleteFromWishList';
+import apiForHf from '@/app/utils/axiosInstanceForHfApi';
 
 const HomePageSlider = ({ shows }) => {
 
@@ -18,45 +26,64 @@ const HomePageSlider = ({ shows }) => {
   const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/original`);
   const [screenWidth, setScreenWidth] = useState(0)
   const [show5WithTrailler, setShow5WithTrailler] = useState([])
-  const { id, changeId, providerId , slugify} = useTvContext()
-
+  const { id, changeId, providerId, slugify, currentUser, whishlistChange, setwhishlistChange } = useTvContext()
+  const router = useRouter();
+  const [checks, setChecks] = useState([])
+  const UseDeleteFromWishList = useDeleteFromWishList();
+  const UseAddToWishList = useAddToWishList()
 
 
   useEffect(() => {
-    try {
-      async function fetchMovies() {
+    const unsubscribe = onAuthStateChanged(authe, async (user) => {
+      // if (user) {
+      try {
+        const token = await user?.getIdToken(true);
         const datas = (await api.get("/trending/all/day")).data.results;
-        setData(shows ? shows : datas)
+        setData(shows ? shows : datas);
 
         const results = await Promise.all(
-          (shows ? shows : datas).filter(v => v.media_type !== 'person').slice(0, 5)?.map(async (v) => {
+          (shows ? shows : datas).filter(v => v.media_type !== 'person').slice(0, 5).map(async (v) => {
             const response = await api.get(`/${v?.media_type}/${v?.id}/videos`);
+
+            const ifSaved = user && (await apiForHf.get(`/api/wishlist/check/${v.id}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              }
+            })).data;
+
             const trailer = response.data?.results?.find(
               (vid) => vid.type === "Trailer" && vid.site === "YouTube"
             );
 
-            return { ...v, trailler: trailer };
+            return { ...v, trailler: trailer, ifSaved: ifSaved };
           })
         );
+
         setShow5WithTrailler(results);
+      } catch (err) {
+        console.error("Error fetching movies or wishlist:", err);
       }
-      fetchMovies()
-    } catch (err) {
-      console.log(err)
-    }
-
-    setScreenWidth(window.innerWidth)
-    window.addEventListener('resize', () => {
-      setScreenWidth(window.innerWidth)
-
+      // } else {
+      //   console.warn("User is not authenticated");
+      // }
     });
 
-  }, [shows, providerId])
+    setScreenWidth(window.innerWidth);
+    const resize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener('resize', resize);
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      unsubscribe(); // clean up Firebase listener
+    };
+  }, [shows, providerId]);
+
 
   const handleError = () => {
     setImgSrc("/assets/black_backdrop.png");
   };
-
 
   return (
     <div className='w-full -mt-[81px] z-10 text-white'>
@@ -100,12 +127,41 @@ const HomePageSlider = ({ shows }) => {
                   <p className='w-[350px] md:w-[460px] text-sm mb-2'>{String(show.overview).split(' ').slice(0, 40).length < String(show.overview).split(" ").length ? `${String(show.overview).split(' ').slice(0, 20).join(" ")} ...` : show.overview}</p>
                   <div className='flex gap-3'>
                     <Link
-                      href={`/${show.media_type}/${show.title ? String(show?.title).toLocaleLowerCase().split(' ').join('-') : String(show?.name).toLocaleLowerCase().split(' ').join('-')}`}
+                      href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
                       onClick={() => changeId(show?.id)}
 
                       className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]'><Play /> <span>Play Now</span> </Link>
                     <Link href={`/watch/${show?.trailler?.key}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]'><CirclePlay /> <span>Watch Trailer</span></Link>
-                    <button style={{ backgroundColor: "#ffffff20" }} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'><Bookmark /></button>
+                    <button onClick={
+                      async () => {
+
+                        if (currentUser) {
+                          if (show?.ifSaved) {
+                            UseDeleteFromWishList(show?.id)
+                            setShow5WithTrailler((prev) =>
+                              prev.map((item) =>
+                                item.id === show.id ? { ...item, ifSaved: false } : item
+                              )
+                            );
+                          } else {
+                            UseAddToWishList(show?.id, show?.title ? show?.title : show?.name, show?.backdrop_path, show?.genre_ids, show?.vote_average, show?.media_type, show?.poster_path)
+                            setShow5WithTrailler((prev) =>
+                              prev.map((item) =>
+                                item.id === show.id ? { ...item, ifSaved: true } : item
+                              )
+                            );
+                          }
+                        } else {
+                          router.push('/auth/sign-up')
+                        }
+
+
+                      }
+                    } style={{ backgroundColor: "#ffffff20" }} className='cursor-pointer rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'>
+                      {
+                        show?.ifSaved ? <GoBookmarkSlash size={24} /> : <Bookmark />}
+
+                    </button>
                   </div>
                 </div>
 
@@ -119,7 +175,7 @@ const HomePageSlider = ({ shows }) => {
 
       </Swiper>
 
-    </div>
+    </div >
   )
 }
 

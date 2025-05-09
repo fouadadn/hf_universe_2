@@ -185,7 +185,7 @@ const Movie = () => {
             }
           </div>
 
-          <div className='flex justify-center ' >
+          <div className='flex justify-center mt-6' >
             <button onClick={() => { setThisMonth([]); setNextMonth([]); setPage(page + 1); }} className='rounded-2xl px-4 py-2 cursor-pointer hover:bg-white hover:text-black font-bold duration-300' style={{ border: "1px solid white" }}>Show more</button>
           </div>
 

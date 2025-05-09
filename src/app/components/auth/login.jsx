@@ -3,9 +3,10 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth"
-import { authe } from "@/app/firebase";
-import { redirect } from 'next/navigation';
+import authe from "@/app/firebase";
+import { redirect, useRouter } from 'next/navigation';
 import { useTvContext } from "@/app/context/idContext";
+
 
 
 const Login = () => {
@@ -17,6 +18,7 @@ const Login = () => {
     email: '',
     password: '',
   })
+  const router = useRouter()
 
 
   useEffect(() => {
@@ -34,7 +36,7 @@ const Login = () => {
 
       const userCredential = await signInWithEmailAndPassword(authe, email, password)
       const token = await userCredential.user.getIdToken()
-      localStorage.setItem('GToken', JSON.stringify(token))
+      localStorage.setItem('GToken', token)
       setLoading(false)
     }
     catch (err) {
@@ -44,12 +46,19 @@ const Login = () => {
     }
   }
 
+  if (currentUser) {
+    return redirect('/')
+  }
+
+
   return (
     <div className="flex justify-center font-sans items-center duration-300" style={{ height: height }}>
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        login(formData.email, formData.password)
-      }} style={{ backgroundColor: "#44403b30", border: "0.2px solid #ffffff35" }} className="border-[0.5px] border-white/20 p-10 rounded-4xl bg-stone-700/30 w-96 md:w-[500px] ">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          login(formData.email, formData.password)
+        }}
+        style={{ backgroundColor: "#44403b30", border: "0.2px solid #ffffff35" }} className="border-[0.5px] border-white/20 p-10 rounded-4xl bg-stone-700/30 w-96 md:w-[500px] ">
         <div className="flex items-center justify-between">
           <div>
             <Link
@@ -61,9 +70,8 @@ const Login = () => {
 
             <span className="text-xs text-stone-500 relative bottom-3">Login to your account</span>
           </div>
-          <Link href={'/'}>
-            <button style={{ border: "0.2px solid #ffffff35" }} className="border-white/30 border rounded-lg px-4 py-2 cursor-pointer">Close</button>
-          </Link>
+          <div onClick={() => router.back()} style={{ border: "0.2px solid #ffffff35" }} className="border-white/30 border rounded-lg px-4 py-2 cursor-pointer">
+            Close </div>
         </div>
 
         {
@@ -125,12 +133,12 @@ const Login = () => {
           </a>
         </div>
 
-        <div className="mt-2 ">
+        <div className="mt-2 group">
           <button disabled={loading ? true : false} className="flex items-center gap-1 justify-center hover:bg-stone-700/50 hover:text-white w-full bg-white text-black rounded-xl py-2 font-bold duration-200 cursor-pointer">
-            Login
+            <span>Login</span>
 
             {
-              loading && <span className="inline-block w-5 h-5 border-b-[1px] border-l-[1px] animate-spin rounded-full border-black  " ></span>
+              loading && <span className="inline-block w-5 h-5 border-b-[1px] border-l-[1px] animate-spin rounded-full border-black group-hover:border-white " ></span>
             }
           </button>
         </div>

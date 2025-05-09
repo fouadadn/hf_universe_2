@@ -15,60 +15,94 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useTvContext } from "@/app/context/idContext";
+import useAddToWishList from '@/app/Hooks/useAddToWishList';
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import authe from "@/app/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { GoBookmarkSlash } from "react-icons/go";
+import UseDeleteFromWishList from "@/app/Hooks/useDeleteFromWishList";
+import useDeleteFromWishList from "@/app/Hooks/useDeleteFromWishList";
+import apiForHf from "@/app/utils/axiosInstanceForHfApi";
 
 const PopularWeek = ({ shows }) => {
   const [data, setData] = useState([]);
   const [popular, setPopular] = useState({});
-  const { id, changeId, slugify, setArrows } = useTvContext()
+  const { id, changeId, slugify, setArrows, currentUser } = useTvContext()
+  const router = useRouter();
+  const hf_api_URL = 'http://localhost:3001'
+  const UseDeleteFromWishList = useDeleteFromWishList();
+  const UseAddToWishList = useAddToWishList()
+
+
 
 
 
   useEffect(() => {
-    try {
-      async function fetchPopular() {
-        const [popular, movieGenres, tvGenres] = [
-          (await api.get("/trending/all/week"))?.data?.results?.sort(
-            (a, b) => b.popularity - a.popularity
-          ),
-          (await api.get("/genre/movie/list")).data.genres,
-          (await api.get("/genre/tv/list")).data.genres,
-        ];
+    const unsubscribe = onAuthStateChanged(authe, async (user) => {
 
-        const combineData = [
-          ...(shows ? shows : popular).map((v) => ({
-            ...v,
-            genres: v.genre_ids.map((gI) => {
-              let ob = {};
-              if (v.media_type === "movie") {
-                movieGenres.map((g) => {
-                  if (g.id === gI) {
-                    ob = { id: g.id, name: g.name };
-                  }
-                });
-              }
+      try {
+        async function fetchPopular() {
+          const [popular, movieGenres, tvGenres] = [
+            (await api.get("/trending/all/week"))?.data?.results?.sort(
+              (a, b) => b.popularity - a.popularity
+            ),
+            (await api.get("/genre/movie/list")).data.genres,
+            (await api.get("/genre/tv/list")).data.genres,
+          ];
 
-              if (v.media_type === "tv") {
-                tvGenres.map((g) => {
-                  if (g.id === gI) {
-                    ob = { id: g.id, name: g.name };
-                  }
-                });
-              }
-              return ob;
-            }),
-          })),
-        ];
+          const combineData = [
+            ...(shows ? shows : popular).map((v) => ({
+              ...v,
+              genres: v.genre_ids.map((gI) => {
+                let ob = {};
+                if (v.media_type === "movie") {
+                  movieGenres.map((g) => {
+                    if (g.id === gI) {
+                      ob = { id: g.id, name: g.name };
+                    }
+                  });
+                }
 
-        setData(combineData);
-        setPopular(combineData[0]);
+                if (v.media_type === "tv") {
+                  tvGenres.map((g) => {
+                    if (g.id === gI) {
+                      ob = { id: g.id, name: g.name };
+                    }
+                  });
+                }
+                return ob;
+              }),
+            })),
+          ];
+
+          setData(combineData);
+          const token = await user?.getIdToken(true);
+
+          const res = user && (await apiForHf.get(`/api/wishlist/check/${combineData[0].id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            }
+          })).data
+          setPopular({ ...combineData[0], ifSaved: res });
+        }
+
+
+        fetchPopular();
+      } catch (err) {
+        console.log(err);
       }
+    })
 
 
-      fetchPopular();
-    } catch (err) {
-      console.log(err);
-    }
+    return () => {
+      // window.removeEventListener('resize', resize);
+      unsubscribe(); // clean up Firebase listener
+    };
   }, [shows]);
+
 
   useEffect(() => {
     try {
@@ -152,7 +186,6 @@ const PopularWeek = ({ shows }) => {
                 </div>
                 <div className="flex items-center text-sm gap-1">
                   <Star fill="gold" stroke="gold" size={15} />
-
                   <div>
                     <span className="font-semibold">
                       {parseFloat(show.vote_average).toFixed(1)}{" "}
@@ -260,8 +293,25 @@ const PopularWeek = ({ shows }) => {
               <Link href={`/watch/${popular?.trailler?.key}`} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]">
                 <CirclePlay /> <span>Watch Trailer</span>
               </Link>
-              <button style={{ backgroundColor: "#ffffff20" }} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200">
-                <Bookmark />
+              <button onClick={
+                () => {
+                  if (currentUser) {
+                    if (popular?.ifSaved) {
+                      UseDeleteFromWishList(popular?.id)
+                      setPopular({ ...popular, ifSaved: false })
+                    } else {
+                      UseAddToWishList(popular?.id, popular?.title ? popular?.title : popular?.name, popular?.backdrop_path, popular?.genre_ids, popular?.vote_average, popular?.media_type, popular?.poster_path)
+                      setPopular({ ...popular, ifSaved: true }
+                      );
+                    }
+                  } else {
+                    router.push('/auth/sign-up')
+                  }
+                }
+              } style={{ backgroundColor: "#ffffff20" }} className='cursor-pointer rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'>
+                {
+                  popular?.ifSaved ? <GoBookmarkSlash size={24} /> : <Bookmark />}
+
               </button>
             </div>
           </div>

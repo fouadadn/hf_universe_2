@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from 'react';
-import { authe } from '../firebase.js';
 import { onAuthStateChanged } from 'firebase/auth';
+import authe from '../firebase';
 
 const TvContext = createContext();
 
@@ -11,6 +11,7 @@ export const TvProvider = ({ children }) => {
     const [providerName, setProviderName] = useState("netflix");
     const [currentUser, setCurrentUser] = useState(null)
     const [id, setId] = useState(null);
+    const [whishlistChange, setwhishlistChange] = useState(false)
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(authe, (user) => {
@@ -19,7 +20,9 @@ export const TvProvider = ({ children }) => {
         return () => {
             unsubscribe();
         }
-    }, [])
+    }, [authe])
+
+    // console.log(currentUser)
 
 
 
@@ -64,7 +67,8 @@ export const TvProvider = ({ children }) => {
     return (
         <TvContext.Provider value={{
             id, changeId, slugify, arrows, setArrows, providerId, changeProviderId, setProviderName, providerName,
-            currentUser, setCurrentUser
+            currentUser, setCurrentUser,
+            whishlistChange, setwhishlistChange
         }}>
             {children}
         </TvContext.Provider>
