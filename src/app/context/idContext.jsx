@@ -13,6 +13,8 @@ export const TvProvider = ({ children }) => {
     const [id, setId] = useState(null);
     const [whishlistChange, setwhishlistChange] = useState(false)
 
+
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(authe, (user) => {
             setCurrentUser(user ? user : null);
@@ -22,9 +24,9 @@ export const TvProvider = ({ children }) => {
         }
     }, [authe])
 
+
+
     // console.log(currentUser)
-
-
 
     useEffect(() => {
         if (typeof window !== 'undefined') {

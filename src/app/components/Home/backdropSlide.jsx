@@ -6,7 +6,6 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, Dot, Star, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useTvContext } from "@/app/context/idContext";
-import axios from "axios";
 
 const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" }) => {
   const [data, setData] = useState([]);
@@ -15,6 +14,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" })
   const [imgSrc, setImgSrc] = useState("/assets/black_backdrop.png");
   const [isfound, setIsFound] = useState(true)
   const { id, changeId, slugify, setArrows } = useTvContext()
+  const date = new Date()
 
 
 
@@ -28,7 +28,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" })
             media_type === "tv"
               ? is_korean
                 ? (
-                  await api.get("/discover/tv?with_original_language=ko")
+                  await api.get(`/discover/tv?with_watch_providers=283&watch_region=US&sort_by=popularity.desc&primary_release_year=${date.getFullYear()}`)
                 ).data.results
                 : (
                   await api.get("trending/tv/day")
@@ -154,63 +154,63 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" })
       <div className="flex gap-6 overflow-auto hide-scrollbar mt-4 p-2" ref={scrollRef}>
         {(showCombineData.length ? showCombineData : data).length > 0
           && (showCombineData.length > 0 ? showCombineData : data)
-          .map((show, i) => (
-            show.backdrop_path &&
-            <Link
-              href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
-              onClick={() => { changeId(show?.id); setArrows(false) }}
-              key={i}
-              className="shrink-0 hover:scale-105 duration-200">
-              <div className="h-[168.6px] ">
-                <img
-                  src={
-                    show.backdrop_path
-                      ? `https://image.tmdb.org/t/p/w500${show.backdrop_path}`
-                      : imgSrc
-                  }
-                  alt={show?.title ? show.title : show.name}
-                  width={300}
-                  height={168.75}
-                  style={{
-                    objectFit: "cover",
-                    objectPosition: "center",
-                  }}
-                  className="rounded-2xl"
-                  onError={handleError}
-                />
-              </div>
+            .map((show, i) => (
+              show.backdrop_path &&
+              <Link
+                href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
+                onClick={() => { changeId(show?.id); setArrows(false) }}
+                key={i}
+                className="shrink-0 hover:scale-105 duration-200">
+                <div className="h-[168.6px] ">
+                  <img
+                    src={
+                      show.backdrop_path
+                        ? `https://image.tmdb.org/t/p/w500${show.backdrop_path}`
+                        : imgSrc
+                    }
+                    alt={show?.title ? show.title : show.name}
+                    width={300}
+                    height={168.75}
+                    style={{
+                      objectFit: "cover",
+                      objectPosition: "center",
+                    }}
+                    className="rounded-2xl"
+                    onError={handleError}
+                  />
+                </div>
 
-              <div className="mt-3 w-[300px] ">
-                <h2 className="font-bold">
-                  {media_type === "tv" ? String(show.name).split(' ').slice(0, 7).join(' ') : String(show.title).split(' ').slice(0, 7).join(' ')}
-                </h2>
-                <div className="mt- flex items-center gap-1">
-                  <div className="flex gap-1 items-center">
-                    <Star fill="gold" stroke="gold" size={15} />
-                    <span className="font-bold">
-                      {parseFloat(show.vote_average).toFixed(1)}{" "}
-                    </span>
-                  </div>
-
-                  <span className="text-stone-500">|</span>
-
-                  <div className="flex text-stone-500">
-                    {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
-                      <span
-                        key={i}
-                        className="flex items-center text-nowrap flex-nowrap">
-                        <span>{g.name}</span>{" "}
-                        <Dot
-                          className={`${i + 1 === arr.length ? "hidden" : "inline"
-                            } -mx-1`}
-                        />
+                <div className="mt-3 w-[300px] ">
+                  <h2 className="font-bold">
+                    {media_type === "tv" ? String(show.name).split(' ').slice(0, 7).join(' ') : String(show.title).split(' ').slice(0, 7).join(' ')}
+                  </h2>
+                  <div className="mt- flex items-center gap-1">
+                    <div className="flex gap-1 items-center">
+                      <Star fill="gold" stroke="gold" size={15} />
+                      <span className="font-bold">
+                        {parseFloat(show.vote_average).toFixed(1)}{" "}
                       </span>
-                    ))}
+                    </div>
+
+                    <span className="text-stone-500">|</span>
+
+                    <div className="flex text-stone-500 text-sm" style={{color: "#79716b"}}>
+                      {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
+                        <span
+                          key={i}
+                          className="flex items-center text-nowrap flex-nowrap">
+                          <span>{g.name}</span>{" "}
+                          <Dot
+                            className={`${i + 1 === arr.length ? "hidden" : "inline"
+                              } -mx-1`}
+                          />
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
 
 
         {

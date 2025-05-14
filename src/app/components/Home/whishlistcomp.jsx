@@ -46,7 +46,6 @@ const Whishlist = ({ filter, check, poster }) => {
     }
 
 
-
     useEffect(() => {
         try {
             async function fetchData() {
@@ -99,14 +98,14 @@ const Whishlist = ({ filter, check, poster }) => {
                     setLoading(false);
 
                     const recentlyAdded = [...combineData]
-                        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // newest first
-                        .slice(0, 5); // get top 4
+                        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                        .slice(0, 5);
+
+
 
                     if (poster) {
                         setData(recentlyAdded)
                     }
-
-
 
                 }
 
@@ -179,10 +178,9 @@ const Whishlist = ({ filter, check, poster }) => {
     return (
         <>
 
-            <div className={`top-0 bottom-0 right-0 left-0 ${confirmShow ? "block" : "hidden"} bg-black/80 flex justify-center items-center z-[999999999] fixed`}>
-
+            <div className={`top-0 bottom-0 right-0 left-0 ${confirmShow ? "block" : "hidden"} flex justify-center items-center z-[999999999] fixed`} style={{ backgroundColor: "#00000090 " }}>
                 <div
-                    className=" flex flex-col border border-white/10 items-center rounded-lg p-2 px-4 w-80 sm:max-w-md  bg-gradient-to-b from-card to-background"
+                    className=" flex flex-col  items-center rounded-lg p-2 px-4 w-80 sm:max-w-md  bg-gradient-to-b "
                     style={{ backgroundColor: "#21262a " }}>
                     <div className="flex justify-between w-full ">
                         <div className=""></div>
@@ -190,14 +188,14 @@ const Whishlist = ({ filter, check, poster }) => {
                             <X />
                         </button>
                     </div>
-                    <div className="mx-auto bg-red-500/10 p-3 rounded-full">
-                        <AlertTriangle className="h-8 w-8 text-red-500" />
+                    <div className="mx-auto bg-red-500/10 p-3 rounded-full" style={{ backgroundColor: "#fb2c3615" }}>
+                        <AlertTriangle className="h-8 w-8 text-red-500" style={{ color: "#fb2c36" }} />
                     </div>
-                    <span className="text-center">Are you sure you want clear your Watchlist</span>
+                    <span className="text-center" >Are you sure you want clear your Watchlist</span>
 
                     <div className="flex gap-2  w-full mt-2">
-                        <button onClick={() => setConfirmShow(false)} className="border border-white/20 hover:bg-[#5c00cc] cursor-pointer duration-200 rounded-lg text-lg px-3 py-1 w-full ">Cancel</button>
-                        <button onClick={handleClearWatchlist} className=" border-white rounded-lg flex items-center gap-1 justify-center hover:bg-red-500/70 cursor-pointer duration-200 bg-red-500 w-full text-lg px-3 py-1">
+                        <button onClick={() => setConfirmShow(false)} className="border border-white/20 hover:bg-[#5c00cc] cursor-pointer duration-200 rounded-lg text-lg px-3 py-1 w-full " style={{ border: "1px solid #ffffff30" }}>Cancel</button>
+                        <button onClick={handleClearWatchlist} className=" border-white rounded-lg flex items-center gap-1 justify-center hover:bg-red-500/70 cursor-pointer duration-200 bg-red-500 w-full text-lg px-3 py-1" style={{ backgroundColor: "#fb2c36" }}>
                             <span>Clear</span>
                             {
                                 confirmShowLoading && <span className="inline-block w-4 h-4 border-b-[1px] border-l-[1px] animate-spin rounded-full border-white group-hover:border-white " ></span>
@@ -207,22 +205,22 @@ const Whishlist = ({ filter, check, poster }) => {
                 </div>
             </div>
             {(!isFull && poster && data.length === 0) &&
-                <div className="mt-10 h-[78vh]">
+                <div className="mt-10 h-[81vh]">
                     <div className="flex flex-col items-center justify-center h-full">
                         <div className="gri p-3 rounded-full">
                             <Bookmark size={35} />
                         </div>
-                        <span className="mt-1 ">
+                        <span className="mt-1 text-center">
                             Your Watchlist is empty explore our movies and tv shows
                         </span>
 
-                        <Link href={"/"} className="border-white border rounded-full px-4 py-2 hover:bg-5c00cc hover:text-black duration-200 mt-2 ">Discover our Shows</Link>
+                        <Link href={"/"} className="border-white border rounded-full px-4 py-2 hover:bg-5c00cc hover:text-black hover:bg-white duration-200 mt-2 ">Discover our Shows</Link>
                     </div>
                 </div>
             }
             {
                 isFull &&
-                <div className={` group relative  ${filter ? "mt-1" : "mt-14"}`}>
+                <div className={` group relative  ${filter ? "mt-1" : "mt-24"}`}>
                     <div className="flex justify-between">
                         {
                             poster &&
@@ -243,19 +241,24 @@ const Whishlist = ({ filter, check, poster }) => {
                             </h2>
                         }
                         {
+                            check &&
+                            <h2 className="text-3xl font-bold mx-2">Your Watchlist</h2>
+
+                        }
+                        {
                             poster &&
-                            <button onClick={() => setConfirmShow(true)} className="border border-white/20 rounded-lg px-3 hover:bg-[#5c00cc]  duration-200">Clear Watchlist</button>
+                            <button onClick={() => setConfirmShow(true)} className="border cursor-pointer border-white/20 rounded-lg px-3 hover:bg-[#5c00cc]  duration-200" style={{ border: "1px solid  #ffffff30" }}>Clear Watchlist</button>
                         }
                     </div>
 
-                    <div className={`flex gap-6 overflow-scroll p-2  hide-scrollbar mt-4`} ref={scrollRef}>
+                    <div className={`flex gap-6 overflow-scroll p-2  hide-scrollbar`} ref={scrollRef}>
                         {!loading > 0 ?
                             data.map((show, i) => (
                                 poster ? <Link
-                                    href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
+                                    href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.show_id}`}
                                     onClick={() => { changeId(show?.show_id); setArrows(false) }}
                                     key={i}
-                                    className="shrink-0 relative">
+                                    className="shrink-0 relative hover:scale-105 duration-200 py-2">
                                     <div className="absolute top-0 bottom-0 right-0 left-0 bg-gradient-to-t from-black to-transparent to-45%">
                                         <div className="absolute bottom-0 z-50">
                                             <div className="px-5 pb-3">
@@ -310,7 +313,7 @@ const Whishlist = ({ filter, check, poster }) => {
                                 </Link> :
                                     (show.media_type === filter || check) &&
                                     <Link
-                                        href={`/${show?.media_type}/${slugify(show?.title)}`}
+                                        href={`/${show?.media_type}/${slugify(show?.title)}/${show?.show_id}`}
                                         onClick={() => { changeId(show?.show_id); setArrows(false) }}
                                         key={i}
                                         className="shrink-0 hover:scale-105 duration-300">
@@ -411,7 +414,8 @@ const Whishlist = ({ filter, check, poster }) => {
                     </div>
 
                     <div className={`opacity-0 group-hover:opacity-100 duration-300  hidden md:block `}>
-                        <div className={`${showLeft ? "opacity-100" : "opacity-0"} duration-400 w-24 mt-[52px]   bg-[linear-gradient(to_right,black_5%,transparent_60%)] z-[999] ${poster ? "h-[380.6px]" : "h-[179.6px]"}  top-0 absolute flex items-center `}>
+                        <div className={`${showLeft ? "opacity-100" : "opacity-0"} duration-400 w-24 mt-[52px
+                          bg-[linear-gradient(to_right,black_5%,transparent_60%)] z-[999] ${poster ? "h-[380.6px]" : "h-[179.6px]"}  top-0 absolute flex items-center `}>
                             <div
                                 onClick={() => scroll("left")}
                                 className={`text-3xl  font-bold border-[1px] bg-white rounded-full p-[1px] ml-2 cursor-pointer `}>

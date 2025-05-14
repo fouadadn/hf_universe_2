@@ -27,7 +27,7 @@ import apiForHf from "@/app/utils/axiosInstanceForHfApi";
 
 
 
-const Details = ({ slug, type }) => {
+const Details = ({ slug, type, id }) => {
   const [show, setShow] = useState({});
   const [cast, setCast] = useState([]);
   const [videos, setVideos] = useState([]);
@@ -38,7 +38,7 @@ const Details = ({ slug, type }) => {
   const [screenWidth, setScreenWidth] = useState(0);
   const [seasonInfo, setSeasonInfo] = useState({})
   const [episodes, setEpisodes] = useState([])
-  const { id, setId, arrows, setArrows, slugify, currentUser } = useTvContext()
+  const { currentUser } = useTvContext()
   const [rerender, setRerender] = useState(1)
   const scrollRef = useRef(null)
   const [showLeft, setShowLeft] = useState(false)
@@ -51,28 +51,16 @@ const Details = ({ slug, type }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(authe, async (user) => {
-
       try {
-        async function getItemBySlug(slug, type) {
-
-          const query = slug.replace(/-/g, ' '); // convert slug back to a normal name
-          const data = (await api.get(`/search/${type}?query=${encodeURIComponent(query)}`)).data
-
-          const match = data.results.find((item) => slugify(item.title || item.name) === slug);
-
-          return match;
-        }
-
         async function fetchMovies() {
 
           if (id) {
-            const movie = await getItemBySlug(slug, type)
             const [show, casts, video, recommendationss, similar] = [
-              (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}`)).data,
-              (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/credits`)).data?.cast,
-              (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/videos`)).data?.results,
-              (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/recommendations`)).data?.results,
-              (await api.get(`/${type}/${arrows || id === 0 ? movie?.id : id}/similar`)).data?.results,
+              (await api.get(`/${type}/${id}`)).data,
+              (await api.get(`/${type}/${id}/credits`)).data?.cast,
+              (await api.get(`/${type}/${id}/videos`)).data?.results,
+              (await api.get(`/${type}/${id}/recommendations`)).data?.results,
+              (await api.get(`/${type}/${id}/similar`)).data?.results,
               // (await api.get(`/${type}/${id}/watch/providers`)).data,
             ];
             const filtredVideos = video?.find(
@@ -99,11 +87,6 @@ const Details = ({ slug, type }) => {
         }
 
         fetchMovies();
-
-        const onPopState = (event) => {
-          setArrows(true)
-        };
-        window.onpopstate = onPopState;
       } catch (err) {
         console.log(err);
       }
@@ -112,7 +95,7 @@ const Details = ({ slug, type }) => {
     return () => {
       unsubscribe();
     };
-  }, [slug, id]);
+  }, [id]);
 
   useEffect(() => {
     try {
@@ -138,7 +121,7 @@ const Details = ({ slug, type }) => {
       console.log(err)
     }
 
-  }, [selectedSeason, slug, rerender])
+  }, [selectedSeason, id, rerender])
 
   function formatTime(time) {
     const hour = parseInt(time) / 60;
@@ -162,7 +145,6 @@ const Details = ({ slug, type }) => {
     setShowRight(isScrollable && !isAtEnd)
 
   }
-
   const scroll = (direction) => {
     const el = scrollRef.current
     if (!el) return
@@ -460,11 +442,11 @@ const Details = ({ slug, type }) => {
             <div className="mx-4 font-bold mt-16">
               <h2 className="text-2xl " id="episodes">Episodes of Season {selectedSeason}: </h2>
 
-              <div className="flex gap-3 mt-2 flex-wrap justify-center mx-6  hide-scrollbar">
+              <div className="flex gap-3 mt-2 w-full flex-wrap justify-center   hide-scrollbar">
                 {
                   episodes?.length > 0 ? episodes?.map((p, i) =>
                     <Link style={{ pointerEvents: `${!compareDate(p?.air_date) && "none"}` }} href={`/stream/tv/${show?.id}/${seasonInfo?.season_number}/${p?.episode_number}`} key={i}
-                      className={` relative shrink-0 rounded-xl cursor-pointer overflow-hidden w-full md:w-72 `}>
+                      className={` relative shrink-0 rounded-xl cursor-pointer  overflow-hidden w-full md:w-72 `}>
                       <div className={`${!compareDate(p?.air_date) && "bg-stone-800"} overflow-hidden rounded-xl`}>
                         {
                           compareDate(p?.air_date) ?
@@ -592,8 +574,26 @@ const Details = ({ slug, type }) => {
                         }) : <div className='flex gap-3'>
                           <Link href={`#seasons`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]'><Play /> <span>Play Now</span> </Link>
                           <Link href={`/watch/${seasonInfo?.trailler?.key}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]'><CirclePlay /> <span>Watch Trailer</span></Link>
-                          <button style={{ backgroundColor: "#ffffff20" }} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'><Bookmark /></button>
-                        </div>
+                          <button onClick={
+                            () => {
+                              if (currentUser) {
+                                if (show?.ifSaved) {
+                                  useDeleteFromWishList(show?.id)
+                                  setShow({ ...show, ifSaved: false })
+                                } else {
+                                  UseAddToWishList(show?.id, show?.title ? show?.title : show?.name, show?.backdrop_path, show?.genres, show?.vote_average, type, show?.poster_path)
+                                  setShow({ ...show, ifSaved: true }
+                                  );
+                                }
+                              } else {
+                                router.push('/auth/sign-up')
+                              }
+                            }
+                          } style={{ backgroundColor: "#ffffff20" }} className='cursor-pointer rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'>
+                            {
+                              show?.ifSaved ? <GoBookmarkSlash size={24} /> : <Bookmark />}
+
+                          </button>                        </div>
                       }
                     </div>
                   </div>

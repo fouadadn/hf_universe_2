@@ -13,17 +13,19 @@ const Footer = () => {
                 </div>
 
                 {/* Navigation */}
-                <div>
+                <div className="">
                     {/* <h2 className="text-lg font-semibold text-white mb-2">Quick Links</h2> */}
-                    <ul className=" flex gap-1 text-xl ">
+                    <ul className=" flex gap-1 text-md md:text-xl ">
                         <li><a href="/" className="hover:underline">Home</a></li> /
                         <li><a href="/discover/netflix" className="hover:underline">Discover</a></li>/
                         <li><a href="/movierelease" className="hover:underline">Movie Release</a></li>/
-                        <li><a href="/mywishlist" className="hover:underline">My Wishlist</a></li>
+                        <li><a href="/your-watchlist" className="hover:underline">My list</a></li>
                     </ul>
                 </div>
 
             </div>
+
+            
 
             <div className=" mt-8 pt-4 text-center text-sm " style={{ color: "#6a7282" }}>
                 © {new Date().getFullYear()} HF Stream. All rights reserved.

@@ -14,11 +14,10 @@ import { useTvContext } from '@/app/context/idContext';
 import { useRouter } from 'next/navigation';
 import useAddToWishList from '@/app/Hooks/useAddToWishList';
 import { GoBookmarkSlash } from "react-icons/go";
-import axios from 'axios';
-import authe from '@/app/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import useDeleteFromWishList from '@/app/Hooks/useDeleteFromWishList';
 import apiForHf from '@/app/utils/axiosInstanceForHfApi';
+import authe from '@/app/firebase';
 
 const HomePageSlider = ({ shows }) => {
 
@@ -31,6 +30,7 @@ const HomePageSlider = ({ shows }) => {
   const [checks, setChecks] = useState([])
   const UseDeleteFromWishList = useDeleteFromWishList();
   const UseAddToWishList = useAddToWishList()
+  const [addMessage, setAddMessage] = useState(false);
 
 
   useEffect(() => {
@@ -87,6 +87,13 @@ const HomePageSlider = ({ shows }) => {
 
   return (
     <div className='w-full -mt-[81px] z-10 text-white'>
+
+      <div className={`${addMessage ? "block" : "hidden"} fixed bottom-4 right-2 z-[99999] `}>
+        <div className="mt-2 bg-teal-500 text-sm text-white rounded-lg p-4" role="alert" aria-labelledby="hs-solid-color-success-label">
+          <span id="hs-solid-color-success-label" className="font-bold">Success</span> alert! You should check in on some of those fields below.
+        </div>
+      </div>
+
       <Swiper
         className='relative pb-5'
         modules={[Navigation, Pagination, Autoplay]}
@@ -117,7 +124,7 @@ const HomePageSlider = ({ shows }) => {
                   className='min-h-96 ' />
                 {/* <img src={`https://image.tmdb.org/t/p/original/${show?.backdrop_path}` } alt="backdrop image" className='w-full brightness-90' /> */}
                 <Link
-                  href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
+                  href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
                   onClick={() => changeId(show?.id)}
                   className='bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0'></Link>
                 <div className='absolute z-[999] text-start bottom-4 lg:bottom-44 mx-4 '>

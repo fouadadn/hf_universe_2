@@ -122,40 +122,43 @@ const PosterSlide = ({ movie, tv }) => {
             </>
         }
       </div>
-      {tv && movie ? "" : <div className="overflow-auto gap-5 -mt-8 flex hide-scrollbar pb-10 pt-5">
+      {tv && movie ? "" : <div className="overflow-auto gap-5 -mt-8 flex hide-scrollbar pb-10 pt-5 px-2">
         {providers?.length > 0
           ? providers.map((p, i) => (
-            <Link href={`/discover/${slugify(p?.provider_name)}`} key={p?.provider_id} onClick={() => { changeProviderId(p?.provider_id) }}>
+            <Link
+              href={`/discover/${slugify(p?.provider_name)}`}
+              key={p?.provider_id}
+              onClick={() => changeProviderId(p?.provider_id)}
+              className="hover:scale-105 duration-200"
+            >
               <div
-                className="shrink-0 h-[64px] relative flex items-center gap-3 w-62 bg-stone-500/30 rounded-2xl px-2 py-1 shadow-xl shadow-white/15 bg-cover"
+                className="relative shrink-0 h-[64px] w-62 flex  items-center gap-3 px-2 py-1 rounded-2xl shadow-xl overflow-hidden group"
                 style={{
                   backgroundImage: `url("https://image.tmdb.org/t/p/original${p?.logo_path}")`,
+                  backgroundSize: "cover",
                   backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }}>
+                }}
+              >
+                {/* Cool Blur Layer */}
+                <div className="absolute inset-0 bg-black/40 transition-all duration-300 backdrop-blur-xl"></div>
+
+                {/* Optional Gradient Overlay for depth */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div>
+
+                {/* Logo */}
                 <img
                   src={`https://image.tmdb.org/t/p/original${p?.logo_path}`}
                   alt={p.provider_name}
-                  // Ensures it takes full width and scales height
-                  style={{
-                    objectFit: "cover", // Use CSS to set objectFit
-                    objectPosition: "center", // Optional, if you need to control the position of the image
-                  }}
-                  className="rounded-xl w-[50px] h-[50px] z-[9999] "
+                  className="relative z-10 w-[50px] h-[50px] object-cover object-center rounded-xl"
                 />
-                <div
-                  className="absolute -top-5 -bottom-5 -left-5 -right-5 backdrop-blur-xs blur-lg  bg-black/30  rounded-2xl"
-                  style={{ backgroundColor: "#00000054" }}></div>
-                <div className="absolute -top-5 -bottom-5 -left-5 -right-5 backdrop-blur-xs blur-lg    rounded-2xl"></div>
-                <div className="absolute -top-5 -bottom-5 -left-5 -right-5 backdrop-blur-xs blur-lg    rounded-2xl"></div>
-                <div className="absolute -top-5 -bottom-5 -left-5 -right-5 backdrop-blur-xs blur-lg    rounded-2xl"></div>
-                <div className="absolute top-0 bottom-0 left-0 right-0  z-[999] shadow_hf  rounded-2xl"></div>
-                <div className="absolute top-0 bottom-0 left-0 right-0  z-[999] shadow_hf  rounded-2xl"></div>
-                <div className="z-[9999] ">
-                  <h2 className="text-xl font-bold ">{p.provider_name} </h2>
+
+                {/* Name */}
+                <div className="relative z-10">
+                  <h2 className="text-xl font-bold text-white">{p.provider_name}</h2>
                 </div>
               </div>
             </Link>
+
           ))
           : Array.from(Array(8)).map((_, i) => (
             <div
@@ -168,16 +171,16 @@ const PosterSlide = ({ movie, tv }) => {
       <h1 className="text-3xl font-bold mt-">Just Release</h1>
 
       <div className="relative group ">
-        <div className="flex gap-6 overflow-auto mt-3 hide-scrollbar"
+        <div className="flex gap-6 overflow-auto mt-3 hide-scrollbar py-3 px-3 "
           ref={scrollRef}>
 
           {media.length > 0
             ? media.map((show, i) => (
               <Link
-                href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
+                href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
                 onClick={() => { changeId(show?.id); setArrows(false) }}
                 key={i}
-                className="shrink-0 relative">
+                className="shrink-0 relative hover:scale-105 duration-200">
                 <div className="absolute top-0 bottom-0 right-0 left-0 bg-gradient-to-t from-black to-transparent to-45%">
                   <div className="absolute bottom-0 z-50">
                     <div className="px-5 pb-3">
@@ -236,7 +239,7 @@ const PosterSlide = ({ movie, tv }) => {
                 key={i}
                 className="w-[250px] h-[375px] bg-stone-600 shrink-0 rounded-xl animate-pulse gri"></div>
             ))
-            }
+          }
 
 
         </div>

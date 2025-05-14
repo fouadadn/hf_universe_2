@@ -26,7 +26,6 @@ export default function Home() {
         </div>
 
         <div className={`${currentUser ? "block" : "hidden"} mt-10`}>
-          <h2 className="text-3xl font-bold mx-2">Your Watchlist</h2>
           <div className="-mt-16 -mb-10">
             <Whishlist check={true} />
           </div>
@@ -46,7 +45,7 @@ export default function Home() {
         </div>
 
         <div className="mt-14 ">
-          <BackdropSlide title={"Korean Series"} media_type={"tv"} is_korean={true} />
+          <BackdropSlide title={"Anime Series"} media_type={"tv"} is_korean={true} />
         </div>
 
         <hr className="border-white/30 mt-5" />

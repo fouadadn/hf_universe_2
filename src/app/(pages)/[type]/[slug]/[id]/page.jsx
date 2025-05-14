@@ -6,10 +6,11 @@ const Movie = async ({ params }) => {
 
   const { slug } = await params
   const { type } = await params
+  const { id } = await params
 
   return (
     <div>
-      <Details slug={slug} type={type} />
+      <Details slug={slug} type={type} id={id} />
     </div>
   )
 

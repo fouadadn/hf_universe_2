@@ -24,7 +24,7 @@ const Stream = ({ type, season, episode, id }) => {
     )
 
 
-    
+
 
     const handleChangeServerToServer1 = () => {
         if (type === "movie") {
@@ -56,7 +56,7 @@ const Stream = ({ type, season, episode, id }) => {
 
     return (
         <div>
-            <div  >
+            <div onClick={() => alert('changed')}>
                 <iframe id="myIframe" className="absolute top-0 bottom-0 right-0 left-0 w-[100%] h-[100%] "
                     src={selectedServer.url} scrolling="no" frameBorder="0" allowFullScreen ></iframe>
             </div>
