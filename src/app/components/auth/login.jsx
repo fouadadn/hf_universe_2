@@ -6,6 +6,7 @@ import { signInWithEmailAndPassword } from "firebase/auth"
 import authe from "@/app/firebase";
 import { redirect, useRouter } from 'next/navigation';
 import { useTvContext } from "@/app/context/idContext";
+import { Eye, EyeClosed } from "lucide-react";
 
 
 
@@ -19,6 +20,7 @@ const Login = () => {
     password: '',
   })
   const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false)
 
 
   useEffect(() => {
@@ -87,7 +89,7 @@ const Login = () => {
                   </svg>
                 </span>
               </div>
-              
+
               <div className="ms-3">
                 <h3 id="hs-bordered-red-style-label" className="text-gray-800 font-semibold dark:text-white">
                   Error!
@@ -119,19 +121,24 @@ const Login = () => {
             <label htmlFor="password" className="font-bold">
               Password
             </label>
-            <input
-              onChange={(e) => { setFormData({ ...formData, password: e.target.value }); setErrors('') }}
-              style={{ border: "1px solid #ffffff55" }}
-              type="password"
-              placeholder="password"
-              className="outline-0 border-[1px] border-white/20 rounded-lg px-5 py-3 mt-1 bg-black"
-            />
+            <div style={{ border: "1px solid #ffffff55" }} className="flex justify-between items-center  border-[1px] border-white/20 rounded-lg px-5 py-3 mt-1 bg-black">
+              <input
+                onChange={(e) => { setFormData({ ...formData, password: e.target.value }); setErrors('') }}
+
+                type={`${showPassword ? "text" : "password"}`}
+                placeholder="password"
+                className="w-full outline-0"
+              />
+              <div onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <Eye /> : <EyeClosed />}
+              </div>
+            </div>
           </div>
         </div>
         <div className="flex justify-center my-5">
-          <a href="" className="font-bold">
-            Forget Password
-          </a>
+          <Link href="/auth/forget-password" className="font-bold">
+            Forget Password?
+          </Link>
         </div>
 
         <div className="mt-2 group">

@@ -1,12 +1,13 @@
 import React from "react";
 import Login from "@/app/components/auth/login";
 import SignUp from "@/app/components/auth/signUp";
+import ForgetPassword from "@/app/components/auth/forgetPassword";
 
 
 const Auth = async ({ params }) => {
 
   const { op } = await params;
- 
+
 
   return <div>
     {
@@ -14,6 +15,9 @@ const Auth = async ({ params }) => {
     }
     {
       op === "sign-up" && <SignUp />
+    }
+    {
+      op === "forget-password" && <ForgetPassword />
     }
   </div>;
 };

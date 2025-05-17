@@ -7,9 +7,8 @@ import BackdropSlide from "../Home/backdropSlide";
 import Footer from "../Home/footer";
 import { useEffect, useState } from "react";
 import api from "@/app/utils/axiosInstance";
-import { useTvContext } from "@/app/context/idContext";
 
-export default function DiscoverDetails({ provider }) {
+export default function DiscoverDetails({ provider, p_id }) {
     const date = new Date();
 
     const [show, setShows] = useState([])
@@ -19,34 +18,14 @@ export default function DiscoverDetails({ provider }) {
     const [releaseMovie, setReleaseMovie] = useState([])
     const [releaseTv, setReleaseTv] = useState([])
     const [tvs, setTvs] = useState([])
-    const { slugify, changeProviderId, setProviderName } = useTvContext()
-    const [providerId, setProviderId] = useState(window !== "undefined" && localStorage.providerId ? localStorage.providerId : 8)
-
 
     useEffect(() => {
         async function fetchData() {
-            const pro = (await api.get("watch/providers/movie", {
-                params: { watch_region: "US" }
-            })).data?.results?.find(
-                (prov) => {
-                    return slugify(prov.provider_name) === slugify(provider)
-                }
-            )
+            const movie = (await api.get(`/discover/movie?with_watch_providers=${p_id}&watch_region=US&sort_by=popularity.desc&primary_release_year=${date.getFullYear()}`)).data.results;
+            const tv = (await api.get(`/discover/tv?with_watch_providers=${p_id}&watch_region=US&sort_by=popularity.desc&primary_release_year=${date.getFullYear()}`)).data.results;
 
-            setProviderId(pro.provider_id)
-            changeProviderId(pro.provider_id)
-            setProviderName(pro.provider_name)
-        }
-        fetchData()
-    }, [])
-
-    useEffect(() => {
-        async function fetchData() {
-            const movie = (await api.get(`/discover/movie?with_watch_providers=${providerId}&watch_region=US&sort_by=popularity.desc&primary_release_year=${date.getFullYear()}`)).data.results;
-            const tv = (await api.get(`/discover/tv?with_watch_providers=${providerId}&watch_region=US&sort_by=popularity.desc&primary_release_year=${date.getFullYear()}`)).data.results;
-
-            setProviderMovies((await api.get(`/discover/movie?with_watch_providers=${providerId}&watch_region=US`)).data.results)
-            setProviderTvs((await api.get(`/discover/tv?with_watch_providers=${providerId}&watch_region=US`)).data.results)
+            setProviderMovies((await api.get(`/discover/movie?with_watch_providers=${p_id}&watch_region=US`)).data.results)
+            setProviderTvs((await api.get(`/discover/tv?with_watch_providers=${p_id}&watch_region=US`)).data.results)
 
 
             const movieWithMediaType = movie.map((e) => { return { ...e, media_type: "movie" } })
@@ -59,7 +38,6 @@ export default function DiscoverDetails({ provider }) {
                 a.popularity - b.popularity
             })
 
-            // console.log("shows", arr)
             setShows(arr)
 
             const getDateRangeForLastMonth = () => {
@@ -73,8 +51,6 @@ export default function DiscoverDetails({ provider }) {
                 };
             };
 
-
-
             const fetchNetflixMovies = async (totalPages = 2) => {
                 const { from, to } = getDateRangeForLastMonth();
 
@@ -84,7 +60,7 @@ export default function DiscoverDetails({ provider }) {
                     requests.push(
                         api.get("/discover/movie", {
                             params: {
-                                with_watch_providers: providerId, // Netflix
+                                with_watch_providers: p_id, 
                                 watch_region: "US",
                                 sort_by: "primary_release_date.desc",
                                 'primary_release_date.gte': from,
@@ -113,7 +89,7 @@ export default function DiscoverDetails({ provider }) {
                     requests.push(
                         api.get("/discover/tv", {
                             params: {
-                                with_watch_providers: providerId, // Netflix
+                                with_watch_providers: p_id, // Netflix
                                 watch_region: "US",
                                 sort_by: "first_air_date.desc",
                                 'first_air_date.gte': from,
@@ -136,7 +112,7 @@ export default function DiscoverDetails({ provider }) {
 
 
 
-    }, [providerId])
+    }, [p_id])
 
 
 

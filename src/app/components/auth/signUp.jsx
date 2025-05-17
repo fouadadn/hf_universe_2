@@ -6,6 +6,7 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import authe from "@/app/firebase";
 import { useTvContext } from "@/app/context/idContext";
 import { redirect, useRouter } from "next/navigation";
+import { Eye, EyeClosed } from "lucide-react";
 
 const SignUp = () => {
 
@@ -20,6 +21,8 @@ const SignUp = () => {
   })
   const [err, setErr] = useState('')
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState({ showPassword: false, showPasswordConfirmation: false })
+
 
   useEffect(() => {
     setHeight(window.innerHeight)
@@ -137,39 +140,52 @@ const SignUp = () => {
           </div>
 
           <div className="flex flex-col">
+
             <label htmlFor="password" className="font-bold">
               Password
             </label>
-            <input
-              onChange={(e) => { setFormData({ ...formData, password: e.target.value }); setErr('') }}
-              style={{ border: "1px solid #ffffff55" }}
-              type="password"
-              placeholder="password"
-              className="outline-0 border-[1px] border-white/20 rounded-lg px-5 py-3 mt-1 bg-black"
-            />
+            <div style={{ border: "1px solid #ffffff55" }} className="flex justify-between items-center  border-[1px] border-white/20 rounded-lg px-5 py-3 mt-1 bg-black">
+              <input
+                onChange={(e) => { setFormData({ ...formData, password: e.target.value }); setErr('') }}
+
+                type={`${showPassword.showPassword ? "text" : "password"}`}
+                placeholder="password"
+                className="w-full outline-0"
+              />
+              <div className="cursor-pointer" onClick={() => setShowPassword({ ...showPassword, showPassword: !showPassword.showPassword })}>
+                {showPassword.showPassword ? <Eye /> : <EyeClosed />}
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-col">
             <label htmlFor="password" className="font-bold">
               Password
             </label>
-            <input
-              onChange={(e) => { setFormData({ ...formData, password_confirmation: e.target.value }); setErr('') }}
+            <div className="border-[1px] border-white/20 rounded-lg px-5 py-3 mt-1 bg-black flex justify-between"
               style={{ border: "1px solid #ffffff55" }}
-              type="password"
-              placeholder="Confirm password"
-              className="outline-0 border-[1px] border-white/20 rounded-lg px-5 py-3 mt-1 bg-black"
-            />
+            >
+              <input
+                onChange={(e) => { setFormData({ ...formData, password_confirmation: e.target.value }); setErr('') }}
+                type={`${showPassword.showPasswordConfirmation ? "text" : "password"}`}
+                placeholder="Confirm password"
+                className="outline-0"
+              />
+
+              <div className="cursor-pointer" onClick={() => setShowPassword({ ...showPassword, showPasswordConfirmation: !showPassword.showPasswordConfirmation })}>
+                {showPassword.showPasswordConfirmation ? <Eye /> : <EyeClosed />}
+              </div>
+            </div>
           </div>
         </div>
         <div className="flex justify-center my-5">
-          <a href="" className="font-bold">
-            Forget Password
-          </a>
+          <Link href="/auth/forget-password" className="font-bold">
+            Forget Password?
+          </Link>
         </div>
 
         <div className="mt-2 group">
-          <button disabled={loading ? true : false} className="hover:bg-stone-700/50 flex justify-center items-center gap-2 hover:text-white w-full text-stone-700 bg-white  rounded-xl py-2 font-bold duration-200 cursor-pointer">
+          <button disabled={loading ? true : false} className="hover:bg-stone-700/50 flex justify-center items-center gap-2 hover:text-white w-full text-stone-700 bg-white  rounded-xl py-2 font-bold duration-200 cursor-pointer" style={{ color: "#44403b" }}>
             <span>Sign Up</span>
             {
               loading && <span className="inline-block w-5 h-5 border-b-[1px] border-l-[1px] animate-spin rounded-full border-black  group-hover:border-white" ></span>

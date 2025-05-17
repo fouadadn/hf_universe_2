@@ -9,17 +9,21 @@ import api from "@/app/utils/axiosInstance";
 import { redirect, useRouter } from "next/navigation";
 import Footer from "./footer";
 import apiForHf from "@/app/utils/axiosInstanceForHfApi";
+import { GoBookmarkSlash } from "react-icons/go";
+import useDeleteFromWishList from "@/app/Hooks/useDeleteFromWishList";
 
 const Whishlist = ({ filter, check, poster }) => {
     const [data, setData] = useState([])
     const [isfound, setIsFound] = useState(true)
-    const { slugify, currentUser, changeId, setArrows, whishlistChange } = useTvContext();
+    const { slugify, currentUser, whishlistChange } = useTvContext();
     const [loading, setLoading] = useState(true);
     const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/w500`);
     const [isFull, setIsFull] = useState(true)
     const [confirmShow, setConfirmShow] = useState(false)
     const [confirmShowLoading, setConfirmShowLoading] = useState(false)
     const router = useRouter()
+    const UseDeleteFromWishList = useDeleteFromWishList();
+
 
     const [seriesFound, setSeriesFound] = useState(false)
     const [moviesFound, setMoviesFound] = useState(false)
@@ -68,7 +72,6 @@ const Whishlist = ({ filter, check, poster }) => {
                             ...v,
                             genres:
                                 // v?.genre_ids[0].name &&
-
                                 v?.media_type === "tv" ?
                                     v.genre_ids?.map((gI) => {
                                         let ob = {};
@@ -98,15 +101,18 @@ const Whishlist = ({ filter, check, poster }) => {
                     setLoading(false);
 
                     const recentlyAdded = [...combineData]
-                        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                        .slice(0, 5);
-
-
+                        .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds)
+                        .slice(0, 6);
 
                     if (poster) {
                         setData(recentlyAdded)
                     }
 
+                    if (filter === "Upcoming") {
+                        setData(combineData.filter((show) => !compareDate(show?.release_date ? show?.release_date : show?.first_air_date)))
+
+
+                    }
                 }
 
             }
@@ -117,6 +123,45 @@ const Whishlist = ({ filter, check, poster }) => {
         }
 
     }, [currentUser, whishlistChange])
+
+
+    useEffect(() => {
+        if (!data.length > 0) {
+            setIsFull(false)
+        } else {
+            setIsFull(true)
+        }
+
+        for (const i in data) {
+            if (data[i].media_type === "tv") {
+                setSeriesFound(true)
+                break;
+            } else {
+                setSeriesFound(false)
+            }
+        }
+
+        for (const i in data) {
+            if (data[i].media_type === "movie") {
+                setMoviesFound(true)
+                break;
+            } else {
+                setMoviesFound(false)
+            }
+        }
+    }, [data])
+
+
+    function compareDate(dateString) {
+        const date = new Date();
+        const release = new Date(dateString);
+
+        if (release > date) {
+            return false
+        } else {
+            return true
+        }
+    }
 
     const scrollRef = useRef(null)
     const [showLeft, setShowLeft] = useState(false)
@@ -149,34 +194,9 @@ const Whishlist = ({ filter, check, poster }) => {
         return () => el.removeEventListener('scroll', checkScroll)
     }, [])
 
-    useEffect(() => {
-        if (!data.length > 0) {
-            setIsFull(false)
-        } else {
-            setIsFull(true)
-        }
-
-        for (const i in data) {
-            if (data[i].media_type === "tv") {
-                setSeriesFound(true)
-                break;
-            } else {
-                setSeriesFound(false)
-            }
-        }
-
-        for (const i in data) {
-            if (data[i].media_type === "movie") {
-                setMoviesFound(true)
-                break;
-            } else {
-                setMoviesFound(false)
-            }
-        }
-    }, [data])
 
     return (
-        <>
+        <div className="mt-6">
 
             <div className={`top-0 bottom-0 right-0 left-0 ${confirmShow ? "block" : "hidden"} flex justify-center items-center z-[999999999] fixed`} style={{ backgroundColor: "#00000090 " }}>
                 <div
@@ -184,7 +204,7 @@ const Whishlist = ({ filter, check, poster }) => {
                     style={{ backgroundColor: "#21262a " }}>
                     <div className="flex justify-between w-full ">
                         <div className=""></div>
-                        <button className="cursor-pointer " onClick={() => { setConfirmShow(false) }}>
+                        <button className="cursor-pointer duration-200 hover:scale-110" onClick={() => { setConfirmShow(false) }}>
                             <X />
                         </button>
                     </div>
@@ -194,11 +214,11 @@ const Whishlist = ({ filter, check, poster }) => {
                     <span className="text-center" >Are you sure you want clear your Watchlist</span>
 
                     <div className="flex gap-2  w-full mt-2">
-                        <button onClick={() => setConfirmShow(false)} className="border border-white/20 hover:bg-[#5c00cc] cursor-pointer duration-200 rounded-lg text-lg px-3 py-1 w-full " style={{ border: "1px solid #ffffff30" }}>Cancel</button>
-                        <button onClick={handleClearWatchlist} className=" border-white rounded-lg flex items-center gap-1 justify-center hover:bg-red-500/70 cursor-pointer duration-200 bg-red-500 w-full text-lg px-3 py-1" style={{ backgroundColor: "#fb2c36" }}>
-                            <span>Clear</span>
+                        <button onClick={() => setConfirmShow(false)} className="border border-white/20 hover:bg-[#5c00cc] hover:scale-105 cursor-pointer duration-200 rounded-lg text-lg px-3 py-1 w-full " style={{ border: "1px solid #ffffff30" }}>Cancel</button>
+                        <button onClick={handleClearWatchlist} className=" border-white rounded-lg flex items-center gap-1 justify-center hover:bg-red-500/70 cursor-pointer duration-200 hover:scale-105 bg-red-500 w-full text-lg px-3 py-1" style={{ backgroundColor: "#fb2c36" }}>
+                            <span >Clear</span>
                             {
-                                confirmShowLoading && <span className="inline-block w-4 h-4 border-b-[1px] border-l-[1px] animate-spin rounded-full border-white group-hover:border-white " ></span>
+                                confirmShowLoading && <span className="inline-block w-4 h-4 border-b-[1px] border-l-[1px] animate-spin rounded-full border-white group-hover:border-white " style={{ borderBottom: "solid 1px white", borderLeft: "solid 1px white" }}></span>
                             }
                         </button>
                     </div>
@@ -214,7 +234,7 @@ const Whishlist = ({ filter, check, poster }) => {
                             Your Watchlist is empty explore our movies and tv shows
                         </span>
 
-                        <Link href={"/"} className="border-white border rounded-full px-4 py-2 hover:bg-5c00cc hover:text-black hover:bg-white duration-200 mt-2 ">Discover our Shows</Link>
+                        <Link href={"/"} className="border-white border rounded-full px-4 py-2 hover:bg-5c00cc hover:text-black hover:bg-white duration-200 mt-2 " style={{ border: "solid 1px white" }}>Discover our Shows</Link>
                     </div>
                 </div>
             }
@@ -241,7 +261,13 @@ const Whishlist = ({ filter, check, poster }) => {
                             </h2>
                         }
                         {
-                            check &&
+                            (filter === "Upcoming") &&
+                            <h2 className="text-3xl font-bold">
+                                Upcoming
+                            </h2>
+                        }
+                        {
+                            check && !filter &&
                             <h2 className="text-3xl font-bold mx-2">Your Watchlist</h2>
 
                         }
@@ -251,14 +277,13 @@ const Whishlist = ({ filter, check, poster }) => {
                         }
                     </div>
 
-                    <div className={`flex gap-6 overflow-scroll p-2  hide-scrollbar`} ref={scrollRef}>
+                    <div className={`flex gap-6 overflow-scroll overflow-y-hidden p-2  hide-scrollbar`} ref={scrollRef}>
                         {!loading > 0 ?
                             data.map((show, i) => (
                                 poster ? <Link
                                     href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.show_id}`}
-                                    onClick={() => { changeId(show?.show_id); setArrows(false) }}
                                     key={i}
-                                    className="shrink-0 relative hover:scale-105 duration-200 py-2">
+                                    className="shrink-0 relative hover:scale-105 duration-200 py-2 ">
                                     <div className="absolute top-0 bottom-0 right-0 left-0 bg-gradient-to-t from-black to-transparent to-45%">
                                         <div className="absolute bottom-0 z-50">
                                             <div className="px-5 pb-3">
@@ -274,7 +299,7 @@ const Whishlist = ({ filter, check, poster }) => {
                                                             <span className="text-gray-400">|</span>{" "}
                                                         </span>
                                                         {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
-                                                            <span key={i} className="text-gray-400">
+                                                            <span key={i} className="text-gray-400 text-xs" style={{color: " #99a1af"}}>
                                                                 {g.name}{" "}
                                                                 <Dot
                                                                     className={` ${i + 1 === 2 || arr.length === i + 1
@@ -312,61 +337,66 @@ const Whishlist = ({ filter, check, poster }) => {
                                     />
                                 </Link> :
                                     (show.media_type === filter || check) &&
-                                    <Link
-                                        href={`/${show?.media_type}/${slugify(show?.title)}/${show?.show_id}`}
-                                        onClick={() => { changeId(show?.show_id); setArrows(false) }}
-                                        key={i}
-                                        className="shrink-0 hover:scale-105 duration-300">
-                                        <div className="h-[168.6px] ">
-                                            <img
-                                                src={
-                                                    show?.backdrop_path
-                                                    && `https://image.tmdb.org/t/p/w500${show?.backdrop_path}`
+                                    <div className="relative hover:scale-105 duration-300" key={i}>
+                                        <button onClick={() => UseDeleteFromWishList(show?.show_id)} className="p-2 rounded-full absolute z-[999] top-1 right-1 cursor-pointer bg-red-500/50  hover:bg-red-500 duration-200" style={{ backgroundColor: '#fb2c3650' }}>
+                                            <GoBookmarkSlash size={24} />
+                                        </button>
+                                        <Link
+                                            href={`/${show?.media_type}/${slugify(show?.title)}/${show?.show_id}`}
+                                            
+                                            className="shrink-0  relative">
 
-                                                }
-                                                alt={show?.title ? show?.title : show?.name}
-                                                width={300}
-                                                height={168.75}
-                                                style={{
-                                                    objectFit: "cover",
-                                                    objectPosition: "center",
-                                                }}
-                                                className="rounded-2xl"
-                                            />
-                                        </div>
+                                            <div className="h-[168.6px] ">  
+                                                <img
+                                                    src={
+                                                        show?.backdrop_path
+                                                        && `https://image.tmdb.org/t/p/w500${show?.backdrop_path}`
 
-                                        <div className="mt-3 w-[300px] ">
-                                            <h2 className="font-bold">
-                                                {String(show?.title).split(' ').slice(0, 7).join(' ')}
+                                                    }
+                                                    alt={show?.title ? show?.title : show?.name}
+                                                    width={300}
+                                                    height={168.75}
+                                                    style={{
+                                                        objectFit: "cover",
+                                                        objectPosition: "center",
+                                                    }}
+                                                    className="rounded-2xl"
+                                                />
+                                            </div>
+
+                                            <div className="mt-3 w-[300px] ">
+                                                <h2 className="font-bold">
+                                                    {String(show?.title).split(' ').slice(0, 7).join(' ')}
 
 
-                                            </h2>
-                                            <div className="mt- flex items-center gap-1">
-                                                <div className="flex gap-1 items-center">
-                                                    <Star fill="gold" stroke="gold" size={15} />
-                                                    <span className="font-bold">
-                                                        {parseFloat(show?.vote_average).toFixed(1)}{" "}
-                                                    </span>
-                                                </div>
-
-                                                <span className="text-stone-500">|</span>
-
-                                                <div className="flex text-stone-500">
-                                                    {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
-                                                        <span
-                                                            key={i}
-                                                            className="flex items-center text-nowrap flex-nowrap">
-                                                            <span>{g.name}</span>{" "}
-                                                            <Dot
-                                                                className={`${i + 1 === arr.length ? "hidden" : "inline"
-                                                                    } -mx-1`}
-                                                            />
+                                                </h2>
+                                                <div className="mt- flex items-center gap-1">
+                                                    <div className="flex gap-1 items-center">
+                                                        <Star fill="gold" stroke="gold" size={15} />
+                                                        <span className="font-bold">
+                                                            {parseFloat(show?.vote_average).toFixed(1)}{" "}
                                                         </span>
-                                                    ))}
+                                                    </div>
+
+                                                    <span className="text-stone-500">|</span>
+
+                                                    <div className="flex " style={{color: " #99a1af"}}>
+                                                        {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
+                                                            <span
+                                                                key={i}
+                                                                className="flex items-center text-sm text-nowrap flex-nowrap">
+                                                                <span>{g.name}</span>{" "}
+                                                                <Dot
+                                                                    className={`${i + 1 === arr.length ? "hidden" : "inline"
+                                                                        } -mx-1`}
+                                                                />
+                                                            </span>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </Link>
+                                        </Link>
+                                    </div>
 
                             )) :
                             poster ? Array.from(Array(20)).map((_, i) => (
@@ -413,9 +443,8 @@ const Whishlist = ({ filter, check, poster }) => {
             } */}
                     </div>
 
-                    <div className={`opacity-0 group-hover:opacity-100 duration-300  hidden md:block `}>
-                        <div className={`${showLeft ? "opacity-100" : "opacity-0"} duration-400 w-24 mt-[52px
-                          bg-[linear-gradient(to_right,black_5%,transparent_60%)] z-[999] ${poster ? "h-[380.6px]" : "h-[179.6px]"}  top-0 absolute flex items-center `}>
+                    <div className={`opacity-0 group-hover:opacity-100 duration-300   hidden md:block `}>
+                        <div className={` duration-400 w-24 mt-[38px] bg-[linear-gradient(to_right,black_5%,transparent_60%)] z-[999] ${poster ? "h-[380.6px]" : "h-[179.6px]"}  z-[99999]  top-0 absolute flex items-center `}>
                             <div
                                 onClick={() => scroll("left")}
                                 className={`text-3xl  font-bold border-[1px] bg-white rounded-full p-[1px] ml-2 cursor-pointer `}>
@@ -423,7 +452,7 @@ const Whishlist = ({ filter, check, poster }) => {
                             </div>
                         </div>
 
-                        <div className={`${showRight ? "opacity-100" : "opacity-0"} mt-[52px] duration-400 w-24  bg-[linear-gradient(to_left,black_5%,transparent_60%)] z-[999] ${poster ? "h-[380.6px]" : "h-[179.6px]"} top-0 right-0 absolute flex items-center justify-end`}>
+                        <div className={`mt-[38px] duration-400 w-24  bg-[linear-gradient(to_left,black_5%,transparent_60%)] z-[999] ${poster ? "h-[380.6px]" : "h-[179.6px]"} top-0 right-0 absolute flex items-center justify-end`}>
                             <div
                                 onClick={() => scroll("right")}
                                 className={`text-3xl  font-bold border-[1px] bg-white mr-2 rounded-full p-[1px] cursor-pointer `}>
@@ -435,7 +464,7 @@ const Whishlist = ({ filter, check, poster }) => {
             }
 
 
-        </>
+        </div>
 
 
         // <div></div>

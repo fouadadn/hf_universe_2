@@ -9,7 +9,6 @@ const apiForHf = axios.create({
 
 apiForHf.interceptors.request.use(
     (config) => {
-        // console.log("Request sent:", config);
         return config;
     },
     (error) => Promise.reject(error)

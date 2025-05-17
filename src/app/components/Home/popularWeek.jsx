@@ -79,7 +79,7 @@ const PopularWeek = ({ shows }) => {
           setData(combineData);
           const token = await user?.getIdToken(true);
 
-          const res = user && (await apiForHf.get(`/api/wishlist/check/${combineData[0].id}`, {
+          const res = user && (await apiForHf.get(`/api/wishlist/check/${combineData[0]?.id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -137,14 +137,14 @@ const PopularWeek = ({ shows }) => {
     }
   };
 
+
   return (
     <div>
-      <div className="flex overflow-auto hide-scrollbar gap-16 mt-2 px-2" ref={scrollRef}>
+      <div className="flex overflow-x-scroll overflow-y-hidden hide-scrollbar gap-16 mt-2 px-2" ref={scrollRef}>
         {data.length > 0
           ? data.map((show, i) => (
             <Link
               href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
-              onClick={() => { changeId(show?.id); setArrows(false) }}
               className="shrink-0 flex items-center gap-4 duration-200 py-2 hover:scale-105"
               key={i}>
               <span className="text-5xl font-bold">{i + 1}</span>
@@ -300,7 +300,7 @@ const PopularWeek = ({ shows }) => {
                       UseDeleteFromWishList(popular?.id)
                       setPopular({ ...popular, ifSaved: false })
                     } else {
-                      UseAddToWishList(popular?.id, popular?.title ? popular?.title : popular?.name, popular?.backdrop_path, popular?.genre_ids, popular?.vote_average, popular?.media_type, popular?.poster_path)
+                      UseAddToWishList(popular?.id, popular?.title ? popular?.title : popular?.name, popular?.backdrop_path, popular?.genre_ids, popular?.vote_average, popular?.media_type, popular?.poster_path, popular?.release_date)
                       setPopular({ ...popular, ifSaved: true }
                       );
                     }

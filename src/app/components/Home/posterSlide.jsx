@@ -12,7 +12,7 @@ const PosterSlide = ({ movie, tv }) => {
   const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/w500`);
   const [providers, setProviders] = useState([]);
   const popularProviderIds = [8, 9, 337, 15, 283, 387, 526, 350, 531]; //80 AMC
-  const { id, changeId, setArrows, slugify, changeProviderId } = useTvContext()
+  const { slugify, changeProviderId } = useTvContext()
 
 
   useEffect(() => {
@@ -113,37 +113,32 @@ const PosterSlide = ({ movie, tv }) => {
 
   return (
     <>
-      <div className="relative">
-        {
-          tv && movie ? "" :
-            <>
-              <div className="h-6 w-full absolute bg-black -top-4 z-[999]"></div>
-              <div className="h-6 bg-black w-full relative top-20 z-[999]"></div>
-            </>
-        }
-      </div>
-      {tv && movie ? "" : <div className="overflow-auto gap-5 -mt-8 flex hide-scrollbar pb-10 pt-5 px-2">
+      {tv && movie ? "" : <div className="overflow-auto gap-5 -mt-8 flex justify-center hide-scrollbar pb-10 pt-5 px-2">
         {providers?.length > 0
           ? providers.map((p, i) => (
             <Link
-              href={`/discover/${slugify(p?.provider_name)}`}
+              href={`/discover/${slugify(p?.provider_name)}/${p.provider_id}`}
               key={p?.provider_id}
               onClick={() => changeProviderId(p?.provider_id)}
               className="hover:scale-105 duration-200"
             >
               <div
-                className="relative shrink-0 h-[64px] w-62 flex  items-center gap-3 px-2 py-1 rounded-2xl shadow-xl overflow-hidden group"
+                className="relative shrink-0 h-[64px] w-62 flex rounded-2xl  items-center gap-3 px-2 py-1 rounded- shadow-xl overflow-hidden group"
                 style={{
                   backgroundImage: `url("https://image.tmdb.org/t/p/original${p?.logo_path}")`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
+                  borderRadius: "16px",
+                  overflow: "hidden"
                 }}
               >
                 {/* Cool Blur Layer */}
-                <div className="absolute inset-0 bg-black/40 transition-all duration-300 backdrop-blur-xl"></div>
+                <div className="absolute inset-0 bg-black/40 transition-all rounded-2xl duration-300 backdrop-blur-xl"></div>
+
+                {/* <div className=" rounded-2xl absolute top-0 bottom-0 right-0 left-0 z-50 p-6" ></div> */}
 
                 {/* Optional Gradient Overlay for depth */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div>
+                {/* <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div> */}
 
                 {/* Logo */}
                 <img
@@ -178,7 +173,6 @@ const PosterSlide = ({ movie, tv }) => {
             ? media.map((show, i) => (
               <Link
                 href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
-                onClick={() => { changeId(show?.id); setArrows(false) }}
                 key={i}
                 className="shrink-0 relative hover:scale-105 duration-200">
                 <div className="absolute top-0 bottom-0 right-0 left-0 bg-gradient-to-t from-black to-transparent to-45%">
@@ -196,7 +190,7 @@ const PosterSlide = ({ movie, tv }) => {
                             <span className="text-gray-400">|</span>{" "}
                           </span>
                           {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
-                            <span key={i} className="text-gray-400">
+                            <span key={i} className="text-gray-400" style={{color: " #99a1af"}}>
                               {g.name}{" "}
                               <Dot
                                 className={` ${i + 1 === 2 || arr.length === i + 1

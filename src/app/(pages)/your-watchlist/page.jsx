@@ -22,17 +22,26 @@ const page = () => {
         </div>
 
         <div>
-          <div>
+          <div className='mt-4'>
             <Whishlist filter={"movie"} poster={false}></Whishlist>
           </div>
         </div>
 
 
         <div>
-          <div>
+          <div className='mt-8'>
             <Whishlist filter={"tv"} poster={false}></Whishlist>
           </div>
         </div>
+
+
+        <div>
+          <div className='mt-8'>
+            <Whishlist filter={"Upcoming"} poster={false} check={true}></Whishlist>
+          </div>
+        </div>
+
+
       </div>
 
       <hr className="border-white/30 mt-5" />

@@ -25,7 +25,7 @@ const HomePageSlider = ({ shows }) => {
   const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/original`);
   const [screenWidth, setScreenWidth] = useState(0)
   const [show5WithTrailler, setShow5WithTrailler] = useState([])
-  const { id, changeId, providerId, slugify, currentUser, whishlistChange, setwhishlistChange } = useTvContext()
+  const { providerId, slugify, currentUser } = useTvContext()
   const router = useRouter();
   const [checks, setChecks] = useState([])
   const UseDeleteFromWishList = useDeleteFromWishList();
@@ -85,6 +85,7 @@ const HomePageSlider = ({ shows }) => {
     setImgSrc("/assets/black_backdrop.png");
   };
 
+  console.log(data)
   return (
     <div className='w-full -mt-[81px] z-10 text-white'>
 
@@ -121,12 +122,11 @@ const HomePageSlider = ({ shows }) => {
                     objectPosition: "center", // Optional, if you need to control the position of the image
                   }}
                   // fill
-                  className='min-h-96 ' />
+                  className='min-h-96 w-full ' />
                 {/* <img src={`https://image.tmdb.org/t/p/original/${show?.backdrop_path}` } alt="backdrop image" className='w-full brightness-90' /> */}
                 <Link
                   href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
-                  onClick={() => changeId(show?.id)}
-                  className='bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0'></Link>
+                  className='bg-gradient-to-t from-black to-transparent bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0'></Link>
                 <div className='absolute z-[999] text-start bottom-4 lg:bottom-44 mx-4 '>
                   <span className='bg-black px-3 py-1 rounded-full mb-5 inline-block capitalize'>{show.media_type}</span>
                   <h1 className='text-3xl md:text-5xl font-bold'>{show?.title ? show.title : show.name}</h1>
@@ -134,9 +134,7 @@ const HomePageSlider = ({ shows }) => {
                   <p className='w-[350px] md:w-[460px] text-sm mb-2'>{String(show.overview).split(' ').slice(0, 40).length < String(show.overview).split(" ").length ? `${String(show.overview).split(' ').slice(0, 20).join(" ")} ...` : show.overview}</p>
                   <div className='flex gap-3'>
                     <Link
-                      href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}`}
-                      onClick={() => changeId(show?.id)}
-
+                      href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
                       className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]'><Play /> <span>Play Now</span> </Link>
                     <Link href={`/watch/${show?.trailler?.key}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]'><CirclePlay /> <span>Watch Trailer</span></Link>
                     <button onClick={
@@ -151,7 +149,8 @@ const HomePageSlider = ({ shows }) => {
                               )
                             );
                           } else {
-                            UseAddToWishList(show?.id, show?.title ? show?.title : show?.name, show?.backdrop_path, show?.genre_ids, show?.vote_average, show?.media_type, show?.poster_path)
+                            UseAddToWishList(show?.id, show?.title ? show?.title : show?.name, show?.backdrop_path, show?.genre_ids, show?.vote_average, show?.media_type, show?.poster_path, show?.release_date ? show?.release_date : show?.first_air_date
+                            )
                             setShow5WithTrailler((prev) =>
                               prev.map((item) =>
                                 item.id === show.id ? { ...item, ifSaved: true } : item

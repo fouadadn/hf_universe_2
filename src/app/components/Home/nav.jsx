@@ -22,6 +22,7 @@ const Nav = () => {
     const [showLink, setShowLinks] = useState(false)
     const path = usePathname();
     const [dispayAccount, setDisplayAccount] = useState(false)
+    const [provider_id, setProvider_id] = useState(8)
 
     useEffect(() => {
         try {
@@ -79,7 +80,7 @@ const Nav = () => {
         <>
             <div className={`${dispayAccount ? "block" : "hidden"} absolute top-0 bottom-0 right-0 left-0  z-[9999]`} onClick={() => { setDisplayAccount(false) }}></div>
 
-            <header className="z-[99999] relative font-sans bg-gradient-to-b from-black to-transparent to-95%">
+            <header className="z-[99999] relative font-sans bg-[linear-gradient(to_bottom,black,transparent_95%)] to-95%">
 
                 <nav className={` ${searchOpen ? "justify-end md:justify-between" : "justify-between"} flex  py-4 mx-2 items-center`}>
                     <Link
@@ -91,9 +92,9 @@ const Nav = () => {
 
                     <div className={`hidden md:block space-x-6 ml-6 `}>
                         <Link className={`hover:underline ${String(path) === '/' ? "text-gray-300 underline" : "text-white"}`} href={"/"}>Home</Link>
-                        <Link className={`hover:underline ${String(path).includes('/discover') ? "text-gray-300 underline" : "text-white"}`} href={`/discover/${slugify(providerName)}`}>Discover</Link>
+                        <Link className={`hover:underline ${String(path).includes('/discover') ? "text-gray-300 underline" : "text-white"}`} href={`/discover/netflix/8`}>Discover</Link>
                         <Link className={`hover:underline ${String(path).includes('/movierelease') ? "text-gray-300 underline" : "text-white"}`} href={"/movierelease"}>Movie Release</Link>
-                        <Link className={`hover:underline ${String(path).includes('/your-watchlist') ? "text-gray-300 underline" : "text-white"}`} href={currentUser ? `/${slugify("your-watchlist")}` : "/auth/login"}>your list</Link>
+                        <Link className={`hover:underline ${String(path).includes('/your-watchlist') ? "text-gray-300 underline" : "text-white"}`} href={currentUser ? `/${slugify("your-watchlist")}` : "/auth/login"}>My list</Link>
                     </div>
 
                     <div className="w-full md:w-fit flex items-center gap-4">
@@ -199,13 +200,13 @@ const Nav = () => {
 
                             }
 
-                            <div className={`${dispayAccount ? "flex" : "hidden"} w-52  py-2 absolute right-0 top-12 rounded-xl  flex-col z-[999999] `} style={{ backgroundColor: "#21262a" }}>
+                            <div onClick={()=> setDisplayAccount(false)} className={`${dispayAccount ? "flex" : "hidden"} w-52  py-2 absolute right-0 top-12 rounded-xl  flex-col z-[999999] `} style={{ backgroundColor: "#21262a" }}>
                                 <div className='px-3 uppercase font-semibold text-lg text-stone-300' style={{ color: "#d6d3d1" }}>
                                     {currentUser?.displayName}
                                 </div>
                                 <div className='flex flex-col  pb-2 mt-2'>
-                                    <a href="/account" className='hover:bg-gray-600 duration-200 px-3'>My Account</a>
-                                    <a href="/your-watchlist" className='hover:bg-gray-600 duration-200 px-3'>your Watchlist </a>
+                                    <Link href="/account" className='hover:bg-gray-600 duration-200 px-3'>My Account</Link>
+                                    <Link href="/your-watchlist" className='hover:bg-gray-600 duration-200 px-3'>My Watchlist </Link>
                                 </div>
 
                                 <hr style={{ borderColor: "#ffffff30" }} />
@@ -240,13 +241,13 @@ const Nav = () => {
                             }
 
 
-                            <div className={`${dispayAccount ? "flex" : "hidden"} w-52  py-2 absolute right-0 top-12 rounded-xl z-[999999]  flex-col `} style={{ backgroundColor: "#21262a" }}>
+                            <div onClick={()=> setDisplayAccount(false)} className={`${dispayAccount ? "flex" : "hidden"} w-52  py-2 absolute right-0 top-12 rounded-xl z-[999999]  flex-col `} style={{ backgroundColor: "#21262a" }}>
                                 <div className='px-3 uppercase font-semibold text-lg' style={{ color: "#d6d3d1" }}>
                                     {currentUser?.displayName}
                                 </div>
                                 <div className='flex flex-col  pb-2 mt-2'>
                                     <Link href="/account" className='hover:bg-gray-600 duration-200 px-3'>My Account</Link>
-                                    <Link href="/your-watchlist" className='hover:bg-gray-600 duration-200 px-3'>your Watchlist </Link>
+                                    <Link href="/your-watchlist" className='hover:bg-gray-600 duration-200 px-3'>My Watchlist </Link>
                                 </div>
 
                                 <hr style={{ borderColor: "#ffffff30" }} />
@@ -268,9 +269,9 @@ const Nav = () => {
 
                 <div className='gap-6 flex rounded-xl px-3 py-1 ' style={{ backgroundColor: "#00000080" }} onClick={() => setShowLinks(false)}>
                     <Link className={`hover:underline ${String(path) === '/' ? "text-gray-300 underline" : "text-white"}`} href={"/"}>Home</Link>
-                    <Link className={`hover:underline ${String(path).includes('/discover') ? "text-gray-300 underline" : "text-white"}`} href={`/discover/${slugify(providerName)}`}>Discover</Link>
+                    <Link className={`hover:underline ${String(path).includes('/discover') ? "text-gray-300 underline" : "text-white"}`} href={`/discover/netflix/8`}>Discover</Link>
                     <Link className={`hover:underline ${String(path).includes('/movierelease') ? "text-gray-300 underline" : "text-white"}`} href={"/movierelease"}>Movie Release</Link>
-                    <Link className={`hover:underline ${String(path).includes('/your-watchlist') ? "text-gray-300 underline" : "text-white"}`} href={currentUser ? `/${slugify("your-watchlist")}` : "/auth/login"}>your list</Link>
+                    <Link className={`hover:underline ${String(path).includes('/your-watchlist') ? "text-gray-300 underline" : "text-white"}`} href={currentUser ? `/${slugify("your-watchlist")}` : "/auth/login"}>My list</Link>
                 </div>
             </div>
         </>

@@ -13,7 +13,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" })
   const [genres, setGenres] = useState([]);
   const [imgSrc, setImgSrc] = useState("/assets/black_backdrop.png");
   const [isfound, setIsFound] = useState(true)
-  const { id, changeId, slugify, setArrows } = useTvContext()
+  const { slugify } = useTvContext()
   const date = new Date()
 
 
@@ -158,7 +158,6 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" })
               show.backdrop_path &&
               <Link
                 href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
-                onClick={() => { changeId(show?.id); setArrows(false) }}
                 key={i}
                 className="shrink-0 hover:scale-105 duration-200">
                 <div className="h-[168.6px] ">
@@ -194,7 +193,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" })
 
                     <span className="text-stone-500">|</span>
 
-                    <div className="flex text-stone-500 text-sm" style={{color: "#79716b"}}>
+                    <div className="flex text-stone-500 text-sm" style={{ color: "#99a1af" }}>
                       {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
                         <span
                           key={i}

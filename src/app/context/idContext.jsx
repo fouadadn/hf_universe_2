@@ -6,11 +6,9 @@ import authe from '../firebase';
 const TvContext = createContext();
 
 export const TvProvider = ({ children }) => {
-    const [arrows, setArrows] = useState(false);
     const [providerId, setProviderId] = useState(null);
     const [providerName, setProviderName] = useState("netflix");
     const [currentUser, setCurrentUser] = useState(null)
-    const [id, setId] = useState(null);
     const [whishlistChange, setwhishlistChange] = useState(false)
 
 
@@ -30,27 +28,20 @@ export const TvProvider = ({ children }) => {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const storedId = localStorage.getItem('id');
             const storedproviderId = localStorage.getItem('providerId')
             const storedproviderName = localStorage.getItem('providerName')
-            if (storedId) setId(storedId);
             if (storedproviderId) setProviderId(providerId);
             if (storedproviderName) setProviderName(name);
         }
     }, []);
 
     useEffect(() => {
-        if (typeof window !== 'undefined' && id) {
-            localStorage.setItem('id', id);
+        if (typeof window !== 'undefined') {
             localStorage.setItem('providerId', providerId)
             localStorage.setItem('name', providerName)
         }
-    }, [id, providerId, providerName]);
+    }, [providerId, providerName]);
 
-    function changeId(id) {
-        localStorage.id = id
-        setId(id)
-    }
 
     function changeProviderId(id) {
         localStorage.providerId = id
@@ -68,7 +59,9 @@ export const TvProvider = ({ children }) => {
 
     return (
         <TvContext.Provider value={{
-            id, changeId, slugify, arrows, setArrows, providerId, changeProviderId, setProviderName, providerName,
+            slugify,
+            providerId, changeProviderId,
+            providerName, setProviderName,
             currentUser, setCurrentUser,
             whishlistChange, setwhishlistChange
         }}>

@@ -187,6 +187,7 @@ const Details = ({ slug, type, id }) => {
     }
   }
 
+  console.log(show)
   return (
     <>
       <div className="-mt-32">
@@ -286,7 +287,7 @@ const Details = ({ slug, type, id }) => {
                           useDeleteFromWishList(show?.id)
                           setShow({ ...show, ifSaved: false })
                         } else {
-                          UseAddToWishList(show?.id, show?.title ? show?.title : show?.name, show?.backdrop_path, show?.genres, show?.vote_average, type, show?.poster_path)
+                          UseAddToWishList(show?.id, show?.title ? show?.title : show?.name, show?.backdrop_path, show?.genres, show?.vote_average, type, show?.poster_path, show?.release_date ? show?.release_date : show?.first_air_date)
                           setShow({ ...show, ifSaved: true }
                           );
                         }
@@ -581,7 +582,7 @@ const Details = ({ slug, type, id }) => {
                                   useDeleteFromWishList(show?.id)
                                   setShow({ ...show, ifSaved: false })
                                 } else {
-                                  UseAddToWishList(show?.id, show?.title ? show?.title : show?.name, show?.backdrop_path, show?.genres, show?.vote_average, type, show?.poster_path)
+                                  UseAddToWishList(show?.id, show?.title ? show?.title : show?.name, show?.backdrop_path, show?.genres, show?.vote_average, type, show?.poster_path, show?.release_date ? show?.release_date : show?.first_air_date)
                                   setShow({ ...show, ifSaved: true }
                                   );
                                 }
