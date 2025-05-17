@@ -14,10 +14,10 @@ const page = () => {
     const [errors, setErrors] = useState('');
     const [newpassword, setNewPassword] = useState('')
 
-    // if (!currentUser) {
-    //     redirect('/auth/login')
+    if (!currentUser) {
+        redirect('/auth/login')
 
-    // }
+    }
 
 
 
@@ -72,6 +72,8 @@ const page = () => {
             setTimeout(() => {
                 setMessage('')
             }, 10000);
+
+            window.location.reload();
         } catch (error) {
             setErrors("invalid password");
             setTimeout(() => {
