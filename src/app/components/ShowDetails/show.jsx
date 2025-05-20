@@ -24,6 +24,7 @@ import authe from "@/app/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import axios from "axios";
 import apiForHf from "@/app/utils/axiosInstanceForHfApi";
+import Head from "next/head";
 
 
 
@@ -38,12 +39,13 @@ const Details = ({ slug, type, id }) => {
   const [screenWidth, setScreenWidth] = useState(0);
   const [seasonInfo, setSeasonInfo] = useState({})
   const [episodes, setEpisodes] = useState([])
-  const { currentUser } = useTvContext()
+  const { currentUser, slugify } = useTvContext()
   const [rerender, setRerender] = useState(1)
   const scrollRef = useRef(null)
   const [showLeft, setShowLeft] = useState(false)
   const [showRight, setShowRight] = useState(false)
   const router = useRouter()
+  const [history, setHistory] = useState({})
 
   const UseAddToWishList = useAddToWishList()
   const useDeleteFromWishList = UseDeleteFromWishList()
@@ -53,7 +55,6 @@ const Details = ({ slug, type, id }) => {
     const unsubscribe = onAuthStateChanged(authe, async (user) => {
       try {
         async function fetchMovies() {
-
           if (id) {
             const [show, casts, video, recommendationss, similar] = [
               (await api.get(`/${type}/${id}`)).data,
@@ -84,9 +85,31 @@ const Details = ({ slug, type, id }) => {
             setSimilares(similar)
             setRerender(rerender + 1)
           }
+
+          const usera = authe.currentUser;
+
+          if (!usera) {
+            return;
+          }
+
+          const token = await usera.getIdToken(true);
+
+          const response = (await apiForHf.get("/api/history", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          })).data
+
+          const s = response.series.find((s) => s.show_id === id)
+
+          setHistory(s)
         }
 
         fetchMovies();
+
+
       } catch (err) {
         console.log(err);
       }
@@ -122,6 +145,9 @@ const Details = ({ slug, type, id }) => {
     }
 
   }, [selectedSeason, id, rerender])
+  useEffect(() => {
+    setSelectedSeason(history?.season ? history?.season : 1)
+  }, [history, id])
 
   function formatTime(time) {
     const hour = parseInt(time) / 60;
@@ -187,11 +213,68 @@ const Details = ({ slug, type, id }) => {
     }
   }
 
-  console.log(show)
+  const handleAddToHistory = async ({ ep = 1, season, ep_backdrop, vote_average }) => {
+
+    const user = authe.currentUser;
+
+    if (!user) {
+      return;
+    }
+
+    const token = await user.getIdToken(true);
+
+    const item = type === "movie" ? {
+      mediaType: "movies",
+      item: {
+        vote_average,
+        show_id: id,
+        name: show?.title,
+        backdrop_path: show?.backdrop_path,
+        genres: show?.genres,
+        watchedAt: new Date().toISOString(),
+        media_type: "movie"
+
+
+      }
+    } :
+
+      {
+        mediaType: "series",
+        item: {
+          vote_average,
+          show_id: id,
+          name: show?.name,
+          backdrop_path: ep_backdrop,
+          genres: show?.genres,
+          season: season ? season : selectedSeason,
+          episode: ep,
+          watchedAt: new Date().toISOString(),
+          media_type: "tv"
+
+        }
+      }
+
+    if (season) {
+      window.location.reload()
+    }
+
+
+    const response = await apiForHf.post(
+      "/api/history",
+      item
+      ,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      }
+    );
+  }
   return (
     <>
       <div className="-mt-32">
-
         {/* backdrop and poster of the show  */}
         {show?.id ? (
           <div className="relative w-full h-[621px] md:h-auto overflow-hidden">
@@ -270,12 +353,14 @@ const Details = ({ slug, type, id }) => {
                   ))}
                 </div>
                 <div className="flex gap-3 mt-2">
-                  <Link href={type === "movie" ? `/stream/${type}/${id}` : '#seasons'} className={`${compareDate(show?.release_date
-                    ? show?.release_date
-                    : show?.first_air_date) ? "block" : 'hidden'} rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]`}>
+                  <Link onClick={() => type === "movie" && handleAddToHistory({ vote_average: show?.vote_average })}
+                    href={type === "movie" ? `/stream/${type}/${slug}/${id}` : '#seasons'}
+                    className={` ${compareDate(show?.release_date
+                      ? show?.release_date
+                      : show?.first_air_date) ? "block" : 'hidden'} rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]`}>
                     <Play /> <span>Play Now</span>{" "}
                   </Link>
-                  <Link href={`/watch/${videos?.key}`}>
+                  <Link href={`/watch/${slugify(show?.name ? show?.name : show?.title)}/${videos?.key}`}>
                     <button className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]">
                       <CirclePlay /> <span>Watch Trailer</span>
                     </button>
@@ -306,7 +391,7 @@ const Details = ({ slug, type, id }) => {
           </div>
         ) : (
           <div className="flex justify-center items-center h-screen ">
-            <div className="border-[1px] animate-spin w-10 h-10 rounded-full border-t-0 border-l-0"></div>
+            <div style={{ border: "1px solid white", borderTopWidth: "0", borderLeftWidth: "0", }} className="border-[1px] animate-spin w-10 h-10 rounded-full border-t-0 border-l-0"></div>
           </div>
         )}
 
@@ -404,7 +489,8 @@ const Details = ({ slug, type, id }) => {
                   {
                     show?.seasons?.length > 0 ? show?.seasons?.map((s, i) => !(s?.season_number === 0) &&
                       s?.air_date &&
-                      <button key={i} onClick={() => { setSelectedSeason(s?.season_number); selectedSeason !== s?.season_number && setEpisodes([]) }} className="shrink-0 cursor-pointer">
+                      <button key={i} onClick={() => { handleAddToHistory({ ep: 1, season: s?.season_number }); setSelectedSeason(s?.season_number); selectedSeason !== s?.season_number && setEpisodes([]) }}
+                        className={`${selectedSeason === s?.season_number ? "border rounded-xl" : ""} shrink-0 cursor-pointer`}>
                         <div className="overflow-hidden rounded-xl">
                           <img src={`https://image.tmdb.org/t/p/w500${s?.poster_path}`} className=" w-44 scale-110 hover:scale-100 duration-300" alt="" />
                         </div>
@@ -441,13 +527,21 @@ const Details = ({ slug, type, id }) => {
 
             </div>
             <div className="mx-4 font-bold mt-16">
-              <h2 className="text-2xl " id="episodes">Episodes of Season {selectedSeason}: </h2>
+              <h2 className="text-2xl " id="episodes">Episodes of Season {selectedSeason}:
+                {
+                  !currentUser &&
+                  <Link href={'/auth/sign-up'} className="text-sm text-gray-500">Sign in to track your watching</Link>
+                }
+              </h2>
 
-              <div className="flex gap-3 mt-2 w-full flex-wrap justify-center   hide-scrollbar">
+              <div className="flex gap-3 mt-2 w-full flex-wrap justify-center  hide-scrollbar">
                 {
                   episodes?.length > 0 ? episodes?.map((p, i) =>
-                    <Link style={{ pointerEvents: `${!compareDate(p?.air_date) && "none"}` }} href={`/stream/tv/${show?.id}/${seasonInfo?.season_number}/${p?.episode_number}`} key={i}
-                      className={` relative shrink-0 rounded-xl cursor-pointer  overflow-hidden w-full md:w-72 `}>
+                    <Link
+                      onClick={() => { handleAddToHistory({ ep: p?.episode_number, ep_backdrop: p?.still_path, vote_average: p?.vote_average }) }} style={{ pointerEvents: `${!compareDate(p?.air_date) && "none"}` }} href={`/stream/tv/${slug}/${show?.id}/${seasonInfo?.season_number}/${p?.episode_number}`}
+                      key={i}
+                      id={p?.episode_number}
+                      className={`${history?.episode === p?.episode_number ? "border" : ""} relative shrink-0 rounded-xl cursor-pointer  overflow-hidden w-full md:w-72 `}>
                       <div className={`${!compareDate(p?.air_date) && "bg-stone-800"} overflow-hidden rounded-xl`}>
                         {
                           compareDate(p?.air_date) ?
@@ -574,7 +668,7 @@ const Details = ({ slug, type, id }) => {
                             </div> : '')
                         }) : <div className='flex gap-3'>
                           <Link href={`#seasons`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]'><Play /> <span>Play Now</span> </Link>
-                          <Link href={`/watch/${seasonInfo?.trailler?.key}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]'><CirclePlay /> <span>Watch Trailer</span></Link>
+                          <Link href={`/watch/${slugify(show?.name ? show?.name : show?.title)}/${seasonInfo?.trailler?.key}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]'><CirclePlay /> <span>Watch Trailer</span></Link>
                           <button onClick={
                             () => {
                               if (currentUser) {

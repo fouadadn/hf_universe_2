@@ -287,10 +287,10 @@ const PopularWeek = ({ shows }) => {
             </p>
 
             <div className="flex gap-3 mt-3">
-              <Link href={`/stream/${popular?.media_type}/${popular?.id}`} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]">
+              <Link href={`/stream/${popular?.media_type}/${slugify(popular?.name ? popular?.name : popular?.title)}/${popular?.id}`} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]">
                 <Play /> <span>Play Now</span>{" "}
               </Link>
-              <Link href={`/watch/${popular?.trailler?.key}`} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]">
+              <Link href={`/watch/${slugify(popular?.name ? popular?.name : popular?.title)}/${popular?.trailler?.key}`} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]">
                 <CirclePlay /> <span>Watch Trailer</span>
               </Link>
               <button onClick={

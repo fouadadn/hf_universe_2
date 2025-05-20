@@ -6,6 +6,9 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, Dot, Star } from "lucide-react";
 import Link from "next/link";
 import { useTvContext } from "@/app/context/idContext";
+import authe from "@/app/firebase";
+import apiForHf from "@/app/utils/axiosInstanceForHfApi";
+import BackdropSlide from "./backdropSlide";
 
 const PosterSlide = ({ movie, tv }) => {
   const [media, setMedia] = useState([]);
@@ -13,6 +16,7 @@ const PosterSlide = ({ movie, tv }) => {
   const [providers, setProviders] = useState([]);
   const popularProviderIds = [8, 9, 337, 15, 283, 387, 526, 350, 531]; //80 AMC
   const { slugify, changeProviderId } = useTvContext()
+  const [history, setHistory] = useState({})
 
 
   useEffect(() => {
@@ -74,9 +78,6 @@ const PosterSlide = ({ movie, tv }) => {
     }
   }, [movie, tv]);
 
-  const handleError = () => {
-    setImgSrc("/assets/black_backdrop.png");
-  };
 
 
   const scrollRef = useRef(null)
@@ -111,60 +112,89 @@ const PosterSlide = ({ movie, tv }) => {
     return () => el.removeEventListener('scroll', checkScroll)
   }, [])
 
+  const user = authe.currentUser;
+
+  useEffect(() => {
+    async function fetchHistory() {
+      if (!user) {
+        return;
+      }
+
+      const token = await user.getIdToken(true);
+
+      const response = await apiForHf.get(
+        "/api/history",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+      setHistory(response.data)
+    }
+    fetchHistory()
+  }, [user])
+
   return (
     <>
-      {tv && movie ? "" : <div className="overflow-auto gap-5 -mt-8 flex justify-center hide-scrollbar pb-10 pt-5 px-2">
-        {providers?.length > 0
-          ? providers.map((p, i) => (
-            <Link
-              href={`/discover/${slugify(p?.provider_name)}/${p.provider_id}`}
-              key={p?.provider_id}
-              onClick={() => changeProviderId(p?.provider_id)}
-              className="hover:scale-105 duration-200"
-            >
-              <div
-                className="relative shrink-0 h-[64px] w-62 flex rounded-2xl  items-center gap-3 px-2 py-1 rounded- shadow-xl overflow-hidden group"
-                style={{
-                  backgroundImage: `url("https://image.tmdb.org/t/p/original${p?.logo_path}")`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  borderRadius: "16px",
-                  overflow: "hidden"
-                }}
+      {tv && movie ? "" :
+        <div className="overflow-auto gap-5 -mt-8 flex hide-scrollbar pb-10 pt-5 px-2">
+          {providers?.length > 0
+            ? providers.map((p, i) => (
+              <Link
+                href={`/discover/${slugify(p?.provider_name)}/${p.provider_id}`}
+                key={p?.provider_id}
+                onClick={() => changeProviderId(p?.provider_id)}
+                className="hover:scale-105 duration-200"
               >
-                {/* Cool Blur Layer */}
-                <div className="absolute inset-0 bg-black/40 transition-all rounded-2xl duration-300 backdrop-blur-xl"></div>
+                <div
+                  className="relative shrink-0 h-[64px] w-62 flex rounded-2xl  items-center gap-3 px-2 py-1 rounded- shadow-xl overflow-hidden group"
+                  style={{
+                    backgroundImage: `url("https://image.tmdb.org/t/p/original${p?.logo_path}")`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    borderRadius: "16px",
+                    overflow: "hidden"
+                  }}
+                >
+                  {/* Cool Blur Layer */}
+                  <div className="absolute inset-0 bg-black/40 transition-all rounded-2xl duration-300 backdrop-blur-xl"></div>
 
-                {/* <div className=" rounded-2xl absolute top-0 bottom-0 right-0 left-0 z-50 p-6" ></div> */}
+                  {/* <div className=" rounded-2xl absolute top-0 bottom-0 right-0 left-0 z-50 p-6" ></div> */}
 
-                {/* Optional Gradient Overlay for depth */}
-                {/* <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div> */}
+                  {/* Optional Gradient Overlay for depth */}
+                  {/* <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div> */}
 
-                {/* Logo */}
-                <img
-                  src={`https://image.tmdb.org/t/p/original${p?.logo_path}`}
-                  alt={p.provider_name}
-                  className="relative z-10 w-[50px] h-[50px] object-cover object-center rounded-xl"
-                />
+                  {/* Logo */}
+                  <img
+                    src={`https://image.tmdb.org/t/p/original${p?.logo_path}`}
+                    alt={p.provider_name}
+                    className="relative z-10 w-[50px] h-[50px] object-cover object-center rounded-xl"
+                  />
 
-                {/* Name */}
-                <div className="relative z-10">
-                  <h2 className="text-xl font-bold text-white">{p.provider_name}</h2>
+                  {/* Name */}
+                  <div className="relative z-10">
+                    <h2 className="text-xl font-bold text-white">{p.provider_name}</h2>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
 
-          ))
-          : Array.from(Array(8)).map((_, i) => (
-            <div
-              key={i}
-              className="w-62 rounded-2xl h-[64px] bg-stone-600 gri shrink-0"></div>
-          ))}
-      </div>}
+            ))
+            : Array.from(Array(8)).map((_, i) => (
+              <div
+                key={i}
+                className="w-62 rounded-2xl h-[64px] bg-stone-600 gri shrink-0"></div>
+            ))}
+        </div>}
+
+      {(user && history?.combined?.length > 0) &&
+        <BackdropSlide title="Continue Watching" show={history?.combined} history={true} />
+      }
 
 
-      <h1 className="text-3xl font-bold mt-">Just Release</h1>
-
+      <h1 className="text-3xl font-bold mt-5">Just Release</h1>
       <div className="relative group ">
         <div className="flex gap-6 overflow-auto mt-3 hide-scrollbar py-3 px-3 "
           ref={scrollRef}>
@@ -190,7 +220,7 @@ const PosterSlide = ({ movie, tv }) => {
                             <span className="text-gray-400">|</span>{" "}
                           </span>
                           {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
-                            <span key={i} className="text-gray-400" style={{color: " #99a1af"}}>
+                            <span key={i} className="text-gray-400" style={{ color: " #99a1af" }}>
                               {g.name}{" "}
                               <Dot
                                 className={` ${i + 1 === 2 || arr.length === i + 1
@@ -234,8 +264,6 @@ const PosterSlide = ({ movie, tv }) => {
                 className="w-[250px] h-[375px] bg-stone-600 shrink-0 rounded-xl animate-pulse gri"></div>
             ))
           }
-
-
         </div>
 
         <div className="opacity-0 group-hover:opacity-100 duration-300 hidden md:block">

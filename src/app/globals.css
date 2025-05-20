@@ -104,3 +104,112 @@ body {
 .griho:hover{
   background-color: #57534d;
 }
+
+.acc {
+  font-size: 2.25rem; /* text-4xl */
+  font-weight: 700; /* font-bold */
+  letter-spacing: -0.025em; /* tracking-tight */
+  
+  /* Gradient text */
+  background-image: linear-gradient(
+    to right, 
+    rgba(92, 0, 204, 0.6), /* #5c00cc99 */
+    #a78bfa,               /* purple-400 */
+    #3b82f6             /* blue-500 */
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Container */
+.alert {
+  background-color: #fef2f2; /* bg-red-50 */
+  border-left-width: 4px;    /* border-s-4 (start = left in LTR) */
+  border-left-style: solid;
+  border-left-color: #ef4444; /* border-red-500 */
+  padding: 1rem;             /* p-4 */
+  border-radius: 0.75rem;    /* rounded-xl */
+}
+
+/* Dark mode container background */
+@media (prefers-color-scheme: dark) {
+  .alert {
+    background-color: rgba(220, 38, 38, 0.3); /* dark:bg-red-800/30 */
+  }
+}
+
+/* Flex wrapper */
+.alert-flex {
+  display: flex;
+}
+
+/* Icon container */
+.icon-container {
+  flex-shrink: 0;
+}
+
+/* Span with the circle */
+.icon-circle {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 2rem;  /* size-8 = 2rem */
+  height: 2rem;
+  border-radius: 9999px;  /* rounded-full */
+  border-width: 4px;
+  border-style: solid;
+  border-color: #fee2e2; /* border-red-100 */
+  background-color: #fecaca; /* bg-red-200 */
+  color: #991b1b; /* text-red-800 */
+}
+
+/* Dark mode for circle */
+@media (prefers-color-scheme: dark) {
+  .icon-circle {
+    border-color: #7f1d1d;  /* dark:border-red-900 */
+    background-color: #991b1b; /* dark:bg-red-800 */
+    color: #fca5a5; /* dark:text-red-400 */
+  }
+}
+
+/* SVG inside the circle */
+.icon-svg {
+  flex-shrink: 0;
+  width: 1rem;  /* size-4 = 1rem */
+  height: 1rem;
+  stroke: currentColor;
+  fill: none;
+}
+
+/* Margin start (left in LTR) */
+.text-container {
+  margin-left: 0.75rem; /* ms-3 */
+}
+
+/* Heading */
+.alert-title {
+  color: #1f2937; /* text-gray-800 */
+  font-weight: 600; /* font-semibold */
+}
+
+/* Dark mode heading */
+@media (prefers-color-scheme: dark) {
+  .alert-title {
+    color: white; /* dark:text-white */
+  }
+}
+
+/* Paragraph */
+.alert-text {
+  font-size: 0.875rem; /* text-sm */
+  color: #374151; /* text-gray-700 */
+}
+
+/* Dark mode paragraph */
+@media (prefers-color-scheme: dark) {
+  .alert-text {
+    color: #9ca3af; /* dark:text-neutral-400 */
+  }
+}

@@ -1,5 +1,6 @@
 import Details from "@/app/components/ShowDetails/show"
 import { useTvContext } from "@/app/context/idContext"
+import api from "@/app/utils/axiosInstance"
 
 
 const Movie = async ({ params }) => {
@@ -7,6 +8,8 @@ const Movie = async ({ params }) => {
   const { slug } = await params
   const { type } = await params
   const { id } = await params
+
+
 
   return (
     <div>
@@ -18,8 +21,18 @@ const Movie = async ({ params }) => {
 
 export default Movie
 
+
+
 export async function generateMetadata({ params }) {
+  const movie = (await api.get(`/${params.type}/${params.id}`)).data;
   return {
-    title: `HF Stream | ${params.slug}`,
+    title: `${params.slug} | HF Stream`,
+    description: movie.overview,
+    openGraph: {
+      title: `${movie.title ? movie.title : movie.name} | HF Stream`,
+      description: movie.overview,
+      images: [`https://image.tmdb.org/t/p/original${movie.poster_path}`],
+      type: 'video.movie',
+    },
   };
 }

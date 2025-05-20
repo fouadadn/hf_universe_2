@@ -46,7 +46,7 @@ const SignUp = () => {
         displayName: formData.username
       });
 
-      // setLoading(false)
+      setLoading(false)
     } catch (err) {
       console.log(err);
       setErr('the email has already been taken')
@@ -84,24 +84,20 @@ const SignUp = () => {
         </div>
         {
           err &&
-          <div className="bg-red-50 border-s-4 border-red-500 p-4 rounded-xl dark:bg-red-800/30" role="alert" aria-labelledby="hs-bordered-red-style-label">
-            <div className="flex">
-              <div className="shrink-0">
-
-                <span className="inline-flex justify-center items-center size-8 rounded-full border-4 border-red-100 bg-red-200 text-red-800 dark:border-red-900 dark:bg-red-800 dark:text-red-400">
-                  <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"   >
+          <div class="alert" role="alert" aria-labelledby="hs-bordered-red-style-label">
+            <div class="alert-flex">
+              <div class="icon-container">
+                <span class="icon-circle">
+                  <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" >
                     <path d="M18 6 6 18"></path>
                     <path d="m6 6 12 12"></path>
                   </svg>
                 </span>
               </div>
-              <div className="ms-3">
-                <h3 id="hs-bordered-red-style-label" className="text-gray-800 font-semibold dark:text-white">
-                  Error!
-                </h3>
-                <p className="text-sm text-gray-700 dark:text-neutral-400">
-                  {err}
-                </p>
+
+              <div class="text-container">
+                <h3 id="hs-bordered-red-style-label" class="alert-title">Error!</h3>
+                <p class="alert-text">{err}</p>
               </div>
             </div>
           </div>
@@ -188,7 +184,7 @@ const SignUp = () => {
           <button disabled={loading ? true : false} className="hover:bg-stone-700/50 flex justify-center items-center gap-2 hover:text-white w-full text-stone-700 bg-white  rounded-xl py-2 font-bold duration-200 cursor-pointer" style={{ color: "#44403b" }}>
             <span>Sign Up</span>
             {
-              loading && <span className="inline-block w-5 h-5 border-b-[1px] border-l-[1px] animate-spin rounded-full border-black  group-hover:border-white" ></span>
+              loading && <span style={{ border: "1px solid black", borderTopWidth: "0", borderLeftWidth: "0", }} className="inline-block w-5 h-5 border-b-[1px] border-l-[1px] animate-spin rounded-full border-black  group-hover:border-white" ></span>
             }
           </button>
         </div>

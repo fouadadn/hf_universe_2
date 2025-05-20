@@ -84,8 +84,6 @@ const HomePageSlider = ({ shows }) => {
   const handleError = () => {
     setImgSrc("/assets/black_backdrop.png");
   };
-
-  console.log(data)
   return (
     <div className='w-full -mt-[81px] z-10 text-white'>
 
@@ -136,7 +134,7 @@ const HomePageSlider = ({ shows }) => {
                     <Link
                       href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
                       className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]'><Play /> <span>Play Now</span> </Link>
-                    <Link href={`/watch/${show?.trailler?.key}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]'><CirclePlay /> <span>Watch Trailer</span></Link>
+                    <Link href={`/watch/${slugify(show?.name ? show?.name : show?.title)}/${show?.trailler?.key}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]'><CirclePlay /> <span>Watch Trailer</span></Link>
                     <button onClick={
                       async () => {
 
@@ -174,7 +172,7 @@ const HomePageSlider = ({ shows }) => {
               </div>
             </SwiperSlide>
           ) : <div className='flex justify-center items-center h-screen '>
-            <div className='border-[1px] animate-spin w-10 h-10 rounded-full border-t-0 border-l-0'></div>
+            <div style={{border: "1px solid white", borderTopWidth: "0" , borderLeftWidth: "0" , }} className='border-[1px] animate-spin w-10 h-10 rounded-full border-t-0 border-l-0'></div>
           </div>
         }
 

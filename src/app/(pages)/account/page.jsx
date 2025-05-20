@@ -19,9 +19,6 @@ const page = () => {
 
     }
 
-
-
-
     useEffect(() => {
         onAuthStateChanged(authe, function (user) {
             setUserData({ displayName: user?.displayName, email: user?.email })
@@ -104,13 +101,13 @@ const page = () => {
 
             <div className='flex justify-between items-center'>
                 <div>
-                    <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-[#5c00cc99] via-purple-400 to-blue-500 bg-clip-text text-transparent ">
+                    <h1 className="acc text-4xl font-bold tracking-tight bg-gradient-to-r from-[#5c00cc99] via-purple-400 to-blue-500 bg-clip-text text-transparent ">
                         My Account
                     </h1>
                     <h2 className='text-stone-500 font-semibold'>Manage your Profile</h2>
                 </div>
 
-                <button onClick={handleSignOut} className='bg-red-500 px-6 py-2 rounded-full flex gap-1 duration-200 hover:scale-105 cursor-pointer'>
+                <button style={{backgroundColor: "#fb2c36"}} onClick={handleSignOut} className='bg-red-500 px-6 py-2 rounded-full flex gap-1 duration-200 hover:scale-105 cursor-pointer'>
                     <LogOut />
                     <span>Sign Out</span>
                 </button>
@@ -137,7 +134,7 @@ const page = () => {
                                 <span>{currentUser?.email} </span>
                             </div>
 
-                            <div className='flex gap-1 mt-2 bg-purple-400/20 text-sm items-center text-purple-400 rounded-full py-[2px] px-6 w-fit'>
+                            <div style={{color: "#c27aff" , backgroundColor: "#c27aff20"}} className='flex gap-1 mt-2 bg-purple-400/20 text-sm items-center text-purple-400 rounded-full py-[2px] px-6 w-fit'>
                                 <Shield size={15} />
                                 <span>Since {String(currentUser?.metadata?.creationTime).split(' ').slice(0, 4).join(' ')}</span>
                             </div>
@@ -179,21 +176,21 @@ const page = () => {
                     <div className='mt-4 w-full md:w-fit'>
                         <div className='flex flex-col'>
                             <label htmlFor="">Username</label>
-                            <input onChange={(e) => { setUserData({ ...userData, displayName: e.target.value }), setErrors('') }} type="text" value={userData?.displayName} className='outline-0 mt-2 focus:border-purple-700 md:w-96 px-3 py-2 rounded-md' style={{ border: "0.1px solid #ffffff10" }} />
+                            <input style={{ border: "1px solid #ffffff20" }} onChange={(e) => { setUserData({ ...userData, displayName: e.target.value }), setErrors('') }} type="text" value={userData?.displayName} className='outline-0 mt-2 focus:border-purple-700 md:w-96 px-3 py-2 rounded-md'  />
                         </div>
                     </div>
 
                     <div className='mt-4 w-full md:w-fit'>
                         <div className='flex flex-col'>
                             <label htmlFor="">email</label>
-                            <input onChange={(e) => { setUserData({ ...userData, email: e.target.value }), setErrors('') }} type="text" value={userData?.email} className='outline-0 mt-2 focus:border-purple-700 md:w-96 px-3 py-2 rounded-md' style={{ border: "0.1px solid #ffffff10" }} />
+                            <input style={{ border: "1px solid #ffffff20" }} onChange={(e) => { setUserData({ ...userData, email: e.target.value }), setErrors('') }} type="text" value={userData?.email} className='outline-0 mt-2 focus:border-purple-700 md:w-96 px-3 py-2 rounded-md'  />
                         </div>
                     </div>
 
                     <div className='mt-4 w-full md:w-fit'>
                         <div className='flex flex-col'>
                             <label htmlFor="">Change Password</label>
-                            <input onChange={(e) => setNewPassword(e.target.value)} type="password" className='outline-0 mt-2 focus:border-purple-700 md:w-96 px-3 py-2 rounded-md' style={{ border: "0.1px solid #ffffff10" }} />
+                            <input style={{ border: "1px solid #ffffff20" }} onChange={(e) => setNewPassword(e.target.value)} type="password" className='outline-0 mt-2 focus:border-purple-700 md:w-96 px-3 py-2 rounded-md'  />
                         </div>
                     </div>
                 </div>

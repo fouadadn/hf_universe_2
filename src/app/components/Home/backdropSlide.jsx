@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight, Dot, Star, TriangleAlert } from "lucide-reac
 import Link from "next/link";
 import { useTvContext } from "@/app/context/idContext";
 
-const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" }) => {
+const BackdropSlide = ({ media_type, is_korean, show, title = "Your WatchList", history = false }) => {
   const [data, setData] = useState([]);
   const [showCombineData, setShowCombineData] = useState([]);
   const [genres, setGenres] = useState([]);
@@ -17,12 +17,41 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" })
   const date = new Date()
 
 
+  useEffect(() => {
+    // console.log(show)
+    async function fetchgenresAndCombineData() {
+      if (show && show.length > 0) {
+        const genres = media_type === "tv"
+          ? (await api.get("genre/tv/list")).data.genres
+          : (await api.get("genre/movie/list")).data.genres;
 
+        setGenres(genres);
+
+        const combineData = show.map((v) => ({
+          ...v,
+          media_type: media_type === "movie" ? "movie" : "tv",
+          genres: v.genre_ids.map((gI) => {
+            let ob = {};
+            genres.forEach((g) => {
+              if (g.id === gI) {
+                ob = { id: g.id, name: g.name };
+              }
+            });
+            return ob;
+          }),
+        }));
+
+        setShowCombineData(combineData);
+      }
+    }
+
+    !history ? fetchgenresAndCombineData() : setShowCombineData(show);
+  }, [show, media_type]);
 
   useEffect(() => {
     try {
       async function fetchData() {
-        if (!show) {
+        if (!show && !history) {
           const [shows, genres] = await Promise.all([
 
             media_type === "tv"
@@ -76,36 +105,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" })
     }
   }, []);
 
-  useEffect(() => {
-    // console.log(show)
-    async function fetchgenresAndCombineData() {
-      if (show && show.length > 0) {
-        const genres = media_type === "tv"
-          ? (await api.get("genre/tv/list")).data.genres
-          : (await api.get("genre/movie/list")).data.genres;
 
-        setGenres(genres);
-
-        const combineData = show.map((v) => ({
-          ...v,
-          media_type: media_type === "movie" ? "movie" : "tv",
-          genres: v.genre_ids.map((gI) => {
-            let ob = {};
-            genres.forEach((g) => {
-              if (g.id === gI) {
-                ob = { id: g.id, name: g.name };
-              }
-            });
-            return ob;
-          }),
-        }));
-
-        setShowCombineData(combineData);
-      }
-    }
-
-    fetchgenresAndCombineData();
-  }, [show, media_type]);
 
   const handleError = () => {
     setImgSrc("/assets/black_backdrop.png");
@@ -152,14 +152,25 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" })
       </h1>
 
       <div className="flex gap-6 overflow-auto hide-scrollbar mt-4 p-2" ref={scrollRef}>
-        {(showCombineData.length ? showCombineData : data).length > 0
-          && (showCombineData.length > 0 ? showCombineData : data)
+        {(showCombineData?.length ? showCombineData : data)?.length > 0
+          && (showCombineData?.length > 0 ? showCombineData : data)
             .map((show, i) => (
               show.backdrop_path &&
               <Link
-                href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
+                href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id ? show?.id : show?.show_id}${history && show?.media_type === "movie"  ? `#${show?.episode}` : ""}`}
                 key={i}
-                className="shrink-0 hover:scale-105 duration-200">
+                className="shrink-0 hover:scale-105 duration-200 relative">
+                {
+                  (show?.media_type === "tv" && history) &&
+                  <div className=" text-sm absolute z-50 top-0 right-0  px-2 py-[2px] text-start rounded-bl-md"
+                    style={{ backgroundColor: "#00000070" }}
+                  >
+                    <span>
+                      E{show?.episode}
+                    </span>
+                  </div>
+                }
+
                 <div className="h-[168.6px] ">
                   <img
                     src={
@@ -181,7 +192,10 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" })
 
                 <div className="mt-3 w-[300px] ">
                   <h2 className="font-bold">
-                    {media_type === "tv" ? String(show.name).split(' ').slice(0, 7).join(' ') : String(show.title).split(' ').slice(0, 7).join(' ')}
+                    {(history && show?.media_type === "tv") &&
+                      <span>S{show?.season}-</span>
+                    }
+                    {String(show.name ? show?.name : show?.title).split(' ').slice(0, 7).join(' ')}
                   </h2>
                   <div className="mt- flex items-center gap-1">
                     <div className="flex gap-1 items-center">
@@ -213,7 +227,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" })
 
 
         {
-          !(showCombineData.length ? showCombineData : data).length > 0 && isfound &&
+          !(showCombineData?.length ? showCombineData : data)?.length > 0 && isfound &&
           Array.from(Array(20)).map((_, i) => {
             setTimeout(() => {
               setIsFound(false)
@@ -233,7 +247,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WishList" })
         }
 
         {
-          !isfound && !(showCombineData.length ? showCombineData : data).length > 0 ? <div className="flex justify-center w-full">
+          !isfound && !(showCombineData?.length ? showCombineData : data)?.length > 0 ? <div className="flex justify-center w-full">
 
             <div className="flex gap-2 items-center ">
               <TriangleAlert />

@@ -9,9 +9,9 @@ const page = () => {
 
   const { currentUser } = useTvContext()
 
-  // if (!currentUser) {
-  //   redirect('/auth/login')
-  // }
+  if (!currentUser) {
+    redirect('/auth/login')
+  }
   return (
     <>
       <div className='mx-3'>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hf-stream.vercel.app/sitemap.xml

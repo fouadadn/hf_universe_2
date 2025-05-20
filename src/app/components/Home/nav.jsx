@@ -139,7 +139,7 @@ const Nav = () => {
                                         searchData?.length > 0 ? searchData?.map((show, i) =>
                                             show.poster_path &&
                                             <Link key={i}
-                                                onClick={() => { setDisplaysearchData(false); setSearchQuery(''); setSearchOpen(false); changeId(show?.id); setArrows(false) }}
+                                                onClick={() => { setDisplaysearchData(false); setSearchQuery(''); setSearchOpen(false);  }}
                                                 href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
                                                 className='flex gap-2'>
                                                 <img src={`https://image.tmdb.org/t/p/w500${show?.poster_path}`} className=' h-[94.08px] w-16 rounded-lg' alt="" />
