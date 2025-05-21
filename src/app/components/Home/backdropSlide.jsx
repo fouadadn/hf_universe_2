@@ -2,10 +2,12 @@
 
 import api from "@/app/utils/axiosInstance";
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import { ChevronLeft, ChevronRight, Dot, Star, TriangleAlert } from "lucide-react";
+import { ChevronLeft, ChevronRight, Dot, Funnel, Star, Trash2, TriangleAlert, X } from "lucide-react";
 import Link from "next/link";
 import { useTvContext } from "@/app/context/idContext";
+import apiForHf from "@/app/utils/axiosInstanceForHfApi";
+import authe from "@/app/firebase";
+import useDeleteFromhistory from "@/app/Hooks/useDeleteFromHistory";
 
 const BackdropSlide = ({ media_type, is_korean, show, title = "Your WatchList", history = false }) => {
   const [data, setData] = useState([]);
@@ -15,6 +17,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WatchList", 
   const [isfound, setIsFound] = useState(true)
   const { slugify } = useTvContext()
   const date = new Date()
+  const deleteFromHistory = useDeleteFromhistory();
 
 
   useEffect(() => {
@@ -45,7 +48,12 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WatchList", 
       }
     }
 
-    !history ? fetchgenresAndCombineData() : setShowCombineData(show);
+    !history ? fetchgenresAndCombineData() : setShowCombineData(title === 'series' ?
+      show?.series?.sort((a, b) => {
+        return new Date(b.watchedAt) - new Date(a.watchedAt)
+      }) : title === "movies" ? show?.movies?.sort((a, b) => {
+        return new Date(b.watchedAt) - new Date(a.watchedAt)
+      }) : show?.combined);
   }, [show, media_type]);
 
   useEffect(() => {
@@ -142,87 +150,101 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WatchList", 
     return () => el.removeEventListener('scroll', checkScroll)
   }, [])
 
-  // console.log(showCombineData)
-
-
   return (
     <div className=" relative group">
-      <h1 className="text-3xl font-bold mx-2">
-        {title}
-      </h1>
 
-      <div className="flex gap-6 overflow-auto hide-scrollbar mt-4 p-2" ref={scrollRef}>
+      <div className={`${(history && (title === "series" || title === "movies")) && "bg-gray-800/70 rounded-xl  px-2"}  mx-2 -z-[9999] flex items-center justify-between`}>
+        {(history ? showCombineData?.length > 0 : true) &&
+          <h1 className="font-bold text-3xl">
+            {title}
+          </h1>
+        }
+      </div>
+
+      <div className="flex gap-6 overflow-auto hide-scrollbar mt-4 p-2 " ref={scrollRef}>
         {(showCombineData?.length ? showCombineData : data)?.length > 0
           && (showCombineData?.length > 0 ? showCombineData : data)
             .map((show, i) => (
               show.backdrop_path &&
-              <Link
-                href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id ? show?.id : show?.show_id}${history && show?.media_type === "movie"  ? `#${show?.episode}` : ""}`}
-                key={i}
-                className="shrink-0 hover:scale-105 duration-200 relative">
+
+              <div className="relative hover:scale-105 duration-200" key={i}>
                 {
-                  (show?.media_type === "tv" && history) &&
-                  <div className=" text-sm absolute z-50 top-0 right-0  px-2 py-[2px] text-start rounded-bl-md"
-                    style={{ backgroundColor: "#00000070" }}
-                  >
-                    <span>
-                      E{show?.episode}
-                    </span>
+                  history &&
+                  <div className="absolute flex  w-full justify-end items-end  top-0 right-0 left-0 bottom-3" >
+                    <div title="Delete From History" onClick={() => { setShowCombineData(showCombineData?.filter((s) => s.show_id !== show?.show_id)); deleteFromHistory(show?.show_id, show?.media_type) }} className="mt-2 ml-2 bg-red-500/40 rounded h-fit p-1 z-[9999] cursor-pointer ">
+                      <Trash2 size={17} />
+                    </div>
                   </div>
                 }
+                <Link
+                  href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id ? show?.id : show?.show_id}${history && show?.media_type === "movie" ? `#${show?.episode}` : ""}`}
 
-                <div className="h-[168.6px] ">
-                  <img
-                    src={
-                      show.backdrop_path
-                        ? `https://image.tmdb.org/t/p/w500${show.backdrop_path}`
-                        : imgSrc
-                    }
-                    alt={show?.title ? show.title : show.name}
-                    width={300}
-                    height={168.75}
-                    style={{
-                      objectFit: "cover",
-                      objectPosition: "center",
-                    }}
-                    className="rounded-2xl"
-                    onError={handleError}
-                  />
-                </div>
+                  className="shrink-0  relative  ">
 
-                <div className="mt-3 w-[300px] ">
-                  <h2 className="font-bold">
-                    {(history && show?.media_type === "tv") &&
-                      <span>S{show?.season}-</span>
-                    }
-                    {String(show.name ? show?.name : show?.title).split(' ').slice(0, 7).join(' ')}
-                  </h2>
-                  <div className="mt- flex items-center gap-1">
-                    <div className="flex gap-1 items-center">
-                      <Star fill="gold" stroke="gold" size={15} />
-                      <span className="font-bold">
-                        {parseFloat(show.vote_average).toFixed(1)}{" "}
+                  {
+                    (show?.media_type === "tv" && history) &&
+                    <div className=" text-sm absolute z-50 top-0 right-0  px-2 py-[2px] text-start rounded-bl-md"
+                      style={{ backgroundColor: "#00000070" }}
+                    >
+                      <span>
+                        E{show?.episode}
                       </span>
                     </div>
+                  }
 
-                    <span className="text-stone-500">|</span>
+                  <div className="h-[168.6px] z-50">
+                    <img
+                      src={
+                        show.backdrop_path
+                          ? `https://image.tmdb.org/t/p/w500${show.backdrop_path}`
+                          : imgSrc
+                      }
+                      alt={show?.title ? show.title : show.name}
+                      width={300}
+                      height={168.75}
+                      style={{
+                        objectFit: "cover",
+                        objectPosition: "center",
+                      }}
+                      className="rounded-2xl"
+                      onError={handleError}
+                    />
+                  </div>
 
-                    <div className="flex text-stone-500 text-sm" style={{ color: "#99a1af" }}>
-                      {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
-                        <span
-                          key={i}
-                          className="flex items-center text-nowrap flex-nowrap">
-                          <span>{g.name}</span>{" "}
-                          <Dot
-                            className={`${i + 1 === arr.length ? "hidden" : "inline"
-                              } -mx-1`}
-                          />
+                  <div className="mt-3 w-[300px] ">
+                    <h2 className="font-bold">
+                      {(history && show?.media_type === "tv") &&
+                        <span>S{show?.season}-</span>
+                      }
+                      {String(show.name ? show?.name : show?.title).split(' ').slice(0, 7).join(' ')}
+                    </h2>
+                    <div className="mt- flex items-center gap-1">
+                      <div className="flex gap-1 items-center">
+                        <Star fill="gold" stroke="gold" size={15} />
+                        <span className="font-bold">
+                          {parseFloat(show.vote_average).toFixed(1)}{" "}
                         </span>
-                      ))}
+                      </div>
+
+                      <span className="text-stone-500">|</span>
+
+                      <div className="flex text-stone-500 text-xs" style={{ color: "#99a1af" }}>
+                        {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
+                          <span
+                            key={i}
+                            className="flex items-center text-nowrap flex-nowrap">
+                            <span>{g.name}</span>{" "}
+                            <Dot
+                              className={`${i + 1 === arr.length ? "hidden" : "inline"
+                                } -mx-1`}
+                            />
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </div>
             ))}
 
 
@@ -247,7 +269,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WatchList", 
         }
 
         {
-          !isfound && !(showCombineData?.length ? showCombineData : data)?.length > 0 ? <div className="flex justify-center w-full">
+          !history && (!isfound && !(showCombineData?.length ? showCombineData : data)?.length > 0) ? <div className="flex justify-center w-full">
 
             <div className="flex gap-2 items-center ">
               <TriangleAlert />
@@ -260,7 +282,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WatchList", 
       </div>
 
       <div className="opacity-0 group-hover:opacity-100 duration-300  hidden md:block ">
-        <div className={`${showLeft ? "opacity-100" : "opacity-0"} duration-400 w-24 bg-[linear-gradient(to_right,black_5%,transparent_60%)] z-[999999] h-[278.6px] top-0 absolute flex items-center `}>
+        <div className={`${showLeft ? "opacity-100" : "opacity-0"} duration-400 w-24 bg-[linear-gradient(to_right,black_5%,transparent_60%)] z-[999] h-[290.6px] top-0 absolute flex items-center `}>
           <div
             onClick={() => scroll("left")}
             className={`text-3xl  font-bold border-[1px] bg-white rounded-full p-[1px] ml-2 cursor-pointer `}>
@@ -268,7 +290,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WatchList", 
           </div>
         </div>
 
-        <div className={`${showRight ? "opacity-100" : "opacity-0"} duration-400 w-24 bg-[linear-gradient(to_left,black_5%,transparent_60%)] z-[999999] h-[278.6px] top-0 right-0 absolute flex items-center justify-end`}>
+        <div className={`${showRight ? "opacity-100" : "opacity-0"} duration-400 w-24 bg-[linear-gradient(to_left,black_5%,transparent_60%)] z-[999] h-[290.6px] top-0 right-0 absolute flex items-center justify-end`}>
           <div
             onClick={() => scroll("right")}
             className={`text-3xl  font-bold border-[1px] bg-white mr-2 rounded-full p-[1px] cursor-pointer `}>

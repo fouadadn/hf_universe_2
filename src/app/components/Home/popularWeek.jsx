@@ -28,9 +28,8 @@ import apiForHf from "@/app/utils/axiosInstanceForHfApi";
 const PopularWeek = ({ shows }) => {
   const [data, setData] = useState([]);
   const [popular, setPopular] = useState({});
-  const { id, changeId, slugify, setArrows, currentUser } = useTvContext()
+  const { slugify, currentUser } = useTvContext()
   const router = useRouter();
-  const hf_api_URL = 'http://localhost:3001'
   const UseDeleteFromWishList = useDeleteFromWishList();
   const UseAddToWishList = useAddToWishList()
 
@@ -108,13 +107,15 @@ const PopularWeek = ({ shows }) => {
     try {
       async function fetchTraillerForPupular() {
 
-        if (shows?.id && popular.id) {
+        if (shows?.id || popular.id) {
           if (shows ? shows : popular.id) {
             const response = await api.get(`/${(shows ? shows : popular)?.media_type}/${(shows ? shows : popular)?.id}/videos`);
             // console.log(popular.id)
             const trailer = response.data?.results?.find(
               (vid) => vid.type === "Trailer" && vid.site === "YouTube"
             );
+
+            console.log(trailer)
 
             setPopular({ ...popular, trailler: trailer })
           }
@@ -137,6 +138,46 @@ const PopularWeek = ({ shows }) => {
     }
   };
 
+
+
+  const handleAddToHistory = async ({ vote_average }) => {
+
+    const user = authe.currentUser;
+
+    if (!user) {
+      return;
+    }
+
+    const token = await user.getIdToken(true);
+
+    const item = popular?.media_type === "movie" && {
+      mediaType: "movies",
+      item: {
+        vote_average,
+        show_id: popular?.id,
+        name: popular?.title,
+        backdrop_path: popular?.backdrop_path,
+        genres: popular?.genres,
+        watchedAt: new Date().toISOString(),
+        media_type: "movie"
+
+
+      }
+    }
+
+    const response = await apiForHf.post(
+      "/api/history",
+      item
+      ,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      }
+    );
+  }
 
   return (
     <div>
@@ -287,7 +328,8 @@ const PopularWeek = ({ shows }) => {
             </p>
 
             <div className="flex gap-3 mt-3">
-              <Link href={`/stream/${popular?.media_type}/${slugify(popular?.name ? popular?.name : popular?.title)}/${popular?.id}`} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]">
+              <Link onClick={() => popular?.media_type === "movie" && handleAddToHistory({ vote_average: popular?.vote_average })}
+                href={`/stream/${popular?.media_type}/${slugify(popular?.name ? popular?.name : popular?.title)}/${popular?.id}`} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]">
                 <Play /> <span>Play Now</span>{" "}
               </Link>
               <Link href={`/watch/${slugify(popular?.name ? popular?.name : popular?.title)}/${popular?.trailler?.key}`} className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]">

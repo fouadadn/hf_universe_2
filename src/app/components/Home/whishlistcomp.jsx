@@ -299,7 +299,7 @@ const Whishlist = ({ filter, check, poster }) => {
                                                             <span className="text-gray-400">|</span>{" "}
                                                         </span>
                                                         {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
-                                                            <span key={i} className="text-gray-400 text-xs" style={{color: " #99a1af"}}>
+                                                            <span key={i} className="text-gray-400 text-xs" style={{ color: " #99a1af" }}>
                                                                 {g.name}{" "}
                                                                 <Dot
                                                                     className={` ${i + 1 === 2 || arr.length === i + 1
@@ -338,15 +338,16 @@ const Whishlist = ({ filter, check, poster }) => {
                                 </Link> :
                                     (show.media_type === filter || check) &&
                                     <div className="relative hover:scale-105 duration-300" key={i}>
-                                        <button onClick={() => UseDeleteFromWishList(show?.show_id)} className="p-2 rounded-full absolute z-[999] top-1 right-1 cursor-pointer bg-red-500/50  hover:bg-red-500 duration-200" style={{ backgroundColor: '#fb2c3650' }}>
+
+                                        <button onClick={() => {setData(data.filter((w) => w.show_id !== show?.show_id)) ; UseDeleteFromWishList(show?.show_id) }} className="p-2 rounded-full absolute z-[999] top-1 right-1 cursor-pointer bg-red-500/50  hover:bg-red-500 duration-200" style={{ backgroundColor: '#fb2c3650' }}>
                                             <GoBookmarkSlash size={24} />
                                         </button>
                                         <Link
                                             href={`/${show?.media_type}/${slugify(show?.title)}/${show?.show_id}`}
-                                            
+
                                             className="shrink-0  relative">
 
-                                            <div className="h-[168.6px] ">  
+                                            <div className="h-[168.6px] ">
                                                 <img
                                                     src={
                                                         show?.backdrop_path
@@ -380,7 +381,7 @@ const Whishlist = ({ filter, check, poster }) => {
 
                                                     <span className="text-stone-500">|</span>
 
-                                                    <div className="flex " style={{color: " #99a1af"}}>
+                                                    <div className="flex " style={{ color: " #99a1af" }}>
                                                         {show?.genres?.slice(0, 2)?.map((g, i, arr) => (
                                                             <span
                                                                 key={i}

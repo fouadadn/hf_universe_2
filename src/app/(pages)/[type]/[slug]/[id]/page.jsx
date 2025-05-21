@@ -26,10 +26,10 @@ export default Movie
 export async function generateMetadata({ params }) {
   const movie = (await api.get(`/${params.type}/${params.id}`)).data;
   return {
-    title: `${params.slug} | HF Stream`,
+    title: `${params.slug} | HF Universe`,
     description: movie.overview,
     openGraph: {
-      title: `${movie.title ? movie.title : movie.name} | HF Stream`,
+      title: `${movie.title ? movie.title : movie.name} | HF Universe`,
       description: movie.overview,
       images: [`https://image.tmdb.org/t/p/original${movie.poster_path}`],
       type: 'video.movie',

@@ -69,7 +69,7 @@ const PosterSlide = ({ movie, tv }) => {
           })),
         ]
 
-        setMedia(combineData);
+        setMedia(combineData.sort((a, b) => new Date(b.release_date) - new Date(a.release_date)));
       }
 
       fetchJustRelease();
@@ -190,7 +190,7 @@ const PosterSlide = ({ movie, tv }) => {
         </div>}
 
       {(user && history?.combined?.length > 0) &&
-        <BackdropSlide title="Continue Watching" show={history?.combined} history={true} />
+        <BackdropSlide title="Continue Watching" show={history} history={true} />
       }
 
 

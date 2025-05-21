@@ -1,13 +1,11 @@
 'use client';
 import authe from '../firebase';
-import { useTvContext } from '../context/idContext';
 import { useCallback } from 'react';
 import apiForHf from '../utils/axiosInstanceForHfApi';
 
-const useDeleteFromWishList = () => {
-  // const { setwhishlistChange } = useTvContext();
+const useDeleteFromhistory = () => {
 
-  const deleteFromWishList = useCallback(async (show_id) => {
+  const deleteFromWishList = useCallback(async (show_id, mediaType) => {
     const user = authe.currentUser;
 
     if (!user) {
@@ -16,18 +14,23 @@ const useDeleteFromWishList = () => {
 
     const token = await user.getIdToken(true);
 
-    await apiForHf.delete(`/api/wishlist/${show_id}`, {
+    const res = await fetch('https://hf-stream-api.vercel.app/api/history', {
+      method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        // Add other headers here if needed, like Authorization
       },
-    });
+      body: JSON.stringify({
+        show_id,
+        mediaType: mediaType === "movie" ? "movies" : "series"
+      })
+    })
 
-    
   }, []);
 
   return deleteFromWishList;
 };
 
-export default useDeleteFromWishList;
+export default useDeleteFromhistory;

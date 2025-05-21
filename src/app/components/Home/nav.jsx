@@ -87,7 +87,7 @@ const Nav = () => {
                         href={"/"}
                         className={`${searchOpen ? 'hidden md:flex' : 'flex'} text-nowrap text-3xl font-bold font-serif  items-center`}>
                         <span className="text-[#5c00cc] font-sans text-5xl">HF</span>
-                        <span>Stream</span>{" "}
+                        <span>Universe</span>{" "}
                     </Link>
 
                     <div className={`hidden md:block space-x-6 ml-6 `}>

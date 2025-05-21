@@ -67,7 +67,7 @@ const Login = () => {
               href={"/"}
               className="text-nowrap text-3xl font-bold font-serif flex items-center">
               <span className="text-[#5c00cc] font-sans text-5xl">HF</span>
-              <span>Stream</span>{" "}
+              <span>Universe</span>{" "}
             </Link>
 
             <span className="text-xs text-stone-500 relative bottom-3">Login to your account</span>

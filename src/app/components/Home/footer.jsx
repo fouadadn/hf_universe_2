@@ -28,7 +28,7 @@ const Footer = () => {
             
 
             <div className=" mt-8 pt-4 text-center text-sm " style={{ color: "#6a7282" }}>
-                © {new Date().getFullYear()} HF Stream. All rights reserved.
+                © {new Date().getFullYear()} HF Universe. All rights reserved.
             </div>
         </footer>
     );
