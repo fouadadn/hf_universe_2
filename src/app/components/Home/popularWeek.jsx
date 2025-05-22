@@ -114,9 +114,6 @@ const PopularWeek = ({ shows }) => {
             const trailer = response.data?.results?.find(
               (vid) => vid.type === "Trailer" && vid.site === "YouTube"
             );
-
-            console.log(trailer)
-
             setPopular({ ...popular, trailler: trailer })
           }
         }
