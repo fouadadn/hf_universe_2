@@ -177,7 +177,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WatchList", 
                   </div>
                 }
                 <Link
-                  href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id ? show?.id : show?.show_id}${history && show?.media_type === "movie" ? `#${show?.episode}` : ""}`}
+                  href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id ? show?.id : show?.show_id}${history && show?.media_type === "tv" ? `#${show?.episode}` : "" }`}
 
                   className="shrink-0  relative  ">
 
