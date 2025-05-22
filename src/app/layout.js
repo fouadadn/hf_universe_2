@@ -3,6 +3,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/react"
 import { TvProvider } from "./context/idContext";
 import Script from "next/script";
+import authe from "./firebase";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,6 +26,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
 
+  
+
+
   return (
     <html lang="en">
       <head>
@@ -32,14 +36,9 @@ export default function RootLayout({ children }) {
         <meta name="google-site-verification" content="wTLaJlDKLrjuono-nL7RCoY69PgVhk9EvnEydCDs9_E" />
         <link rel="icon" href="/favicon.ico" />
 
-        <Script
-          data-cfasync="false"
-          src="//dcbbwymp1bhlf.cloudfront.net/?wbbcd=1181800"
-          strategy="afterInteractive"
-        />    
-        <Script src="/adblock.js" strategy="afterInteractive" />
- 
-         
+       
+
+
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Analytics />
