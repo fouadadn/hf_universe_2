@@ -80,9 +80,9 @@ const Nav = () => {
         <>
             <div className={`${dispayAccount ? "block" : "hidden"} absolute top-0 bottom-0 right-0 left-0  z-[9999]`} onClick={() => { setDisplayAccount(false) }}></div>
 
-            <header className="z-[99999] relative font-sans bg-[linear-gradient(to_bottom,black,transparent_95%)] to-95%">
+            <header className="z-[99999] relative font-sans  bg-[linear-gradient(to_bottom,black,transparent_95%)] to-95%">
 
-                <nav className={` ${searchOpen ? "justify-end md:justify-between" : "justify-between"} flex  py-4 mx-2 items-center`}>
+                <nav className={` ${searchOpen ? "justify-end md:justify-between" : "justify-between"} flex  py-5  mx-2 items-center`}>
                     <Link
                         href={"/"}
                         className={`${searchOpen ? 'hidden md:flex' : 'flex'} text-nowrap text-3xl font-bold font-serif  items-center`}>
