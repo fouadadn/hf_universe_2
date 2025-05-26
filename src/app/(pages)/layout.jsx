@@ -8,18 +8,19 @@ import { useEffect, useState } from "react";
 
 const layout = ({ children }) => {
   const [user, setUser] = useState('')
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(authe, (user) => {
       setUser(user);
+      setAuthChecked(true);
     });
 
     return () => unsubscribe();
   }, []);
 
   const hideAdsFor = "fouadadnan07@gmail.com";
-  const showAds = !user || user?.email !== hideAdsFor;
-
+  const showAds = authChecked && (!user || user.email?.toLowerCase().trim() !== hideAdsFor);
   return (
     <div className="">
       {
