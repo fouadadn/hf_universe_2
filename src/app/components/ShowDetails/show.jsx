@@ -298,7 +298,7 @@ const Details = ({ slug, type, id }) => {
             {/* <img src={`https://image.tmdb.org/t/p/original/${show?.backdrop_path}` } alt="backdrop image" className='w-full brightness-90' /> */}
             <div className="bg-gradient-to-r from-black to-transparent hidden md:block bg-[linear-gradient(to_right,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0"></div>
             <div className="bg-gradient-to-r from-black to-transparent flex justify-center items-center bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0">
-              <Link href={type === "movie" ? `/stream/${type}/${id}` : '#seasons'} className="bg-[#5c00cc30] p-6 rounded-full cursor-pointer">
+              <Link href={type === "movie" ? `/stream/${type}/${slug}/${id}` : '#seasons'} className="bg-[#5c00cc30] p-6 rounded-full cursor-pointer">
                 <Play size={70} className="relative left-1" />
               </Link>
             </div>
