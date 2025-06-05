@@ -6,7 +6,7 @@ import Link from "next/link";
 import api from '@/app/utils/axiosInstance';
 import { useTvContext } from '@/app/context/idContext';
 import { usePathname } from 'next/navigation';
-import { signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import authe from '@/app/firebase';
 import Footer from './footer';
 
@@ -23,8 +23,12 @@ const Nav = () => {
     const path = usePathname();
     const [dispayAccount, setDisplayAccount] = useState(false)
     const [provider_id, setProvider_id] = useState(8)
+    const [userloaded, setUserloaded] = useState(false)
 
     useEffect(() => {
+        onAuthStateChanged(authe, (user) => {
+            setUserloaded(true)
+        })
         try {
             async function fetchSearchData() {
                 const search = (await api.get(`/search/multi?query=${searchQuery}`))?.data?.results
@@ -72,9 +76,6 @@ const Nav = () => {
 
 
     }
-
-
-    // console.log(currentUser)
 
     return (
         <>
@@ -139,7 +140,7 @@ const Nav = () => {
                                         searchData?.length > 0 ? searchData?.map((show, i) =>
                                             show.poster_path &&
                                             <Link key={i}
-                                                onClick={() => { setDisplaysearchData(false); setSearchQuery(''); setSearchOpen(false);  }}
+                                                onClick={() => { setDisplaysearchData(false); setSearchQuery(''); setSearchOpen(false); }}
                                                 href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
                                                 className='flex gap-2'>
                                                 <img src={`https://image.tmdb.org/t/p/w500${show?.poster_path}`} className=' h-[94.08px] w-16 rounded-lg' alt="" />
@@ -166,41 +167,43 @@ const Nav = () => {
                         </div>
 
                         <div className={`${searchOpen ? "hidden" : "block"} gap-2 hidden lg:flex relative`}>
-                            {currentUser?.uid ?
-                                <button
-                                    onClick={
-                                        () => {
-                                            setDisplayAccount(!dispayAccount)
-                                        }
-                                    }
-                                    className="whitespace-nowrap rounded-full  gri cursor-pointer flex items-center p-1 gap-1"
-                                    style={{ backgroundColor: "#21262a50" }}
-                                >
-                                    <div className={` bg-[#21262a] w-9 h-9  rounded-full`}>
-                                        <span className='text-2xl uppercase relative top-[2px] '>{String(currentUser?.displayName)?.split('')[0]}</span>
-                                    </div>
+                            {
+                                userloaded && (
+                                    currentUser?.uid ?
+                                        <button
+                                            onClick={
+                                                () => {
+                                                    setDisplayAccount(!dispayAccount)
+                                                }
+                                            }
+                                            className="whitespace-nowrap rounded-full  gri cursor-pointer flex items-center p-1 gap-1"
+                                            style={{ backgroundColor: "#21262a50" }}
+                                        >
+                                            <div className={` bg-[#21262a] w-9 h-9  rounded-full`}>
+                                                <span className='text-2xl uppercase relative top-[2px] '>{String(currentUser?.displayName)?.split('')[0]}</span>
+                                            </div>
 
-                                    <span className={`${dispayAccount ? "rotate-180" : "rotate-0"} duration-200`}>
-                                        <ChevronDown size={20} />
-                                    </span>
-                                </button> :
-                                <>
-                                    <Link href={"/auth/sign-up"} className=' '>
-                                        <button className="border-[1px] rounded-xl px-3 py-[7px] cursor-pointer whitespace-nowrap">
-                                            Sign Up
-                                        </button>
-                                    </Link>
-                                    <Link href={"/auth/login"} className=''>
-                                        <button className=" rounded-xl px-3 py-[7px] bg-[#5c00cc] cursor-pointer" >
-                                            Login
-                                        </button>
-                                    </Link>
-                                </>
-
+                                            <span className={`${dispayAccount ? "rotate-180" : "rotate-0"} duration-200`}>
+                                                <ChevronDown size={20} />
+                                            </span>
+                                        </button> :
+                                        <>
+                                            <Link href={"/auth/sign-up"} className=' '>
+                                                <button className="border-[1px] rounded-xl px-3 py-[7px] cursor-pointer whitespace-nowrap">
+                                                    Sign Up
+                                                </button>
+                                            </Link>
+                                            <Link href={"/auth/login"} className=''>
+                                                <button className=" rounded-xl px-3 py-[7px] bg-[#5c00cc] cursor-pointer" >
+                                                    Login
+                                                </button>
+                                            </Link>
+                                        </>
+                                )
 
                             }
 
-                            <div onClick={()=> setDisplayAccount(false)} className={`${dispayAccount ? "flex" : "hidden"} w-52  py-2 absolute right-0 top-12 rounded-xl  flex-col z-[999999] `} style={{ backgroundColor: "#21262a" }}>
+                            <div onClick={() => setDisplayAccount(false)} className={`${dispayAccount ? "flex" : "hidden"} w-52  py-2 absolute right-0 top-12 rounded-xl  flex-col z-[999999] `} style={{ backgroundColor: "#21262a" }}>
                                 <div className='px-3 uppercase font-semibold text-lg text-stone-300' style={{ color: "#d6d3d1" }}>
                                     {currentUser?.displayName}
                                 </div>
@@ -241,7 +244,7 @@ const Nav = () => {
                             }
 
 
-                            <div onClick={()=> setDisplayAccount(false)} className={`${dispayAccount ? "flex" : "hidden"} w-52  py-2 absolute right-0 top-12 rounded-xl z-[999999]  flex-col `} style={{ backgroundColor: "#21262a" }}>
+                            <div onClick={() => setDisplayAccount(false)} className={`${dispayAccount ? "flex" : "hidden"} w-52  py-2 absolute right-0 top-12 rounded-xl z-[999999]  flex-col `} style={{ backgroundColor: "#21262a" }}>
                                 <div className='px-3 uppercase font-semibold text-lg' style={{ color: "#d6d3d1" }}>
                                     {currentUser?.displayName}
                                 </div>

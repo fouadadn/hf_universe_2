@@ -1,17 +1,23 @@
 "use client"
-import React from 'react'
+import React, { useEffect } from 'react'
 import Whishlist from '@/app/components/Home/whishlistcomp'
-import { useTvContext } from '@/app/context/idContext'
 import { redirect } from 'next/navigation'
 import Footer from '@/app/components/Home/footer'
+import authe from '@/app/firebase'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const page = () => {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(authe, async (user) => {
+      if (!user) {
+        redirect('/auth/login')
+      }
+    })
 
-  const { currentUser } = useTvContext()
-
-  if (!currentUser) {
-    redirect('/auth/login')
-  }
+    return () => {
+      unsubscribe();
+    };
+  }, [])
   return (
     <>
       <div className='mx-3'>

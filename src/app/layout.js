@@ -26,7 +26,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
 
-  
+
 
 
   return (
@@ -36,7 +36,25 @@ export default function RootLayout({ children }) {
         <meta name="google-site-verification" content="wTLaJlDKLrjuono-nL7RCoY69PgVhk9EvnEydCDs9_E" />
         <link rel="icon" href="/favicon.ico" />
 
-       
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-XK35E0KJR1"
+        />
+
+        <Script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-XK35E0KJR1', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
+
+
 
 
       </head>

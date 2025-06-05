@@ -489,7 +489,7 @@ const Details = ({ slug, type, id }) => {
                   {
                     show?.seasons?.length > 0 ? show?.seasons?.map((s, i) => !(s?.season_number === 0) &&
                       s?.air_date &&
-                      <button key={i} onClick={() => { handleAddToHistory({ ep: 1, season: s?.season_number }); setSelectedSeason(s?.season_number); selectedSeason !== s?.season_number && setEpisodes([]) }}
+                      <button key={i} onClick={() => { setSelectedSeason(s?.season_number); selectedSeason !== s?.season_number && setEpisodes([]) }}
                         className={`${selectedSeason === s?.season_number ? "border rounded-xl" : ""} shrink-0 cursor-pointer`}>
                         <div className="overflow-hidden rounded-xl">
                           <img src={`https://image.tmdb.org/t/p/w500${s?.poster_path}`} className=" w-44 scale-110 hover:scale-100 duration-300" alt="" />
@@ -537,8 +537,10 @@ const Details = ({ slug, type, id }) => {
               <div className="flex gap-3 mt-2 w-full flex-wrap justify-center  hide-scrollbar">
                 {
                   episodes?.length > 0 ? episodes?.map((p, i) =>
+        
                     <Link
-                      onClick={() => { handleAddToHistory({ ep: p?.episode_number, ep_backdrop: p?.still_path, vote_average: p?.vote_average }) }} style={{ pointerEvents: `${!compareDate(p?.air_date) && "none"}` }} href={`/stream/tv/${slug}/${show?.id}/${seasonInfo?.season_number}/${p?.episode_number}`}
+                      onClick={() => { handleAddToHistory({ ep: p?.episode_number, ep_backdrop: p?.still_path, vote_average: p?.vote_average , season: p?.season_number
+                        }) }} style={{ pointerEvents: `${!compareDate(p?.air_date) && "none"}` }} href={`/stream/tv/${slug}/${show?.id}/${seasonInfo?.season_number}/${p?.episode_number}`}
                       key={i}
                       id={p?.episode_number}
                       className={`${history?.episode === p?.episode_number ? "border" : ""} relative shrink-0 rounded-xl cursor-pointer  overflow-hidden w-full md:w-72 `}>
@@ -572,7 +574,8 @@ const Details = ({ slug, type, id }) => {
                           E{p?.episode_number}
                         </span>
                       </div>
-                    </Link>) :
+                    </Link>
+                    ) :
                     Array?.from(Array(10)).map((_, i) => <div key={i} className="shrink-0 w-72 h-[161.85px] gri rounded-xl animate-pulse">
                     </div>)
                 }
