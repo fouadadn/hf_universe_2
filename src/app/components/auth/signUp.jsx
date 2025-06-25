@@ -3,10 +3,11 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
-import authe from "@/app/firebase";
+import authe, { db } from "@/app/firebase";
 import { useTvContext } from "@/app/context/idContext";
 import { redirect, useRouter } from "next/navigation";
 import { Eye, EyeClosed } from "lucide-react";
+import { doc, setDoc } from "firebase/firestore";
 
 const SignUp = () => {
 
@@ -46,7 +47,25 @@ const SignUp = () => {
         displayName: formData.username
       });
 
+      const user = userCredential.user;
+
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        email: user.email,
+        displayName: formData.username,
+        show_ads: true,      // default value
+        is_admin: false,     // default value
+        disabled: false,
+        emailVerified: user.emailVerified,
+        metadata: {
+          creationTime: user.metadata.creationTime,
+          lastSignInTime: user.metadata.lastSignInTime
+        }
+
+      });
+
       setLoading(false)
+
     } catch (err) {
       console.log(err);
       setErr('the email has already been taken')
