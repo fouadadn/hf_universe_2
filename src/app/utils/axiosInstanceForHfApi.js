@@ -4,7 +4,7 @@ const hf_api_URL_LOCAL = 'http://localhost:3002'
 const hf_api_URL_SERVER = 'https://hf-stream-api.vercel.app'
 
 const apiForHf = axios.create({
-    baseURL: hf_api_URL_LOCAL,
+    baseURL: hf_api_URL_SERVER,
 });
 
 apiForHf.interceptors.request.use(
