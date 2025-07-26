@@ -11,8 +11,6 @@ export const TvProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null)
     const [whishlistChange, setwhishlistChange] = useState(false)
 
-
-
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(authe, (user) => {
             setCurrentUser(user ? user : null);

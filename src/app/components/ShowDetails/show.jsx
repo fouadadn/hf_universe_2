@@ -22,9 +22,8 @@ import { GoBookmarkSlash } from "react-icons/go";
 import UseDeleteFromWishList from "@/app/Hooks/useDeleteFromWishList";
 import authe from "@/app/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import axios from "axios";
 import apiForHf from "@/app/utils/axiosInstanceForHfApi";
-import Head from "next/head";
+
 
 
 
@@ -254,9 +253,9 @@ const Details = ({ slug, type, id }) => {
         }
       }
 
-    if (season) {
-      window.location.reload()
-    }
+    // if (season) {
+    //   window.location.reload()
+    // }
 
 
     const response = await apiForHf.post(
@@ -537,13 +536,19 @@ const Details = ({ slug, type, id }) => {
               <div className="flex gap-3 mt-2 w-full flex-wrap justify-center  hide-scrollbar">
                 {
                   episodes?.length > 0 ? episodes?.map((p, i) =>
-        
+
                     <Link
-                      onClick={() => { handleAddToHistory({ ep: p?.episode_number, ep_backdrop: p?.still_path, vote_average: p?.vote_average , season: p?.season_number
-                        }) }} style={{ pointerEvents: `${!compareDate(p?.air_date) && "none"}` }} href={`/stream/tv/${slug}/${show?.id}/${seasonInfo?.season_number}/${p?.episode_number}`}
+                      onClick={() => {
+                        handleAddToHistory({
+                          ep: p?.episode_number, ep_backdrop: p?.still_path, vote_average: p?.vote_average, season: p?.season_number
+                        })
+                      }}
+                      style={{ pointerEvents: `${!compareDate(p?.air_date) && "none"}`, border: `${(history?.episode === p?.episode_number && history?.season === selectedSeason)&& "1px solid white"} ` }}
+                      href={`/stream/tv/${slug}/${show?.id}/${seasonInfo?.season_number}/${p?.episode_number}`}
                       key={i}
                       id={p?.episode_number}
-                      className={`${history?.episode === p?.episode_number ? "border" : ""} relative shrink-0 rounded-xl cursor-pointer  overflow-hidden w-full md:w-72 `}>
+                      className={` relative shrink-0 rounded-xl cursor-pointer  overflow-hidden w-full md:w-72 `}
+                    >
                       <div className={`${!compareDate(p?.air_date) && "bg-stone-800"} overflow-hidden rounded-xl`}>
                         {
                           compareDate(p?.air_date) ?
@@ -575,7 +580,7 @@ const Details = ({ slug, type, id }) => {
                         </span>
                       </div>
                     </Link>
-                    ) :
+                  ) :
                     Array?.from(Array(10)).map((_, i) => <div key={i} className="shrink-0 w-72 h-[161.85px] gri rounded-xl animate-pulse">
                     </div>)
                 }

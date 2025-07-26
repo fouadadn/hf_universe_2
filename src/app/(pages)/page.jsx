@@ -1,5 +1,4 @@
 "use client"
-
 import HomePageSlider from "../components/Home/HomePageSlider";
 import PosterSlide from "../components/Home/posterSlide";
 import PopularWeek from "../components/Home/popularWeek";

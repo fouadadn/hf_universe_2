@@ -1,13 +1,14 @@
 "use client"
+import authe from '@/app/firebase'
+import api from '@/app/utils/axiosInstance'
+import apiForHf from '@/app/utils/axiosInstanceForHfApi'
 import { Server } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
 const Stream = ({ type, season, episode, id }) => {
 
-    // const { id } = useTvContext()
     const [displayServers, setDisplayServers] = useState(false)
     const [selectedServer, setSelectedServer] = useState({})
-    const [clicked, setClicked] = useState(false)
 
     useEffect(() => {
         setSelectedServer(localStorage?.server ?
@@ -25,8 +26,71 @@ const Stream = ({ type, season, episode, id }) => {
             })
     }, [])
 
+    // const handleAddToHistory = async ({ ep = 1, ep_backdrop, vote_average }) => {
+
+    //     const show = (await api.get(`/${type}/${id}`)).data
+
+    //     console.log(show)
+
+    //     const user = authe.currentUser;
+
+    //     if (!user) {
+    //         return;
+    //     }
+
+    //     const token = await user.getIdToken(true);
+
+    //     const item = type === "movie" ? {
+    //         mediaType: "movies",
+    //         item: {
+    //             vote_average,
+    //             show_id: id,
+    //             name: show?.title,
+    //             backdrop_path: show?.backdrop_path,
+    //             genres: show?.genres,
+    //             watchedAt: new Date().toISOString(),
+    //             media_type: "movie"
 
 
+    //         }
+    //     } :
+
+    //         {
+    //             mediaType: "series",
+    //             item: {
+    //                 vote_average,
+    //                 show_id: id,
+    //                 name: show?.name,
+    //                 backdrop_path: ep_backdrop,
+    //                 genres: show?.genres,
+    //                 season: season,
+    //                 episode: ep,
+    //                 watchedAt: new Date().toISOString(),
+    //                 media_type: "tv"
+
+    //             }
+    //         }
+
+    //     if (season) {
+    //         window.location.reload()
+    //     }
+
+
+    //     const response = await apiForHf.post(
+    //         "/api/history",
+    //         item
+    //         ,
+    //         {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //                 "Content-Type": "application/json",
+    //                 Accept: "application/json",
+    //             },
+    //         }
+    //     );
+    // }
+
+    //  handleAddToHistory()
 
     const handleChangeServerToServer1 = () => {
         if (type === "movie") {
