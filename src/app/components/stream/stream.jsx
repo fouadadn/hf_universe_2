@@ -2,6 +2,7 @@
 import authe from '@/app/firebase'
 import api from '@/app/utils/axiosInstance'
 import apiForHf from '@/app/utils/axiosInstanceForHfApi'
+import { onAuthStateChanged } from 'firebase/auth'
 import { Server } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
@@ -24,73 +25,76 @@ const Stream = ({ type, season, episode, id }) => {
                 url: type === "movie" ? `https://moviesapi.club/${type}/${id}` : `https://moviesapi.club/${type}/${id}-${season}-${episode}`,
                 server: 1
             })
+
+
     }, [])
 
-    // const handleAddToHistory = async ({ ep = 1, ep_backdrop, vote_average }) => {
+    onAuthStateChanged(authe, (user) => {
+        if (user) {
+            const handleAddToHistory = async () => {
 
-    //     const show = (await api.get(`/${type}/${id}`)).data
+                const show = (await api.get(`/${type}/${id}`)).data
+                const chosenSeason = (await api.get(`/tv/${id}/season/${season}`)).data
+                const episodes = chosenSeason?.episodes || [];
+                const chosenEpisode = episodes.find(ep => ep.episode_number == episode)
 
-    //     console.log(show)
+                const user = authe.currentUser;
 
-    //     const user = authe.currentUser;
+                if (!user) {
+                    return;
+                }
+                const token = await user.getIdToken(true);
 
-    //     if (!user) {
-    //         return;
-    //     }
-
-    //     const token = await user.getIdToken(true);
-
-    //     const item = type === "movie" ? {
-    //         mediaType: "movies",
-    //         item: {
-    //             vote_average,
-    //             show_id: id,
-    //             name: show?.title,
-    //             backdrop_path: show?.backdrop_path,
-    //             genres: show?.genres,
-    //             watchedAt: new Date().toISOString(),
-    //             media_type: "movie"
-
-
-    //         }
-    //     } :
-
-    //         {
-    //             mediaType: "series",
-    //             item: {
-    //                 vote_average,
-    //                 show_id: id,
-    //                 name: show?.name,
-    //                 backdrop_path: ep_backdrop,
-    //                 genres: show?.genres,
-    //                 season: season,
-    //                 episode: ep,
-    //                 watchedAt: new Date().toISOString(),
-    //                 media_type: "tv"
-
-    //             }
-    //         }
-
-    //     if (season) {
-    //         window.location.reload()
-    //     }
+                const item = type === "movie" ? {
+                    mediaType: "movies",
+                    item: {
+                        vote_average,
+                        show_id: id,
+                        name: show?.title,
+                        backdrop_path: show?.backdrop_path,
+                        genres: show?.genres,
+                        watchedAt: new Date().toISOString(),
+                        media_type: "movie"
 
 
-    //     const response = await apiForHf.post(
-    //         "/api/history",
-    //         item
-    //         ,
-    //         {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //                 "Content-Type": "application/json",
-    //                 Accept: "application/json",
-    //             },
-    //         }
-    //     );
-    // }
+                    }
+                } :
 
-    //  handleAddToHistory()
+                    {
+                        mediaType: "series",
+                        item: {
+                            vote_average: show?.vote_average,
+                            show_id: id,
+                            name: show?.name,
+                            backdrop_path: chosenEpisode?.still_path,
+                            genres: show?.genres,
+                            season: parseInt(season),
+                            episode: parseInt(episode),
+                            watchedAt: new Date().toISOString(),
+                            media_type: "tv"
+
+                        }
+                    }
+
+                const response = await apiForHf.post(
+                    "/api/history",
+                    item
+                    ,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                        },
+                    }
+                );
+            }
+
+            handleAddToHistory()
+        }
+    })
+
+
 
     const handleChangeServerToServer1 = () => {
         if (type === "movie") {

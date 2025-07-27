@@ -271,6 +271,8 @@ const Details = ({ slug, type, id }) => {
       }
     );
   }
+
+  console.log(seasonInfo)
   return (
     <>
       <div className="-mt-32">
@@ -543,7 +545,7 @@ const Details = ({ slug, type, id }) => {
                           ep: p?.episode_number, ep_backdrop: p?.still_path, vote_average: p?.vote_average, season: p?.season_number
                         })
                       }}
-                      style={{ pointerEvents: `${!compareDate(p?.air_date) && "none"}`, border: `${(history?.episode === p?.episode_number && history?.season === selectedSeason)&& "1px solid white"} ` }}
+                      style={{ pointerEvents: `${!compareDate(p?.air_date) && "none"}`, border: `${(history?.episode === p?.episode_number && history?.season === selectedSeason) && "1px solid white"} ` }}
                       href={`/stream/tv/${slug}/${show?.id}/${seasonInfo?.season_number}/${p?.episode_number}`}
                       key={i}
                       id={p?.episode_number}
@@ -641,6 +643,14 @@ const Details = ({ slug, type, id }) => {
                           />
                         </span>
                       ))}
+                    </div>
+                    <span>|</span>
+                    <div className="flex items-center text-sm gap-1 text-stone-400">
+                      <span className="">
+                        {seasonInfo?.release_date
+                          ? seasonInfo?.release_date
+                          : seasonInfo?.air_date}
+                      </span>
                     </div>
                   </div>
                   {/* <p className="w-80 md:w-[56%] text-xs md:text-base ">
