@@ -28,6 +28,6 @@ export default Auth;
 export async function generateMetadata({ params }) {
   const { op } = await params;
   return {
-    title: `HF Stream | ${op === "login" ? "Login" : "Sign Up"}`,
+    title: `HF Universe | ${op === "login" ? "Login" : "Sign Up"}`,
   };
 }

@@ -8,6 +8,7 @@ import {
   ChevronRight,
   CirclePlay,
   Dot,
+  ExternalLink,
   Play,
   Star,
   UserRound,
@@ -41,8 +42,11 @@ const Details = ({ slug, type, id }) => {
   const { currentUser, slugify } = useTvContext()
   const [rerender, setRerender] = useState(1)
   const scrollRef = useRef(null)
+  const castscrollRef = useRef(null)
   const [showLeft, setShowLeft] = useState(false)
   const [showRight, setShowRight] = useState(false)
+  const [showLeftCast, setShowLeftCast] = useState(false)
+  const [showRightCast, setShowRightCast] = useState(false)
   const router = useRouter()
   const [history, setHistory] = useState({})
 
@@ -159,6 +163,7 @@ const Details = ({ slug, type, id }) => {
 
   const checkScroll = () => {
     const el = scrollRef.current
+    const elcast = castscrollRef.current
     if (!el) return
 
     const isScrollable = el.scrollWidth > el.clientWidth
@@ -166,12 +171,20 @@ const Details = ({ slug, type, id }) => {
     const isAtEnd = el.scrollLeft + el.offsetWidth >= el.scrollWidth - 1
 
 
+    const casTisScrollable = elcast.scrollWidth > el.clientWidth
+    const casTisAtStart = elcast.scrollLeft === 0
+    const casTisAtEnd = elcast.scrollLeft + elcast.offsetWidth >= elcast.scrollWidth - 1
+
+
     setShowLeft(isScrollable && !isAtStart)
     setShowRight(isScrollable && !isAtEnd)
 
+    setShowLeftCast(casTisScrollable && !casTisAtStart)
+    setShowRightCast(casTisScrollable && !casTisAtEnd)
+
   }
-  const scroll = (direction) => {
-    const el = scrollRef.current
+  const scroll = ({ direction, ref }) => {
+    const el = ref === "cast" ? castscrollRef.current : scrollRef.current
     if (!el) return
 
     el.scrollBy({ left: direction === 'right' ? window?.innerWidth : -window?.innerWidth, behavior: 'smooth' })
@@ -272,7 +285,6 @@ const Details = ({ slug, type, id }) => {
     );
   }
 
-  console.log(seasonInfo)
   return (
     <>
       <div className="-mt-32">
@@ -343,9 +355,9 @@ const Details = ({ slug, type, id }) => {
                   </div>
                 </div>
 
-                <div className="flex">
+                <div className="flex text-xs md:text-sm">
                   {show?.genres?.map((g, i, arr) => (
-                    <div className="flex" key={i}>
+                    <div className="flex items-center" key={i}>
                       <span>{g?.name}</span>{" "}
                       <Dot
                         className={`${arr?.length > i + 1 ? "inline" : "hidden"}`}
@@ -418,7 +430,7 @@ const Details = ({ slug, type, id }) => {
             <div className={`mx-4 group relative`}>
               <div
                 className="flex gap-3 mt-2 overflow-auto hide-scrollbar"
-                ref={scrollRef}>
+                ref={castscrollRef}>
                 {cast?.length > 0
                   ? cast?.map((c, i) => (
                     <div key={i} className="flex items-center gap-3">
@@ -460,17 +472,17 @@ const Details = ({ slug, type, id }) => {
               </div>
 
               <div className="opacity-0 group-hover:opacity-100 duration-300 ">
-                <div className={`${showLeft ? "opacity-100" : "opacity-0"} duration-400 w-24 bg-[linear-gradient(to_right,black_5%,transparent_60%)] z-[999999] h-[80px] top-0 absolute flex items-center `}>
+                <div className={`${showLeftCast ? "opacity-100" : "opacity-0"} duration-300 w-24 bg-[linear-gradient(to_right,black_5%,transparent_60%)] z-[999999] h-[80px] top-0 absolute flex items-center `}>
                   <div
-                    onClick={() => scroll("left")}
+                    onClick={() => scroll({ direction: "left", ref: "cast" })}
                     className={`text-3xl  font-bold border-[1px] bg-white rounded-full p-[1px] ml-2 cursor-pointer `}>
                     <ChevronLeft color="black" />
                   </div>
                 </div>
 
-                <div className={`${showRight ? "opacity-100" : "opacity-0"} duration-400 w-24 bg-[linear-gradient(to_left,black_5%,transparent_60%)] z-[999999] h-[80px] top-0 right-0 absolute flex items-center justify-end`}>
+                <div className={`${showRightCast ? "opacity-100" : "opacity-0"} duration-300 w-24 bg-[linear-gradient(to_left,black_5%,transparent_60%)] z-[999999] h-[80px] top-0 right-0 absolute flex items-center justify-end`}>
                   <div
-                    onClick={() => scroll("right")}
+                    onClick={() => scroll({ direction: "right", ref: "cast" })}
                     className={`text-3xl  font-bold border-[1px] bg-white mr-2 rounded-full p-[1px] cursor-pointer `}>
                     <ChevronRight color="black" />
                   </div>
@@ -486,12 +498,12 @@ const Details = ({ slug, type, id }) => {
             <div className=" font-bold mt-5" id="seasons">
               <h2 className="mx-4 text-2xl ">Seasons</h2>
               <div className='relative group '>
-                <div ref={scrollRef} className={`mx-4 flex gap-3 mt-2 overflow-x-scroll hide-scrollbar`}>
+                <div ref={scrollRef} className={`mx-1 flex gap-3 mt-2 overflow-x-scroll hide-scrollbar pb-10`}>
                   {
                     show?.seasons?.length > 0 ? show?.seasons?.map((s, i) => !(s?.season_number === 0) &&
                       s?.air_date &&
                       <button key={i} onClick={() => { setSelectedSeason(s?.season_number); selectedSeason !== s?.season_number && setEpisodes([]) }}
-                        className={`${selectedSeason === s?.season_number ? "border rounded-xl" : ""} shrink-0 cursor-pointer`}>
+                        className={`${selectedSeason === s?.season_number ? "border rounded-xl  shadow-lg shadow-[#5c00cca1] " : ""} shrink-0  cursor-pointer`}>
                         <div className="overflow-hidden rounded-xl">
                           <img src={`https://image.tmdb.org/t/p/w500${s?.poster_path}`} className=" w-44 scale-110 hover:scale-100 duration-300" alt="" />
                         </div>
@@ -506,20 +518,19 @@ const Details = ({ slug, type, id }) => {
                   }
                 </div>
                 {/* */}
-                <div className="opacity-0 group-hover:opacity-100  duration-300 ">
-                  <div className={`${showLeft ? "opacity-100" : "opacity-0"} duration-400 w-24 bg-[linear-gradient(to_right,black_5%,transparent_60%)] z-[999999] h-[265px] top-0 absolute flex items-center  `}>
+                <div className="md:opacity-0 group-hover:opacity-100  duration-300 ">
+                  <div onClick={() => scroll({ direction: "left", ref: "season" })} className={`${showLeft ? "opacity-100" : "opacity-0"} duration-400 w-10   bg-[linear-gradient(to_right,black_5%,transparent_90%)] z-[999999] h-[265px] top-0 absolute flex items-center  `}>
                     <div
-                      onClick={() => scroll("left")}
-                      className={`text-3xl  font-bold border-[1px] bg-white rounded-full p-[1px] ml-2 cursor-pointer `}>
+                      className={`text-xl  font-bold border-[1px] bg-white rounded-full p-[1px] ml-1 cursor-pointer `}>
                       <ChevronLeft color="black" />
 
                     </div>
                   </div>
 
-                  <div className={`${showRight ? "opacity-100" : "opacity-0"} duration-400 w-24 bg-[linear-gradient(to_left,black_5%,transparent_60%)] z-[999999] h-[265px] top-0 right-0 absolute flex items-center justify-end`}>
+                  <div onClick={() => scroll({ direction: "right", ref: "season" })} className={`${showRight ? "opacity-100" : "opacity-0"} duration-400 w-10 bg-[linear-gradient(to_left,black_5%,transparent_90%)] z-[999999] h-[265px] top-0 right-0 absolute flex items-center justify-end`}>
                     <div
-                      onClick={() => scroll("right")}
-                      className={`text-3xl  font-bold border-[1px] bg-white mr-2 rounded-full p-[1px] cursor-pointer `}>
+
+                      className={`text-xl  font-bold border-[1px] bg-white mr-1 rounded-full p-[1px] cursor-pointer `}>
                       <ChevronRight color="black" />
                     </div>
                   </div>
@@ -527,13 +538,14 @@ const Details = ({ slug, type, id }) => {
               </div>
 
             </div>
-            <div className="mx-4 font-bold mt-16">
-              <h2 className="text-2xl " id="episodes">Episodes of Season {selectedSeason}:
-                {
-                  !currentUser &&
-                  <Link href={'/auth/sign-up'} className="text-sm text-gray-500">Sign in to track your watching</Link>
-                }
-              </h2>
+            <div className="mx-4 font-bold ">
+              <h2 className="text-2xl " id="episodes">Episodes of Season {selectedSeason}:</h2>
+              <h3>{
+                !currentUser &&
+                <Link href={'/auth/sign-up'} className="text-sm text-gray-500 underline py-1 flex items-center gap-1">Sign in to track your watching <ExternalLink size={15} /></Link>
+              }
+              </h3>
+
 
               <div className="flex gap-3 mt-2 w-full flex-wrap justify-center  hide-scrollbar">
                 {
@@ -591,7 +603,8 @@ const Details = ({ slug, type, id }) => {
           </div>
         }
 
-        <div className="mx-4">
+        <hr className="mt-6" style={{ borderColor: "#ffffff30" }} />
+        <div className="mx-1">
           <div className="mt-16">
             <BackdropSlide title={'Recommendations'} is_korean={false} media_type={type} show={recommendations} />
           </div>
@@ -609,7 +622,7 @@ const Details = ({ slug, type, id }) => {
                     objectFit: "contain", // Use CSS to set objectFit
                     objectPosition: "center", // Optional, if you need to control the position of the image
                   }}
-                  className="rounded-2xl relative lg:bottom-42 w-full"
+                  className="rounded-2xl relative lg:bottom-42 w-full brightness-50 md:brightness-75"
                 />
 
                 <div className="bg-gradient-to-t from-black to-transparent  bg-[linear-gradient(to_right,black_15%,transparent_80%)] absolute top-0 bottom-0 right-0 left-0"></div>
@@ -620,7 +633,7 @@ const Details = ({ slug, type, id }) => {
                   </h1>
 
                   <div className="flex items-center gap-1">
-                    <div className="flex items-center text-sm gap-1">
+                    <div className="flex items-center text-xs gap-1">
                       <Star fill="gold" stroke="gold" size={15} />
 
                       <div>
@@ -644,7 +657,7 @@ const Details = ({ slug, type, id }) => {
                         </span>
                       ))}
                     </div>
-                    <span>|</span>
+                    <span className={type === "movie" && "hidden"}>|</span>
                     <div className="flex items-center text-sm gap-1 text-stone-400">
                       <span className="">
                         {seasonInfo?.release_date
@@ -671,12 +684,13 @@ const Details = ({ slug, type, id }) => {
 
                   <div className="flex gap-1 items-center " >
                     <div className="md:mt-2">
-                      <h2 className="text-xl md:text-4xl font-sans font-extrabold">{show?.tagline ? show?.tagline : "No tagline!"} </h2>
+                      <h2 className="text-md md:text-4xl font-sans font-extrabold">{show?.tagline ? show?.tagline : "No tagline!"} </h2>
                     </div>
                   </div>
 
                   <div>
-                    <h2 className="whitespace-nowrap">Networks :</h2>
+
+                    <h3 className={`${type === "movie" ? "block" : 'hidden'}`}>Networks :</h3>
                     <div className="flex gap-2 flex-wrap">
                       {type === "movie" ?
                         show?.production_companies?.slice(0, 3)?.map((pc, i) => {
@@ -706,7 +720,8 @@ const Details = ({ slug, type, id }) => {
                             {
                               show?.ifSaved ? <GoBookmarkSlash size={24} /> : <Bookmark />}
 
-                          </button>                        </div>
+                          </button>
+                        </div>
                       }
                     </div>
                   </div>

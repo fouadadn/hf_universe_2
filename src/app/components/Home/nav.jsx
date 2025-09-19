@@ -86,8 +86,8 @@ const Nav = () => {
                 <nav className={` ${searchOpen ? "justify-end md:justify-between" : "justify-between"} flex  py-5  mx-2 items-center`}>
                     <Link
                         href={"/"}
-                        className={`${searchOpen ? 'hidden md:flex' : 'flex'} text-nowrap text-3xl font-bold font-serif  items-center`}>
-                        <span className="text-[#5c00cc] font-sans text-5xl">HF</span>
+                        className={`${searchOpen ? 'hidden md:flex' : 'flex'} text-nowrap text-xl md:text-3xl font-bold font-serif  items-center`}>
+                        <span className="text-[#5c00cc] font-sans text-3xl md:text-5xl">HF</span>
                         <span>Universe</span>{" "}
                     </Link>
 
