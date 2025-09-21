@@ -1,14 +1,13 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from 'react'
-import { ChevronDown, CircleUserRound, Dot, Menu, Search, X } from "lucide-react";
+import { ChevronDown, CircleUserRound, Dot, History, Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import api from '@/app/utils/axiosInstance';
 import { useTvContext } from '@/app/context/idContext';
 import { usePathname } from 'next/navigation';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import authe from '@/app/firebase';
-import Footer from './footer';
 
 const Nav = () => {
 
@@ -18,12 +17,12 @@ const Nav = () => {
     const [displaysearchData, setDisplaysearchData] = useState(false)
     const [noResults, setNoResults] = useState(false)
     const inpurRef = useRef(null)
-    const { id, changeId, slugify, setArrows, providerName, currentUser, whishlistChange } = useTvContext()
+    const { slugify, currentUser } = useTvContext()
     const [showLink, setShowLinks] = useState(false)
     const path = usePathname();
     const [dispayAccount, setDisplayAccount] = useState(false)
-    const [provider_id, setProvider_id] = useState(8)
     const [userloaded, setUserloaded] = useState(false)
+    const [searchHistoryData, setSearchHistoryData] = useState([])
 
     useEffect(() => {
         onAuthStateChanged(authe, (user) => {
@@ -37,6 +36,10 @@ const Nav = () => {
 
             }
             fetchSearchData()
+
+            setSearchHistoryData(JSON.parse(localStorage.getItem("searchHistory") || "[]"))
+
+
         } catch (err) {
             console.log(err)
         }
@@ -127,20 +130,45 @@ const Nav = () => {
                                                 }
                                             }, 2000);
                                         }} onFocus={() => { setSearchOpen(true); setIsFocused(true) }}
-                                            onBlur={() => setIsFocused(false)} ref={inpurRef} type="search" name=""
+                                            onBlur={() => {setIsFocused(false); }} ref={inpurRef} type="search" name=""
                                             className={` [&::-webkit-search-cancel-button]:appearance-none w-full md:w-[240px] px-1 outline-0  `} id="" placeholder='Search' />
                                     </div>
                                 </div>
 
                             </div>
 
-                            <div className={`overflow-scroll hide-scrollbar py-3  ${displaysearchData && searchQuery ? 'block' : "hidden"} w-[97%] md:w-[270px] h-[70vh] md:h-96 bg-[#21262a] absolute z-50 top-10 md:top-8 rounded-xl right-1`}>
-                                <div className='flex flex-col gap-2  px-3 h-[70vh] md:h-96'>
+                            <div className={`overflow-scroll hide-scrollbar py-3  ${displaysearchData  ? 'block' : "hidden"} w-[97%] md:w-[270px] h-[70vh] md:h-96 bg-[#21262a] absolute z-50 top-10 md:top-8 rounded-xl right-1`}>
+                                <div className={`${searchQuery ? "hidden" : "block"} flex gap-1 flex-col mx-2  `} >
+                                    {searchHistoryData.length > 0 && searchHistoryData.map((s, i) =>
+                                        <div onClick={() => { setSearchQuery(s) }} key={i} className='flex gap-3 items-center cursor-pointer hover:bg-gray-700 duration-200 py-2 rounded-lg px-1 ' >
+                                            <History size={20} strokeWidth={1} className='shrink-0' />
+                                            <p className='text-sm'>{s}</p>
+
+                                        </div>)}
+                                </div>
+
+                                <div className={`flex flex-col gap-2 mt-1  px-3 h-[70vh]  ${searchData?.length > 0 ? "md:h-96" : "md:h-3"}`}>
                                     {
                                         searchData?.length > 0 ? searchData?.map((show, i) =>
                                             show.poster_path &&
                                             <Link key={i}
-                                                onClick={() => { setDisplaysearchData(false); setSearchQuery(''); setSearchOpen(false); }}
+                                                onClick={() => {
+                                                    setDisplaysearchData(false); setSearchQuery(''); setSearchOpen(false);
+                                                    let history = [];
+                                                    try {
+                                                        history = JSON.parse(localStorage.getItem("searchHistory")) || [];
+                                                    } catch {
+                                                        history = [];
+                                                    }
+
+                                                    history.unshift(show?.title ? show?.title : show?.name);
+
+                                                    history = [...new Set(history)];
+
+                                                    history = history.slice(0, 10);
+
+                                                    localStorage.setItem("searchHistory", JSON.stringify(history));
+                                                }}
                                                 href={`/${show.media_type}/${show.title ? slugify(show?.title) : slugify(show?.name)}/${show?.id}`}
                                                 className='flex gap-2'>
                                                 <img src={`https://image.tmdb.org/t/p/w500${show?.poster_path}`} className=' h-[94.08px] w-16 rounded-lg' alt="" />
@@ -154,13 +182,21 @@ const Nav = () => {
                                                     </div>
                                                 </div>
                                             </Link>) : !noResults ?
+                                            searchQuery &&
                                             <div className='w-full h-full flex justify-center items-center'>
                                                 <div className='border-b border-l w-6 h-6 rounded-full animate-spin'></div>
-                                            </div> : <div className='text-[#909295] w-full h-full flex justify-center items-center'>
+                                            </div>
+                                            :
+                                            searchQuery &&
+                                            <div className='text-[#909295] w-full h-full flex justify-center items-center'>
                                                 <span>No Results</span>
                                             </div>
                                     }
+
+
                                 </div>
+
+
 
                             </div>
 

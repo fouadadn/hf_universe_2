@@ -25,13 +25,12 @@ export default Movie
 
 export async function generateMetadata({ params }) {
 
-  const { slug } = await params
   const { type } = await params
   const { id } = await params
 
   const movie = (await api.get(`/${type}/${id}`)).data;
   return {
-    title: `${slug} | HF Universe`,
+    title: `${movie.title ? movie.title : movie.name} | HF Universe`,
     description: movie.overview,
     openGraph: {
       title: `${movie.title ? movie.title : movie.name} | HF Universe`,

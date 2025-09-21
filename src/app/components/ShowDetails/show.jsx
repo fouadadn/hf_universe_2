@@ -1,6 +1,6 @@
 'use client';
 import api from "@/app/utils/axiosInstance";
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   Bookmark,
@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Play,
   Star,
+  TvMinimalPlay,
   UserRound,
 } from "lucide-react";
 import Link from "next/link";
@@ -285,9 +286,19 @@ const Details = ({ slug, type, id }) => {
     );
   }
 
+  const handleClick = () => {
+    const target = document.getElementById(`${history?.episode || 1}`);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
   return (
     <>
       <div className="-mt-32">
+        <button onClick={handleClick} className="p-3 bg-[#21262a] rounded-full fixed z-[99999999] bottom-2 right-2">
+          <TvMinimalPlay size={20} />
+        </button>
         {/* backdrop and poster of the show  */}
         {show?.id ? (
           <div className="relative w-full h-[621px] md:h-auto overflow-hidden">
@@ -503,13 +514,20 @@ const Details = ({ slug, type, id }) => {
                     show?.seasons?.length > 0 ? show?.seasons?.map((s, i) => !(s?.season_number === 0) &&
                       s?.air_date &&
                       <button key={i} onClick={() => { setSelectedSeason(s?.season_number); selectedSeason !== s?.season_number && setEpisodes([]) }}
-                        className={`${selectedSeason === s?.season_number ? "border rounded-xl  shadow-lg shadow-[#5c00cca1] " : ""} shrink-0  cursor-pointer`}>
+                        className={`${selectedSeason === s?.season_number ? "border border-gray-600 rounded-xl shadow-lg shadow-[#5c00cca1] " : ""} shrink-0 relative cursor-pointer`}>
                         <div className="overflow-hidden rounded-xl">
                           <img src={`https://image.tmdb.org/t/p/w500${s?.poster_path}`} className=" w-44 scale-110 hover:scale-100 duration-300" alt="" />
                         </div>
                         <div className="text-center">
-                          <span>
+                          {/* <span>
                             Season {s?.season_number}
+                          </span> */}
+                        </div>
+                        <div className=" text-sm absolute z-50 top-0 right-0  px-2 py-[2px] text-start rounded-bl-md"
+                          style={{ backgroundColor: "#00000070" }}
+                        >
+                          <span>
+                            S{s?.season_number}
                           </span>
                         </div>
                       </button>) :
@@ -557,11 +575,11 @@ const Details = ({ slug, type, id }) => {
                           ep: p?.episode_number, ep_backdrop: p?.still_path, vote_average: p?.vote_average, season: p?.season_number
                         })
                       }}
-                      style={{ pointerEvents: `${!compareDate(p?.air_date) && "none"}`, border: `${(history?.episode === p?.episode_number && history?.season === selectedSeason) && "1px solid white"} ` }}
+                      style={{ pointerEvents: `${!compareDate(p?.air_date) && "none"}`, border: `${(history?.episode === p?.episode_number && history?.season === selectedSeason) && "1px solid #4a5565"} ` }}
                       href={`/stream/tv/${slug}/${show?.id}/${seasonInfo?.season_number}/${p?.episode_number}`}
                       key={i}
                       id={p?.episode_number}
-                      className={` relative shrink-0 rounded-xl cursor-pointer  overflow-hidden w-full md:w-72 `}
+                      className={` relative shrink-0 rounded-xl cursor-pointer  overflow-hidden w-full md:w-72 ${history?.episode === p?.episode_number && history?.season === selectedSeason && "shadow-lg shadow-[#5c00cca1] "} `}
                     >
                       <div className={`${!compareDate(p?.air_date) && "bg-stone-800"} overflow-hidden rounded-xl`}>
                         {
@@ -657,7 +675,7 @@ const Details = ({ slug, type, id }) => {
                         </span>
                       ))}
                     </div>
-                    <span className={type === "movie" && "hidden"}>|</span>
+                    <span className={type === "movie" ? "hidden" : "inline-block"}>|</span>
                     <div className="flex items-center text-sm gap-1 text-stone-400">
                       <span className="">
                         {seasonInfo?.release_date
@@ -725,19 +743,6 @@ const Details = ({ slug, type, id }) => {
                       }
                     </div>
                   </div>
-
-                  {/* <div className="flex gap-3 mt-3">
-                      <button className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]">
-                        <Play /> <span>Play Now</span>{" "}
-                      </button>
-                      <button className=" rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]">
-                        <CirclePlay /> <span>Watch Trailer</span>
-                      </button>
-                      <button className="border-[1px] rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200">
-                        <Bookmark />
-                      </button>
-                    </div> */}
-
                 </div>
                 {/* </Link> */}
               </div>
@@ -776,6 +781,8 @@ const Details = ({ slug, type, id }) => {
       </div >
       <hr className="mt-6" style={{ borderColor: "#ffffff30" }} />
       <Footer />
+
+
     </>
   );
 };

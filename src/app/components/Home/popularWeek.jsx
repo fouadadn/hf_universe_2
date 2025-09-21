@@ -204,7 +204,7 @@ const PopularWeek = ({ shows }) => {
                   {show.original_language}
                 </span>
                 <h2 className="font-semibold text-xl">
-                  {show.title ? show.title : show.name}
+                  {show.title ? String(show.title).split(' ').slice(0 , 3).join(' ') : show.name}
                 </h2>
                 <div className="flex items-center gap-1">
                   <Film className="" stroke="gray" />
