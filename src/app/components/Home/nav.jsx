@@ -101,10 +101,11 @@ const Nav = () => {
                         <Link className={`hover:underline ${String(path).includes('/your-watchlist') ? "text-gray-300 underline" : "text-white"}`} href={currentUser ? `/${slugify("your-watchlist")}` : "/auth/login"}>My list</Link>
                     </div>
 
-                    <div className="w-full md:w-fit flex items-center gap-4">
+                    <div className="w-full md:w-fit flex items-center gap-4 duration-300">
 
                         <div className={`${searchOpen ? "mb-2" : ""} relative w-[100%] `}>
-                            <div onClick={() => setDisplaysearchData(true)} className={`relative -top-5  ${searchOpen ? 'top-0 mt-2 md:mb-2 left-2 h-10 md:h-fit' : "glbo"}   pr-3 `}>
+                            <div onClick={() => setDisplaysearchData(true)} className={`relative  -top-5  ${searchOpen ? 'top-0 mt-2 md:mb-2 left-2 h-10 md:h-fit' : "glbo"}   pr-3 `}>
+
                                 <div className={` ${searchOpen ? "md:absolute -top-5 right-1 -mt-3 md:mt-0" : "absolute"}
                           overflow-hidden ${searchOpen ? `bg-[#21262a] w-full` : "bg-transparent"}
                           hover:bg-[#21262a]  flex duration-300 rounded-full p-2 w-10    
@@ -114,7 +115,8 @@ const Nav = () => {
                                         <div className=''>
                                             {/* <X className={`${searchOpen ? 'relative left-[7px]' : "absolute "}  duration-300 ${searchOpen ? "opacity-100" : 'opacity-0'} `} /> */}
                                             {/* <Search className={`${searchOpen ? 'relative left-[7px]' : "absolute "} duration-300 ${searchOpen ? "opacity-0" : 'opacity-100'} `} /> */}
-                                            <Search className={`${searchOpen ? "ml-1" : "glbo"}`} />
+                                            {searchOpen ? <X className='ml-1' /> : <Search className={`${searchOpen ? "ml-1" : "glbo"}`} />}
+
                                         </div>
                                     </div>
 
@@ -130,14 +132,15 @@ const Nav = () => {
                                                 }
                                             }, 2000);
                                         }} onFocus={() => { setSearchOpen(true); setIsFocused(true) }}
-                                            onBlur={() => {setIsFocused(false); }} ref={inpurRef} type="search" name=""
+                                            onBlur={() => { setIsFocused(false); }} ref={inpurRef} type="search" name=""
                                             className={` [&::-webkit-search-cancel-button]:appearance-none w-full md:w-[240px] px-1 outline-0  `} id="" placeholder='Search' />
                                     </div>
                                 </div>
 
                             </div>
+                            
 
-                            <div className={`overflow-scroll hide-scrollbar py-3  ${displaysearchData  ? 'block' : "hidden"} w-[97%] md:w-[270px] h-[70vh] md:h-96 bg-[#21262a] absolute z-50 top-10 md:top-8 rounded-xl right-1`}>
+                            <div className={`overflow-scroll hide-scrollbar py-3  ${displaysearchData && searchOpen  ? 'block' : "hidden"} w-[97%] md:w-[270px] h-[70vh] md:h-96 bg-[#21262a] absolute z-50 top-10 md:top-8 rounded-xl right-1`}>
                                 <div className={`${searchQuery ? "hidden" : "block"} flex gap-1 flex-col mx-2  `} >
                                     {searchHistoryData.length > 0 && searchHistoryData.map((s, i) =>
                                         <div onClick={() => { setSearchQuery(s) }} key={i} className='flex gap-3 items-center cursor-pointer hover:bg-gray-700 duration-200 py-2 rounded-lg px-1 ' >
@@ -199,7 +202,7 @@ const Nav = () => {
 
 
                             </div>
-
+                                
                         </div>
 
                         <div className={`${searchOpen ? "hidden" : "block"} gap-2 hidden lg:flex relative`}>
