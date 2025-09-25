@@ -50,6 +50,7 @@ const Details = ({ slug, type, id }) => {
   const [showRightCast, setShowRightCast] = useState(false)
   const router = useRouter()
   const [history, setHistory] = useState({})
+  const itemRefs = useRef({});
 
   const UseAddToWishList = useAddToWishList()
   const useDeleteFromWishList = UseDeleteFromWishList()
@@ -192,6 +193,11 @@ const Details = ({ slug, type, id }) => {
   }
 
   useEffect(() => {
+    setScreenWidth(window.innerWidth);
+    window.addEventListener("resize", () => {
+      setScreenWidth(window.innerWidth);
+    });
+
     checkScroll()
     const el = scrollRef.current
     if (!el) return
@@ -203,10 +209,7 @@ const Details = ({ slug, type, id }) => {
     // Optional: re-check when content loads (for dynamic content)
     const interval = setInterval(checkScroll, 500)
 
-    setScreenWidth(window.innerWidth);
-    window.addEventListener("resize", () => {
-      setScreenWidth(window.innerWidth);
-    });
+
 
     return () => {
       el.removeEventListener('scroll', checkScroll)
@@ -225,6 +228,7 @@ const Details = ({ slug, type, id }) => {
       return true
     }
   }
+
 
   const handleAddToHistory = async ({ ep = 1, season, ep_backdrop, vote_average }) => {
 
@@ -293,12 +297,40 @@ const Details = ({ slug, type, id }) => {
     }
   };
 
+
+  useEffect(() => {
+    if (selectedSeason && scrollRef.current && itemRefs.current[selectedSeason]) {
+      const container = scrollRef.current;
+      const item = itemRefs.current[selectedSeason];
+
+      // Calculate scroll so item goes to center
+      const containerRect = container.getBoundingClientRect();
+      const itemRect = item.getBoundingClientRect();
+
+      const offset =
+        item.offsetLeft -
+        container.offsetLeft -
+        container.clientWidth / 2 +
+        item.clientWidth / 2;
+
+      container.scrollTo({
+        left: offset,
+        behavior: "smooth",
+      });
+    }
+  }, [selectedSeason]);
+
+
+
+
   return (
     <>
       <div className="-mt-32">
-        <button onClick={handleClick} className="p-3 bg-[#21262a] rounded-full fixed z-[99999999] bottom-2 right-2">
-          <TvMinimalPlay size={20} />
-        </button>
+        {type === "tv" &&
+          <button onClick={handleClick} className="p-3 bg-[#21262a] rounded-full fixed z-[99999999] bottom-2 right-2">
+            <TvMinimalPlay size={20} />
+          </button>
+        }
         {/* backdrop and poster of the show  */}
         {show?.id ? (
           <div className="relative w-full h-[621px] md:h-auto overflow-hidden">
@@ -513,7 +545,11 @@ const Details = ({ slug, type, id }) => {
                   {
                     show?.seasons?.length > 0 ? show?.seasons?.map((s, i) => !(s?.season_number === 0) &&
                       s?.air_date &&
-                      <button key={i} onClick={() => { setSelectedSeason(s?.season_number); selectedSeason !== s?.season_number && setEpisodes([]) }}
+                      <button
+                        ref={(el) => (itemRefs.current[s.season_number] = el)}
+                        id={`S${s?.season_number}`}
+                        key={i}
+                        onClick={() => { setSelectedSeason(s?.season_number); selectedSeason !== s?.season_number && setEpisodes([]) }}
                         className={`${selectedSeason === s?.season_number ? "border border-gray-600 rounded-xl shadow-lg shadow-[#5c00cca1] " : ""} shrink-0 relative cursor-pointer`}>
                         <div className="overflow-hidden rounded-xl">
                           <img src={`https://image.tmdb.org/t/p/w500${s?.poster_path}`} className=" w-44 scale-110 hover:scale-100 duration-300" alt="" />
@@ -718,7 +754,9 @@ const Details = ({ slug, type, id }) => {
                             </div> : '')
                         }) : <div className='flex gap-3'>
                           <Link href={`#seasons`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]'><Play /> <span>Play Now</span> </Link>
-                          <Link href={`/watch/${slugify(show?.name ? show?.name : show?.title)}/${seasonInfo?.trailler?.key}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]'><CirclePlay /> <span>Watch Trailer</span></Link>
+                          {seasonInfo?.trailler?.key &&
+                            <Link href={`/watch/${slugify(show?.name ? show?.name : show?.title)}/${seasonInfo?.trailler?.key}`} className=' rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#37007a98]'><CirclePlay /> <span>Watch Trailer</span></Link>
+                          }
                           <button onClick={
                             () => {
                               if (currentUser) {
@@ -736,7 +774,23 @@ const Details = ({ slug, type, id }) => {
                             }
                           } style={{ backgroundColor: "#ffffff20" }} className='cursor-pointer rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'>
                             {
-                              show?.ifSaved ? <GoBookmarkSlash size={24} /> : <Bookmark />}
+                              show?.ifSaved ?
+                                seasonInfo?.trailler?.key ?
+                                  <GoBookmarkSlash size={24} /> :
+                                  <div>
+                                    <p>Remove from WhatchList</p>
+                                    <GoBookmarkSlash size={20} />
+                                  </div>
+                                :
+                                seasonInfo?.trailler?.key ?
+                                  <Bookmark /> :
+                                  <div className="flex gap-1">
+                                    <Bookmark />
+                                    <p>Add to Watchlist</p>
+                                  </div>
+
+
+                            }
 
                           </button>
                         </div>

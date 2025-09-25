@@ -179,14 +179,14 @@ const page = () => {
                 }
                 <div className='flex justify-between items-center'>
                     <div>
-                        <h1 className="acc text-4xl font-bold tracking-tight bg-gradient-to-r from-[#5c00cc99] via-purple-400 to-blue-500 bg-clip-text text-transparent ">
+                        <h1 className="acc text-2xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-[#5c00cc99] via-purple-400 to-blue-500 bg-clip-text text-transparent ">
                             My Account
                         </h1>
-                        <h2 className='text-stone-500 font-semibold'>Manage your Profile</h2>
+                        <h2 className='text-stone-500 text-sm md:text-base font-semibold'>Manage your Profile</h2>
                     </div>
 
-                    <button style={{ backgroundColor: "#fb2c36" }} onClick={handleSignOut} className='bg-red-500 px-6 py-2 rounded-full flex gap-1 duration-200 hover:scale-105 cursor-pointer'>
-                        <LogOut />
+                    <button style={{ backgroundColor: "#fb2c36" }} onClick={handleSignOut} className='bg-red-500 px-6 py-2 rounded-full flex items-center text-sm gap-1 duration-200 hover:scale-105 cursor-pointer'>
+                        <LogOut size={18} />
                         <span>Sign Out</span>
                     </button>
                 </div>
@@ -195,10 +195,10 @@ const page = () => {
                 <div className='bg-gray-800/70 relative rounded-xl mt-10 w-full h-[530px] md:h-[500px] p-3'>
                     <h2 className='font-semibold text-xl'>Personal Information</h2>
 
-                    <div className='flex gap-2 md:gap-6 items-center justify-start'>
+                    <div className='flex gap-2 md:gap-6 mt-2 items-center justify-start'>
 
-                        <div className={` bg-[#21262a] w-24 md:w-32 h-24 md:h-32 shrink-0 flex justify-center items-center rounded-full mt-2`} style={{ border: "0.2px solid #ffffff40" }}>
-                            <span className='text-6xl md:text-7xl uppercase relative top-[2px] '>
+                        <div className={` bg-[#21262a] w-20 md:w-32 h-20 md:h-32 shrink-0 flex justify-center items-center rounded-full mt-2`} style={{ border: "0.2px solid #ffffff40" }}>
+                            <span className='text-5xl md:text-7xl uppercase relative top-[2px] '>
                                 {String(currentUser?.displayName)?.split('')[0]}
                             </span>
                         </div>
@@ -207,7 +207,7 @@ const page = () => {
                             <div>
                                 <h2 className='capitalize font-semibold text-2xl md:text-3xl'>{currentUser?.displayName}</h2>
 
-                                <div className='flex gap-1 bg-[#5c00cc30] rounded-full justify-center text-sm md:text-md items-center w-fit px-6 py-[2px]  mt-1' >
+                                <div className='flex gap-1 bg-[#5c00cc30] rounded-full justify-center text-sm md:text-md items-center w-fit px-5 py-[2px]  mt-1' >
                                     <Mail size={20} className='text-[#5c00cc] ' />
                                     <span>{currentUser?.email} </span>
                                 </div>
@@ -282,7 +282,7 @@ const page = () => {
                     history?.combined?.length > 0 &&
                     <div className=' w-full  mt-10 rounded-xl'>
                         <div className='flex justify-between items-center'>
-                            <h1 className='text-3xl font-bold px-2 flex gap-1 items-center'>
+                            <h1 className='text-xl md:text-3xl font-bold px-2 flex gap-1 items-center'>
                                 <History className='text-[#5c00cc] ' />
                                 <span>
                                     Recent Activity
