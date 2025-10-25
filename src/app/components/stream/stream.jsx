@@ -1,129 +1,21 @@
 "use client"
-import authe from '@/app/firebase'
-import api from '@/app/utils/axiosInstance'
-import apiForHf from '@/app/utils/axiosInstanceForHfApi'
-import { onAuthStateChanged } from 'firebase/auth'
 import { Server } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import useStreamServer from '@/app/Hooks/useStreamServer';
+import useStreamHistory from '@/app/Hooks/useStreamHistory';
 
 const Stream = ({ type, season, episode, id }) => {
+    const [displayServers, setDisplayServers] = useState(false);
+    const { selectedServer, setServer } = useStreamServer(type, id, season, episode);
 
-    const [displayServers, setDisplayServers] = useState(false)
-    const [selectedServer, setSelectedServer] = useState({})
-
-    useEffect(() => {
-        setSelectedServer(localStorage?.server ?
-            {
-                url: type === "movie" ? `${JSON.parse(localStorage.server).url}/${type}/${id}` :
-                    JSON.parse(localStorage.server).server === 1 ?
-                        `${JSON.parse(localStorage.server).url}/${type}/${id}-${season}-${episode}` :
-                        `${JSON.parse(localStorage.server).url}/${type}/${id}/${season}-${episode}`
-                ,
-                server: JSON.parse(localStorage.server).server
-            } :
-            {
-                url: type === "movie" ? `https://moviesapi.club/${type}/${id}` : `https://moviesapi.club/${type}/${id}-${season}-${episode}`,
-                server: 1
-            })
-
-
-    }, [])
-
-    onAuthStateChanged(authe, (user) => {
-        if (user) {
-            const handleAddToHistory = async () => {
-
-                const show = (await api.get(`/${type}/${id}`)).data
-                const chosenSeason = (await api.get(`/tv/${id}/season/${season}`)).data
-                const episodes = chosenSeason?.episodes || [];
-                const chosenEpisode = episodes.find(ep => ep.episode_number == episode)
-
-                const user = authe.currentUser;
-
-                if (!user) {
-                    return;
-                }
-                const token = await user.getIdToken(true);
-
-                const item = type === "movie" ? {
-                    mediaType: "movies",
-                    item: {
-                        vote_average,
-                        show_id: id,
-                        name: show?.title,
-                        backdrop_path: show?.backdrop_path,
-                        genres: show?.genres,
-                        watchedAt: new Date().toISOString(),
-                        media_type: "movie"
-
-
-                    }
-                } :
-
-                    {
-                        mediaType: "series",
-                        item: {
-                            vote_average: show?.vote_average,
-                            show_id: id,
-                            name: show?.name,
-                            backdrop_path: chosenEpisode?.still_path,
-                            genres: show?.genres,
-                            season: parseInt(season),
-                            episode: parseInt(episode),
-                            watchedAt: new Date().toISOString(),
-                            media_type: "tv"
-
-                        }
-                    }
-
-                const response = await apiForHf.post(
-                    "/api/history",
-                    item
-                    ,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                            Accept: "application/json",
-                        },
-                    }
-                );
-            }
-
-            handleAddToHistory()
-        }
-    })
-
-
-
-    const handleChangeServerToServer1 = () => {
-        if (type === "movie") {
-            setSelectedServer({ url: `https://moviesapi.club/${type}/${id}`, server: 1 })
-            localStorage.setItem('server', JSON.stringify({ url: `https://moviesapi.club`, server: 1 }))
-        } else {
-            setSelectedServer({ url: `https://moviesapi.club/${type}/${id}-${season}-${episode}`, server: 1 })
-            localStorage.setItem('server', JSON.stringify({ url: `https://moviesapi.club`, server: 1 }))
-
-        }
-    }
-
-    const handleChangeServerToServer2 = () => {
-
-        if (type === "movie") {
-            setSelectedServer({ url: `https://vidsrc.xyz/embed/${type}/${id}`, server: 2 })
-            localStorage.setItem('server', JSON.stringify({ url: `https://vidsrc.xyz/embed`, server: 2 }))
-        } else {
-            setSelectedServer({ url: `https://vidsrc.xyz/embed/${type}/${id}/${season}-${episode}`, server: 2 })
-            localStorage.setItem('server', JSON.stringify({ url: `https://vidsrc.xyz/embed`, server: 2 }))
-
-        }
-    }
+    // Add to history
+    useStreamHistory(type, id, season, episode);
 
     return (
         <div >
             <div >
                 <iframe id="myIframe" className="absolute top-0 bottom-0 right-0 left-0 w-[100%] h-[100%] "
-                    src={selectedServer.url} scrolling="no" frameBorder="0" allowFullScreen ></iframe>
+                    src={selectedServer.url} scrolling="no" frameBorder="0" allowFullScreen={true} ></iframe>
             </div>
 
 
@@ -133,8 +25,8 @@ const Stream = ({ type, season, episode, id }) => {
             </button>
 
             <div className={`w-32  py-2 px-2 space-y-1 bg-[#5c00cc] rounded-xl ${displayServers ? "left-2" : "-left-32"} duration-300 bottom-20 absolute z-[999] `}>
-                <button onClick={handleChangeServerToServer1} className={`bg-[#2f0069] px-2 w-full cursor-pointer rounded-lg py-1 hover:opacity-40 duration-200  ${selectedServer.server === 1 ? "opacity-30" : "opacity-100"}  `}>Server 1</button>
-                <button onClick={handleChangeServerToServer2} className={`bg-[#2f0069] px-2 w-full cursor-pointer rounded-lg py-1 hover:opacity-40 duration-200 ${selectedServer.server === 2 ? "opacity-30" : "opacity-100"} `}>Server 2</button>
+                <button onClick={() => setServer('https://moviesapi.club', 1)} className={`bg-[#2f0069] px-2 w-full cursor-pointer rounded-lg py-1 hover:opacity-40 duration-200  ${selectedServer.server === 1 ? "opacity-30" : "opacity-100"}  `}>Server 1</button>
+                <button onClick={() => setServer('https://vidsrc.xyz/embed', 2)} className={`bg-[#2f0069] px-2 w-full cursor-pointer rounded-lg py-1 hover:opacity-40 duration-200 ${selectedServer.server === 2 ? "opacity-30" : "opacity-100"} `}>Server 2</button>
             </div>
         </div >
     )

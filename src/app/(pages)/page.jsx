@@ -31,20 +31,20 @@ export default function Home() {
         </div>
 
         <div className="mt-20 mx-2">
-          <h1 className="text-3xl font-bold mt-14">Popular of the week</h1>
+          <h2 className="text-3xl font-bold mt-14">Popular of the week</h2>
           <PopularWeek />
         </div>
 
         <div className="mt-14 ">
-          <BackdropSlide title={"Movies"} media_type={"movie"} />
+          <BackdropSlide title={"Trending Movies"} media_type={"movie"} />
         </div>
 
         <div className="mt-14 ">
-          <BackdropSlide title={"Seires"} media_type={"tv"} />
+          <BackdropSlide title={"Trending Series"} media_type={"tv"} />
         </div>
 
         <div className="mt-14 ">
-          <BackdropSlide title={"Anime Series"} media_type={"tv"} is_korean={true} />
+          <BackdropSlide title={"Popular Anime"} media_type={"tv"} is_korean={true} />
         </div>
 
         <hr className="border-white/30 mt-5" />

@@ -61,7 +61,7 @@ export const TvProvider = ({ children }) => {
             providerId, changeProviderId,
             providerName, setProviderName,
             currentUser, setCurrentUser,
-            whishlistChange, setwhishlistChange
+            whishlistChange, setwhishlistChange 
         }}>
             {children}
         </TvContext.Provider>

@@ -25,134 +25,143 @@ import UseDeleteFromWishList from "@/app/Hooks/useDeleteFromWishList";
 import authe from "@/app/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import apiForHf from "@/app/utils/axiosInstanceForHfApi";
+import { useCarouselScroll } from "@/app/Hooks/useCarouselScroll";
 
+const useShowData = (id, type, preloadedShowData) => {
+  const [state, setState] = useState({
+    show: {},
+    cast: [],
+    videos: [],
+    recommendations: [],
+    similares: [],
+    seasonInfo: {},
+    episodes: [],
+    history: {},
+    loading: true,
+  });
+  const [selectedSeason, setSelectedSeason] = useState(1);
 
-
-
-const Details = ({ slug, type, id }) => {
-  const [show, setShow] = useState({});
-  const [cast, setCast] = useState([]);
-  const [videos, setVideos] = useState([]);
-  const [recommendations, setRecommendations] = useState([]);
-  const [similares, setSimilares] = useState([]);
-  const [selectedSeason, setSelectedSeason] = useState(1)
-  const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/original`);
-  const [screenWidth, setScreenWidth] = useState(0);
-  const [seasonInfo, setSeasonInfo] = useState({})
-  const [episodes, setEpisodes] = useState([])
-  const { currentUser, slugify } = useTvContext()
-  const [rerender, setRerender] = useState(1)
-  const scrollRef = useRef(null)
-  const castscrollRef = useRef(null)
-  const [showLeft, setShowLeft] = useState(false)
-  const [showRight, setShowRight] = useState(false)
-  const [showLeftCast, setShowLeftCast] = useState(false)
-  const [showRightCast, setShowRightCast] = useState(false)
-  const router = useRouter()
-  const [history, setHistory] = useState({})
-  const itemRefs = useRef({});
-
-  const UseAddToWishList = useAddToWishList()
-  const useDeleteFromWishList = UseDeleteFromWishList()
-
-
+  // Effect for main show data, recommendations, and history
   useEffect(() => {
+    let isMounted = true;
     const unsubscribe = onAuthStateChanged(authe, async (user) => {
       try {
-        async function fetchMovies() {
-          if (id) {
-            const [show, casts, video, recommendationss, similar] = [
-              (await api.get(`/${type}/${id}`)).data,
-              (await api.get(`/${type}/${id}/credits`)).data?.cast,
-              (await api.get(`/${type}/${id}/videos`)).data?.results,
-              (await api.get(`/${type}/${id}/recommendations`)).data?.results,
-              (await api.get(`/${type}/${id}/similar`)).data?.results,
-              // (await api.get(`/${type}/${id}/watch/providers`)).data,
-            ];
-            const filtredVideos = video?.find(
-              (vid) => vid.type === "Trailer" && vid.site === "YouTube"
-            )
+        if (preloadedShowData && isMounted) {
+          const token = user ? await user.getIdToken(true) : null;
+          const res = user ? (await apiForHf.get(`/api/wishlist/check/${preloadedShowData.show.id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })).data : false;
 
-            const token = await user?.getIdToken(true);
+          setState(prev => ({
+            ...prev,
+            show: { ...preloadedShowData.show, ifSaved: res },
+            cast: preloadedShowData.cast,
+            videos: preloadedShowData.trailer,
+          }));
+        }
 
-            const res = user && (await apiForHf.get(`/api/wishlist/check/${show.id}`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-              }
-            })).data
+        if (id && isMounted) {
+          const [recommendationss, similar] = await Promise.all([
+            api.get(`/${type}/${id}/recommendations`).then(res => res.data.results),
+            api.get(`/${type}/${id}/similar`).then(res => res.data.results)
+          ]);
 
-            setShow({ ...show, ifSaved: res });
-            setCast(casts);
-            setVideos(filtredVideos);
-            setRecommendations(recommendationss)
-            setSimilares(similar)
-            setRerender(rerender + 1)
-          }
+          if (!isMounted) return;
+          setState(prev => ({ ...prev, recommendations: recommendationss, similares: similar }));
+        }
 
-          const usera = authe.currentUser;
-
-          if (!usera) {
-            return;
-          }
-
-          const token = await usera.getIdToken(true);
-
-          const response = (await apiForHf.get("/api/history", {
+        if (user && isMounted) {
+          const token = await user.getIdToken(true);
+          const historyResponse = (await apiForHf.get("/api/history", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
               Accept: "application/json",
             },
-          })).data
+          })).data;
 
-          const s = response.series.find((s) => s.show_id === id)
-
-          setHistory(s)
+          if (isMounted) {
+            const seriesHistory = historyResponse.series.find((s) => s.show_id === id);
+            setState(prev => ({ ...prev, history: seriesHistory || {} }));
+          }
         }
-
-        fetchMovies();
-
-
       } catch (err) {
         console.log(err);
       }
-    })
+    });
 
     return () => {
+      isMounted = false;
       unsubscribe();
     };
-  }, [id]);
+  }, [id, preloadedShowData]);
 
+  // Effect for season-specific data
   useEffect(() => {
+    let isMounted = true;
     try {
       async function fetchSeasonData() {
-        if (show?.id) {
+        if (state.show?.id && type === "tv") {
           const [season, video] = [
-            (await api.get(`/tv/${show?.id}/season/${selectedSeason}`)).data,
-            (await api.get(`/tv/${show?.id}/season/${selectedSeason}/videos`)),
-          ]
+            (await api.get(`/tv/${state.show.id}/season/${selectedSeason}`)).data,
+            (await api.get(`/tv/${state.show.id}/season/${selectedSeason}/videos`)),
+          ];
           const trailer = video.data?.results?.find(
             (vid) => vid.type === "Trailer" && vid.site === "YouTube"
           );
 
-          setSeasonInfo({ ...season, trailler: trailer })
-          setEpisodes(season?.episodes)
+          if (isMounted) {
+            setState(prev => ({
+              ...prev,
+              seasonInfo: { ...season, trailler: trailer },
+              episodes: season?.episodes,
+            }));
+          }
         }
       }
-
-      if (type === "tv") {
-        fetchSeasonData()
-      }
+      fetchSeasonData();
     } catch (err) {
       console.log(err)
     }
+    return () => { isMounted = false; };
+  }, [selectedSeason, state.show?.id, type]);
 
-  }, [selectedSeason, id, rerender])
+  // Effect to set initial season based on history
   useEffect(() => {
-    setSelectedSeason(history?.season ? history?.season : 1)
-  }, [history, id])
+    if (state.history?.season) {
+      setSelectedSeason(state.history.season);
+    }
+  }, [state.history]);
+
+  return { ...state, selectedSeason, setSelectedSeason, setShow: (newShow) => setState(prev => ({ ...prev, show: newShow })), setEpisodes: (newEpisodes) => setState(prev => ({ ...prev, episodes: newEpisodes })) };
+};
+
+const Details = ({ slug, type, id, preloadedShowData }) => {
+  const {
+    show, cast, videos, recommendations, similares, seasonInfo, episodes, history,
+    selectedSeason, setSelectedSeason, setShow, setEpisodes
+  } = useShowData(id, type, preloadedShowData);
+
+  const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/original`);
+  const [screenWidth, setScreenWidth] = useState(0);
+  const { currentUser, slugify } = useTvContext();
+  const router = useRouter();
+  const itemRefs = useRef({});
+
+  const UseAddToWishList = useAddToWishList();
+  const useDeleteFromWishList = UseDeleteFromWishList();
+
+  const { scrollRef: seasonsScrollRef, scroll: scrollSeasons, showLeft: showLeftSeason, showRight: showRightSeason } = useCarouselScroll();
+  const { scrollRef: castScrollRef, scroll: scrollCast, showLeft: showLeftCast, showRight: showRightCast } = useCarouselScroll();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setScreenWidth(window.innerWidth);
+      const handleResize = () => setScreenWidth(window.innerWidth);
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
+  }, []);
 
   function formatTime(time) {
     const hour = parseInt(time) / 60;
@@ -162,61 +171,6 @@ const Details = ({ slug, type, id }) => {
     }
     return `${parseInt(hour)}h${parseInt(min)}min`;
   }
-
-  const checkScroll = () => {
-    const el = scrollRef.current
-    const elcast = castscrollRef.current
-    if (!el) return
-
-    const isScrollable = el.scrollWidth > el.clientWidth
-    const isAtStart = el.scrollLeft === 0
-    const isAtEnd = el.scrollLeft + el.offsetWidth >= el.scrollWidth - 1
-
-
-    const casTisScrollable = elcast.scrollWidth > el.clientWidth
-    const casTisAtStart = elcast.scrollLeft === 0
-    const casTisAtEnd = elcast.scrollLeft + elcast.offsetWidth >= elcast.scrollWidth - 1
-
-
-    setShowLeft(isScrollable && !isAtStart)
-    setShowRight(isScrollable && !isAtEnd)
-
-    setShowLeftCast(casTisScrollable && !casTisAtStart)
-    setShowRightCast(casTisScrollable && !casTisAtEnd)
-
-  }
-  const scroll = ({ direction, ref }) => {
-    const el = ref === "cast" ? castscrollRef.current : scrollRef.current
-    if (!el) return
-
-    el.scrollBy({ left: direction === 'right' ? window?.innerWidth : -window?.innerWidth, behavior: 'smooth' })
-  }
-
-  useEffect(() => {
-    setScreenWidth(window.innerWidth);
-    window.addEventListener("resize", () => {
-      setScreenWidth(window.innerWidth);
-    });
-
-    checkScroll()
-    const el = scrollRef.current
-    if (!el) return
-
-    // Listen to scroll and resize
-    el.addEventListener('scroll', checkScroll)
-    window.addEventListener('resize', checkScroll)
-
-    // Optional: re-check when content loads (for dynamic content)
-    const interval = setInterval(checkScroll, 500)
-
-
-
-    return () => {
-      el.removeEventListener('scroll', checkScroll)
-      window.removeEventListener('resize', checkScroll)
-      clearInterval(interval)
-    }
-  }, [])
 
   function compareDate(dateString) {
     const date = new Date();
@@ -228,7 +182,6 @@ const Details = ({ slug, type, id }) => {
       return true
     }
   }
-
 
   const handleAddToHistory = async ({ ep = 1, season, ep_backdrop, vote_average }) => {
 
@@ -299,8 +252,8 @@ const Details = ({ slug, type, id }) => {
 
 
   useEffect(() => {
-    if (selectedSeason && scrollRef.current && itemRefs.current[selectedSeason]) {
-      const container = scrollRef.current;
+    if (selectedSeason && seasonsScrollRef.current && itemRefs.current[selectedSeason]) {
+      const container = seasonsScrollRef.current;
       const item = itemRefs.current[selectedSeason];
 
       // Calculate scroll so item goes to center
@@ -319,9 +272,6 @@ const Details = ({ slug, type, id }) => {
       });
     }
   }, [selectedSeason]);
-
-
-
 
   return (
     <>
@@ -471,9 +421,7 @@ const Details = ({ slug, type, id }) => {
           <h2 className={`font-bold text-2xl mt-5  mx-4`}>Cast</h2>
           {
             <div className={`mx-4 group relative`}>
-              <div
-                className="flex gap-3 mt-2 overflow-auto hide-scrollbar"
-                ref={castscrollRef}>
+              <div className="flex gap-3 mt-2 overflow-auto hide-scrollbar" ref={castScrollRef}>
                 {cast?.length > 0
                   ? cast?.map((c, i) => (
                     <div key={i} className="flex items-center gap-3">
@@ -516,17 +464,13 @@ const Details = ({ slug, type, id }) => {
 
               <div className="opacity-0 group-hover:opacity-100 duration-300 ">
                 <div className={`${showLeftCast ? "opacity-100" : "opacity-0"} duration-300 w-24 bg-[linear-gradient(to_right,black_5%,transparent_60%)] z-[999999] h-[80px] top-0 absolute flex items-center `}>
-                  <div
-                    onClick={() => scroll({ direction: "left", ref: "cast" })}
-                    className={`text-3xl  font-bold border-[1px] bg-white rounded-full p-[1px] ml-2 cursor-pointer `}>
+                  <div onClick={() => scrollCast("left")} className={`text-3xl  font-bold border-[1px] bg-white rounded-full p-[1px] ml-2 cursor-pointer `}>
                     <ChevronLeft color="black" />
                   </div>
                 </div>
 
                 <div className={`${showRightCast ? "opacity-100" : "opacity-0"} duration-300 w-24 bg-[linear-gradient(to_left,black_5%,transparent_60%)] z-[999999] h-[80px] top-0 right-0 absolute flex items-center justify-end`}>
-                  <div
-                    onClick={() => scroll({ direction: "right", ref: "cast" })}
-                    className={`text-3xl  font-bold border-[1px] bg-white mr-2 rounded-full p-[1px] cursor-pointer `}>
+                  <div onClick={() => scrollCast("right")} className={`text-3xl  font-bold border-[1px] bg-white mr-2 rounded-full p-[1px] cursor-pointer `}>
                     <ChevronRight color="black" />
                   </div>
                 </div>
@@ -540,8 +484,8 @@ const Details = ({ slug, type, id }) => {
           <div>
             <div className=" font-bold mt-5" id="seasons">
               <h2 className="mx-4 text-2xl ">Seasons</h2>
-              <div className='relative group '>
-                <div ref={scrollRef} className={`mx-1 flex gap-3 mt-2 overflow-x-scroll hide-scrollbar pb-10`}>
+              <div className='relative group'>
+                <div ref={seasonsScrollRef} className={`mx-1 flex gap-3 mt-2 overflow-x-scroll hide-scrollbar pb-10`}>
                   {
                     show?.seasons?.length > 0 ? show?.seasons?.map((s, i) => !(s?.season_number === 0) &&
                       s?.air_date &&
@@ -549,7 +493,7 @@ const Details = ({ slug, type, id }) => {
                         ref={(el) => (itemRefs.current[s.season_number] = el)}
                         id={`S${s?.season_number}`}
                         key={i}
-                        onClick={() => { setSelectedSeason(s?.season_number); selectedSeason !== s?.season_number && setEpisodes([]) }}
+                        onClick={() => { setSelectedSeason(s?.season_number); if (selectedSeason !== s?.season_number) { setEpisodes([]) } }}
                         className={`${selectedSeason === s?.season_number ? "border border-gray-600 rounded-xl shadow-lg shadow-[#5c00cca1] " : ""} shrink-0 relative cursor-pointer`}>
                         <div className="overflow-hidden rounded-xl">
                           <img src={`https://image.tmdb.org/t/p/w500${s?.poster_path}`} className=" w-44 scale-110 hover:scale-100 duration-300" alt="" />
@@ -573,7 +517,7 @@ const Details = ({ slug, type, id }) => {
                 </div>
                 {/* */}
                 <div className="md:opacity-0 group-hover:opacity-100  duration-300 ">
-                  <div onClick={() => scroll({ direction: "left", ref: "season" })} className={`${showLeft ? "opacity-100" : "opacity-0"} duration-400 w-10   bg-[linear-gradient(to_right,black_5%,transparent_90%)] z-[999999] h-[265px] top-0 absolute flex items-center  `}>
+                  <div onClick={() => scrollSeasons("left")} className={`${showLeftSeason ? "opacity-100" : "opacity-0"} duration-400 w-10   bg-[linear-gradient(to_right,black_5%,transparent_90%)] z-[999999] h-[265px] top-0 absolute flex items-center  `}>
                     <div
                       className={`text-xl  font-bold border-[1px] bg-white rounded-full p-[1px] ml-1 cursor-pointer `}>
                       <ChevronLeft color="black" />
@@ -581,7 +525,7 @@ const Details = ({ slug, type, id }) => {
                     </div>
                   </div>
 
-                  <div onClick={() => scroll({ direction: "right", ref: "season" })} className={`${showRight ? "opacity-100" : "opacity-0"} duration-400 w-10 bg-[linear-gradient(to_left,black_5%,transparent_90%)] z-[999999] h-[265px] top-0 right-0 absolute flex items-center justify-end`}>
+                  <div onClick={() => scrollSeasons("right")} className={`${showRightSeason ? "opacity-100" : "opacity-0"} duration-400 w-10 bg-[linear-gradient(to_left,black_5%,transparent_90%)] z-[999999] h-[265px] top-0 right-0 absolute flex items-center justify-end`}>
                     <div
 
                       className={`text-xl  font-bold border-[1px] bg-white mr-1 rounded-full p-[1px] cursor-pointer `}>
@@ -777,14 +721,14 @@ const Details = ({ slug, type, id }) => {
                               show?.ifSaved ?
                                 seasonInfo?.trailler?.key ?
                                   <GoBookmarkSlash size={24} /> :
-                                  <div>
-                                    <p>Remove from WhatchList</p>
+                                  <div className="flex gap-1 items-center" >
                                     <GoBookmarkSlash size={20} />
+                                    <p>Remove from WhatchList</p>
                                   </div>
                                 :
                                 seasonInfo?.trailler?.key ?
                                   <Bookmark /> :
-                                  <div className="flex gap-1">
+                                  <div className="flex gap-1 items-center">
                                     <Bookmark />
                                     <p>Add to Watchlist</p>
                                   </div>
@@ -842,8 +786,6 @@ const Details = ({ slug, type, id }) => {
 };
 
 export default Details;
-
-
 
 
 

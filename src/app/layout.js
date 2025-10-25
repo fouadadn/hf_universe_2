@@ -16,11 +16,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
+  metadataBase: new URL('https://hf-universe-2.vercel.app'),
   title: "HF Universe",
   description: "Stream movies and TV shows for free on HF Universe. Enjoy the latest content without the hassle of subscriptions. Watch instantly, anywhere, anytime!",
   icons: {
     icon: '/favicon.ico',
   },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  creator: 'HF Universe',
 };
 
 

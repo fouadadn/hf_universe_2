@@ -1,84 +1,127 @@
-"use client"
 import Footer from '@/app/components/Home/footer';
-import { useTvContext } from '@/app/context/idContext';
 import api from '@/app/utils/axiosInstance';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import Image from 'next/image';
 
-const Movie = () => {
+const monthsWithIndex = {
+  1: "January",
+  2: "February",
+  3: "March",
+  4: "April",
+  5: "May",
+  6: "June",
+  7: "July",
+  8: "August",
+  9: "September",
+  10: "October",
+  11: "November",
+  12: "December"
+};
 
-  const [thisMonth, setThisMonth] = useState([])
-  const [nextMonth, setNextMonth] = useState([])
-  const [nextTwoMonth, setTwoNextMonth] = useState([])
-  const [page, setPage] = useState(2)
+function slugify(str) {
+  return String(str)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+const getUpcomingMovies = async () => {
   const date = new Date();
-  const currentMonth = date.getMonth() + 1
-  const { slugify } = useTvContext()
+  const currentYear = date.getFullYear();
+  const currentMonth = date.getMonth() + 1;
 
-  const monthsWithIndex = {
-    1: "January",
-    2: "February",
-    3: "March",
-    4: "April",
-    5: "May",
-    6: "June",
-    7: "July",
-    8: "August",
-    9: "September",
-    10: "October",
-    11: "November",
-    12: "December"
+  const fetchNetflixMovies = async (totalPages = 4) => {
+    const requests = [];
+    for (let i = 1; i <= totalPages; i++) {
+      requests.push(
+        api.get("/movie/upcoming", { params: { page: i } })
+      );
+    }
+    const responses = await Promise.all(requests);
+    return responses.flatMap(res => res.data.results);
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      const fetchNetflixMovies = async (totalPages = 2) => {
-        const requests = [];
+  const upcomingMovies = await fetchNetflixMovies();
 
-        for (let i = 1; i <= totalPages; i++) {
-          requests.push(
-            api.get("/movie/upcoming", {
-              params: {
-                page: i,
-              },
-            })
-          );
-        }
+  const filterByMonth = (month, data) => {
+    return data.filter((movie) => {
+      const releaseDate = new Date(movie.release_date);
+      return (
+        releaseDate.getMonth() + 1 === month &&
+        releaseDate.getFullYear() === currentYear
+      );
+    }).filter((movie, index, self) =>
+      index === self.findIndex((m) => m.id === movie.id)
+    ).sort((a, b) => new Date(a.release_date) - new Date(b.release_date));
+  };
 
-        const responses = await Promise.all(requests);
-        return responses.flatMap(res => res.data.results);
-      };
-      const netflixMovies = await fetchNetflixMovies(page);
+  const thisMonth = filterByMonth(currentMonth, upcomingMovies);
+  const nextMonth = filterByMonth(currentMonth + 1, upcomingMovies);
+  const nextTwoMonth = filterByMonth(currentMonth + 2, upcomingMovies);
 
+  return { thisMonth, nextMonth, nextTwoMonth, currentMonth };
+};
 
-      function filterBymounth(month, data) {
-        const currentDate = new Date();
-        const currentYear = currentDate.getFullYear();
+export async function generateMetadata() {
+  const { thisMonth, nextMonth, currentMonth } = await getUpcomingMovies();
+  const moviesForTitle = [...thisMonth, ...nextMonth].slice(0, 3).map(m => m.title).join(', ');
 
-        const filtered = data.filter((movie) => {
-          const date = new Date(movie.release_date);
-          return (
-            date.getMonth() + 1 === month &&
-            date.getFullYear() === currentYear
-          );
-        }).filter((movie, index, self) =>
-          index === self.findIndex((m) => m.id === movie.id)
-        ).sort((a, b) => String(a.release_date).split('-')[2] - String(b.release_date).split('-')[2]);
-        return filtered
+  const title = `Upcoming Movie Releases for ${monthsWithIndex[currentMonth]} & ${monthsWithIndex[currentMonth + 1]} | HF Universe`;
+  const description = `Stay up-to-date with the latest movie release schedule. Upcoming movies include: ${moviesForTitle}. Find out when new movies are coming to theaters on HF Universe.`;
+
+  return {
+    title,
+    description,
+    keywords: ["movie releases", "upcoming movies", "release schedule", "new movies", "HF Universe", monthsWithIndex[currentMonth], monthsWithIndex[currentMonth + 1]],
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      url: '/movierelease',
+    },
+  };
+}
+
+const MovieReleasePage = async () => {
+  const { thisMonth, nextMonth, nextTwoMonth, currentMonth } = await getUpcomingMovies();
+
+  const allMovies = [...thisMonth, ...nextMonth, ...nextTwoMonth];
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    'name': 'Upcoming Movie Release Schedule',
+    'description': 'A list of upcoming movie releases.',
+    'itemListElement': allMovies.map((movie, index) => ({
+      '@type': 'ListItem',
+      'position': index + 1,
+      'item': {
+        '@type': 'Movie',
+        'name': movie.title,
+        'url': `/movie/${slugify(movie.title)}/${movie.id}`,
+        'image': `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+        'dateCreated': movie.release_date,
+        'description': movie.overview,
+        ...(movie.vote_average && {
+          'aggregateRating': {
+            '@type': 'AggregateRating',
+            'ratingValue': movie.vote_average,
+            'bestRating': '10',
+            'ratingCount': movie.vote_count,
+          }
+        })
       }
-
-      setThisMonth(filterBymounth(currentMonth, netflixMovies))
-      setNextMonth(filterBymounth(currentMonth + 1, netflixMovies))
-      setTwoNextMonth(filterBymounth(currentMonth + 2, netflixMovies))
-    }
-    fetchData()
-  }, [page])
+    })),
+  };
 
   return (
-    <div className='absolute top-0'>
+    <div className='w-full'>
       <div className='mb-10 '>
         <div className='relative -top-1 h-[50vh] md:h-[90vh] overflow-hidden'>
-          <img src="/assets/upcoming.jpg" alt="" className=' w-full' />
+          <Image src="/assets/upcoming.jpg" alt="Upcoming movie releases banner" className='w-full object-cover' width={1920} height={1080} priority />
           <div className='bg-gradient-to-t from-black to-transparent flex  items-end bg-[linear-gradient(to_top,black_15%,transparent_80%)] absolute top-0 bottom-0  right-0 left-0'>
             <div className='relative bottom-12 px-4 '>
               <h1 className="text-2xl md:text-4xl font-bold mb-2 text-white max-w-[450px] ">Schedule Release Of All Movies Around The World</h1>
@@ -87,32 +130,36 @@ const Movie = () => {
               </p>
             </div>
           </div>
-
-
         </div>
 
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
 
         <div className='mx-4  font-bold text-2xl'>
           <h2>UPCOMING RELEASE</h2>
         </div>
 
         <div className='mt-12 mx-4'>
-          <h2 className='font-bold text-2xl mb-2'>{monthsWithIndex[currentMonth]}</h2>
+          <h3 className='font-bold text-2xl mb-2'>{monthsWithIndex[currentMonth]}</h3>
           <hr className=' ' style={{ borderColor: '#ffffff30' }} />
           <div className="grid grid-cols-1 sm:grid-cols-2  gap-6 mt-4">
             {
               thisMonth.length > 0 ? thisMonth.map((movie) => (
                 <Link
-                  href={`movie/${slugify(movie.title)}/${movie?.id}`}
+                  href={`/movie/${slugify(movie.title)}/${movie?.id}`}
                   key={movie.id} className=" text-white rounded-lg p-2 shadow-md justify-items-start flex items-center gap-2">
                   <div className='bg-white h-12 w-12 rounded-full flex items-center justify-center'>
                     <span className='text-black text-2xl font-bold'>{String(movie.release_date)?.split('-')[2]}</span>
                   </div>
                   <div className='w-14 h-16 overflow-hidden rounded-2xl'>
-                    <img
+                    <Image
                       src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                       alt={movie.title}
-                      className="w-14  relative bottom-2"
+                      width={56}
+                      height={84}
+                      className="w-14 h-auto relative bottom-2"
                     />
                   </div>
                   <div>
@@ -121,7 +168,7 @@ const Movie = () => {
                   </div>
                 </Link>
               ))
-                : Array.from(Array(15)).map((_, i) => <div key={i} className='flex gap-3 items-center animate-pulse'>
+                : Array.from({ length: 8 }).map((_, i) => <div key={i} className='flex gap-3 items-center animate-pulse'>
                   <div className='w-14 h-14 rounded-full gri'>
 
                   </div>
@@ -140,25 +187,25 @@ const Movie = () => {
 
         </div>
 
-
-
         <div className='mt-12 mx-4'>
-          <h2 className='font-bold text-2xl mb-2'>{monthsWithIndex[currentMonth + 1]}</h2>
+          <h3 className='font-bold text-2xl mb-2'>{monthsWithIndex[currentMonth + 1]}</h3>
           <hr className=' ' style={{ borderColor: '#ffffff30' }} />
           <div className="grid grid-cols-1 sm:grid-cols-2  gap-6 mt-4">
             {
               nextMonth.length > 0 ? nextMonth.map((movie) => (
                 <Link
-                  href={`movie/${slugify(movie.title)}/${movie?.id}`}
+                  href={`/movie/${slugify(movie.title)}/${movie?.id}`}
                   key={movie.id} className=" text-white rounded-lg p-2 shadow-md justify-items-start flex items-center gap-2 ">
                   <div className='bg-white h-12 w-12 rounded-full flex items-center justify-center shrink-0'>
                     <span className='text-black text-2xl font-bold'>{String(movie.release_date)?.split('-')[2]}</span>
                   </div>
                   <div className='w-14 h-16 rounded-2xl overflow-hidden'>
-                    <img
+                    <Image
                       src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                       alt={movie.title}
-                      className="w-14 relative bottom-2 "
+                      width={56}
+                      height={84}
+                      className="w-14 h-auto relative bottom-2 "
                     />
                   </div>
                   <div>
@@ -166,7 +213,7 @@ const Movie = () => {
                     <p className="text-sm text-gray-400" style={{ color: "#99a1af" }}>Release: {movie.release_date}</p>
                   </div>
                 </Link>
-              )) : Array.from(Array(15)).map((_, i) => <div key={i} className='flex gap-3 items-center animate-pulse'>
+              )) : Array.from({ length: 8 }).map((_, i) => <div key={i} className='flex gap-3 items-center animate-pulse'>
                 <div className='h-14 w-14 rounded-full gri'>
 
                 </div>
@@ -182,18 +229,7 @@ const Movie = () => {
               )
             }
           </div>
-
-          <div className='flex justify-center mt-6' >
-            <button onClick={() => { setThisMonth([]); setNextMonth([]); setPage(page + 1); }} className='rounded-2xl px-4 py-2 cursor-pointer hover:bg-white hover:text-black font-bold duration-300' style={{ border: "1px solid white" }}>Show more</button>
-          </div>
-
         </div>
-
-
-
-
-
-
       </div>
       <hr style={{ borderColor: "#ffffff30" }} className='mt-16' />
       <Footer />
@@ -201,4 +237,4 @@ const Movie = () => {
   )
 }
 
-export default Movie
+export default MovieReleasePage

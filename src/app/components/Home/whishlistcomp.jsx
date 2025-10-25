@@ -11,6 +11,7 @@ import Footer from "./footer";
 import apiForHf from "@/app/utils/axiosInstanceForHfApi";
 import { GoBookmarkSlash } from "react-icons/go";
 import useDeleteFromWishList from "@/app/Hooks/useDeleteFromWishList";
+import { useCarouselScroll } from "@/app/Hooks/useCarouselScroll";
 
 const Whishlist = ({ filter, check, poster }) => {
     const [data, setData] = useState([])
@@ -18,15 +19,11 @@ const Whishlist = ({ filter, check, poster }) => {
     const { slugify, currentUser, whishlistChange } = useTvContext();
     const [loading, setLoading] = useState(true);
     const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/w500`);
-    const [isFull, setIsFull] = useState(true)
     const [confirmShow, setConfirmShow] = useState(false)
     const [confirmShowLoading, setConfirmShowLoading] = useState(false)
     const router = useRouter()
     const UseDeleteFromWishList = useDeleteFromWishList();
-
-
-    const [seriesFound, setSeriesFound] = useState(false)
-    const [moviesFound, setMoviesFound] = useState(false)
+    const { scrollRef, scroll } = useCarouselScroll();
 
     async function handleClearWatchlist() {
         setConfirmShowLoading(true)
@@ -94,7 +91,9 @@ const Whishlist = ({ filter, check, poster }) => {
                                     })
                         })),
                     ];
-                    setData(combineData);
+
+                    const sortedData = combineData.sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+                    setData(sortedData);
                     setData((prev) =>
                         prev.map((item) => { return { ...item, ifSaved: true } }
                         ));
@@ -102,7 +101,7 @@ const Whishlist = ({ filter, check, poster }) => {
 
                     const recentlyAdded = [...combineData]
                         .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds)
-                        .slice(0, 6);
+                        .slice(0, 10);
 
                     if (poster) {
                         setData(recentlyAdded)
@@ -124,32 +123,9 @@ const Whishlist = ({ filter, check, poster }) => {
 
     }, [currentUser, whishlistChange])
 
-
-    useEffect(() => {
-        if (!data.length > 0) {
-            setIsFull(false)
-        } else {
-            setIsFull(true)
-        }
-
-        for (const i in data) {
-            if (data[i].media_type === "tv") {
-                setSeriesFound(true)
-                break;
-            } else {
-                setSeriesFound(false)
-            }
-        }
-
-        for (const i in data) {
-            if (data[i].media_type === "movie") {
-                setMoviesFound(true)
-                break;
-            } else {
-                setMoviesFound(false)
-            }
-        }
-    }, [data])
+    const isFull = data.length > 0;
+    const seriesFound = data.some(item => item.media_type === 'tv');
+    const moviesFound = data.some(item => item.media_type === 'movie');
 
 
     function compareDate(dateString) {
@@ -162,37 +138,6 @@ const Whishlist = ({ filter, check, poster }) => {
             return true
         }
     }
-
-    const scrollRef = useRef(null)
-    const [showLeft, setShowLeft] = useState(false)
-    const [showRight, setShowRight] = useState(true)
-
-    const checkScroll = () => {
-        const el = scrollRef.current
-        if (!el) return
-
-        const isAtStart = el.scrollLeft === 0
-        const isAtEnd = el.scrollLeft + el.offsetWidth >= el.scrollWidth - 1
-
-        setShowLeft(!isAtStart)
-        setShowRight(!isAtEnd)
-    }
-
-    const scroll = (direction) => {
-        const el = scrollRef.current
-        if (!el) return
-
-        el.scrollBy({ left: direction === 'right' ? window?.innerWidth : -window?.innerWidth, behavior: 'smooth' })
-    }
-
-    useEffect(() => {
-        checkScroll()
-        const el = scrollRef.current
-        if (!el) return
-
-        el.addEventListener('scroll', checkScroll)
-        return () => el.removeEventListener('scroll', checkScroll)
-    }, [])
 
 
     return (

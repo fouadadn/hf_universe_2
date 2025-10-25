@@ -110,16 +110,15 @@ const HomePageSlider = ({ shows }) => {
           (show5WithTrailler.length > 0 ? show5WithTrailler : data).length > 0 ? (show5WithTrailler.length > 0 ? show5WithTrailler : data.slice(0, 5)).map((show) =>
             <SwiperSlide >
               <div className='relative w-full h-[621px] md:h-auto '>
-                <img src={imgSrc.toString().startsWith('https') ? `${imgSrc}${screenWidth > 800 ? show?.backdrop_path : show?.poster_path}` : imgSrc} onError={handleError}
+                <Image src={imgSrc.toString().startsWith('https') ? `${imgSrc}${screenWidth > 800 ? show?.backdrop_path : show?.poster_path}` : imgSrc} onError={handleError}
                   alt={show?.title ? show.title : show.name}
-                  // Ensures it takes full width and scales height
-                  width={1920}        // Set an arbitrary width
+                  width={1920}
                   height={1080}
+                  priority={true}
                   style={{
                     objectFit: "cover", // Use CSS to set objectFit
                     objectPosition: "center", // Optional, if you need to control the position of the image
                   }}
-                  // fill
                   className='min-h-96 w-full ' />
                 {/* <img src={`https://image.tmdb.org/t/p/original/${show?.backdrop_path}` } alt="backdrop image" className='w-full brightness-90' /> */}
                 <Link
