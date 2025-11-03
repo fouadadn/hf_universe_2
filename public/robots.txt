@@ -1,4 +1,9 @@
+# *
 User-agent: *
 Allow: /
 
-Sitemap: https://hf-stream.vercel.app/sitemap.xml
+# Host
+Host: https://hf-universe-2.vercel.app
+
+# Sitemaps
+Sitemap: https://hf-universe-2.vercel.app/sitemap.xml
