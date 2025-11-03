@@ -21,32 +21,41 @@ async function fetchTMDBPages(endpoint, maxPages = 5) {
   return results;
 }
 
+function slugify(str) {
+        return String(str)
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
 // Dynamic URLs for movie details
 async function getMoviePaths() {
-  const movies = await fetchTMDBPages('movie/popular', 10);
-  return movies.map(movie => `/movie/${movie.title.toLowerCase().replace(/ /g, '-')}/${movie.id}`);
+  const movies = await fetchTMDBPages('movie/popular', 20);
+  return movies.map(movie => `/movie/${slugify(movie.title)}/${movie.id}`);
 }
 
 // Dynamic URLs for TV series details
 async function getTVPaths() {
-  const tvShows = await fetchTMDBPages('tv/popular', 10);
-  return tvShows.map(tv => `/tv/${tv.name.toLowerCase().replace(/ /g, '-')}/${tv.id}`);
+  const tvShows = await fetchTMDBPages('tv/popular', 20);
+  return tvShows.map(tv => `/tv/${slugify(tv.name)}/${tv.id}`);
 }
 
 // Streaming URLs
 async function getMovieStreamPaths() {
-  const movies = await fetchTMDBPages('movie/popular', 10);
-  return movies.map(movie => `/stream/movie/${movie.title.toLowerCase().replace(/ /g, '-')}/${movie.id}`);
+  const movies = await fetchTMDBPages('movie/popular', 20);
+  return movies.map(movie => `/stream/movie/${slugify(movie.title)}/${movie.id}`);
 }
 
 async function getTVStreamPaths() {
-  const tvShows = await fetchTMDBPages('tv/popular', 10);
-  return tvShows.map(tv => `/stream/tv/${tv.name.toLowerCase().replace(/ /g, '-')}/${tv.id}/1/1`);
+  const tvShows = await fetchTMDBPages('tv/popular', 20);
+  return tvShows.map(tv => `/stream/tv/${slugify(tv.name)}/${tv.id}/1/1`);
 }
 
 // Trailer URLs with real YouTube IDs
 async function getTrailerPaths() {
-  const movies = await fetchTMDBPages('movie/popular', 10);
+  const movies = await fetchTMDBPages('movie/popular', 20);
   const paths = [];
 
   for (const movie of movies) {
@@ -59,7 +68,7 @@ async function getTrailerPaths() {
         // Find first YouTube trailer
         const trailer = data.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
         if (trailer) {
-          paths.push(`/watch/${movie.title.toLowerCase().replace(/ /g, '-')}/${trailer.key}`);
+          paths.push(`/watch/${slugify(movie.title)}/${trailer.key}`);
         }
       }
     } catch (err) {
