@@ -69,11 +69,11 @@ const Layout = ({ children }) => {
             src="//dcbbwymp1bhlf.cloudfront.net/?wbbcd=1181800"
             strategy="afterInteractive"
           />
-          <Script
+          {/* <Script
             data-cfasync="false"
             src="//dcbbwymp1bhlf.cloudfront.net/?wbbcd=1181798"
             strategy="afterInteractive"
-          />
+          /> */}
         </>
       )}
 
