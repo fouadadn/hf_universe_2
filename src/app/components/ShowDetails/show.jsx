@@ -28,7 +28,7 @@ import {
 import Link from "next/link";
 import BackdropSlide from "../Home/backdropSlide";
 import Footer from "../Home/footer";
-import { useTvContext } from "@/app/context/idContext"; 
+import { useTvContext } from "@/app/context/idContext";
 import { useRouter } from "next/navigation";
 import useAddToWishList from "@/app/Hooks/useAddToWishList";
 import { GoBookmarkSlash } from "react-icons/go";
@@ -177,7 +177,7 @@ const Details = ({ slug, type, id, preloadedShowData }) => {
   const { currentUser, slugify } = useTvContext();
   const router = useRouter();
   const itemRefs = useRef({});
-  const [showSharePopup, setShowSharePopup] = useState(false);
+  const [showSharePopup, setShowSharePopup] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
   const [isCopied, setIsCopied] = useState(false);
 
@@ -381,11 +381,16 @@ const Details = ({ slug, type, id, preloadedShowData }) => {
   }, [selectedSeason]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSharePopup(true);
-    }, 8000);
+    const popupShownInSession = sessionStorage.getItem('sharePopupShown');
 
-    return () => clearTimeout(timer);
+    if (!popupShownInSession) {
+      const timer = setTimeout(() => {
+        setShowSharePopup(true);
+        sessionStorage.setItem('sharePopupShown', 'true');
+      }, 8000);
+
+      return () => clearTimeout(timer);
+    }
   }, []);
   return (
     <>
@@ -501,7 +506,7 @@ const Details = ({ slug, type, id, preloadedShowData }) => {
                       }
                     }
                   } style={{ backgroundColor: "#ffffff20" }} className='cursor-pointer rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'>
-                    { 
+                    {
                       show?.ifSaved ? <GoBookmarkSlash size={24} /> : <Bookmark />}
 
                   </button>
@@ -522,12 +527,15 @@ const Details = ({ slug, type, id, preloadedShowData }) => {
         {/* sharing  */}
         {showSharePopup && (
           <div className="fixed inset-0 bg-black/60 z-[99999999] flex justify-center items-center backdrop-blur-md" onClick={() => setShowSharePopup(false)}>
-            <div className="bg-[#1a1d20] relative border border-gray-700 p-6 rounded-2xl shadow-2xl shadow-[#5c00cc50] text-center max-w-lg w-11/12 mx-4 animate-in fade-in-0 zoom-in-95" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-[#1a1d20] relative border border-gray-700 pt-7 p-6 rounded-2xl shadow-2xl shadow-[#5c00cc50] text-center max-w-lg w-11/12 mx-4 animate-in fade-in-0 zoom-in-95" onClick={(e) => e.stopPropagation()}>
               <button onClick={() => setShowSharePopup(false)} className="absolute top-2 right-2 text-gray-500 hover:text-white transition-colors p-2 rounded-full">
                 <X size={20} />
               </button>
               <div className="mb-6">
-                <h2 className="text-2xl font-bold">Sharing is caring</h2>
+                <div className="flex gap-1 justify-center">
+                  <Smile size={30}/>
+                  <h2 className="text-2xl font-bold">Sharing is caring</h2>
+                </div>
                 <p className="text-gray-400 mt-1">Let your friends know what you're watching!</p>
               </div>
 
