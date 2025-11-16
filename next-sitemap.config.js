@@ -32,30 +32,30 @@ function slugify(str) {
 
 // Dynamic URLs for movie details
 async function getMoviePaths() {
-  const movies = await fetchTMDBPages('movie/popular', 100);
+  const movies = await fetchTMDBPages('movie/popular', 1000);
   return movies.map(movie => `/movie/${slugify(movie.title)}/${movie.id}`);
 }
 
 // Dynamic URLs for TV series details
 async function getTVPaths() {
-  const tvShows = await fetchTMDBPages('tv/popular', 100);
+  const tvShows = await fetchTMDBPages('tv/popular', 1000);
   return tvShows.map(tv => `/tv/${slugify(tv.name)}/${tv.id}`);
 }
 
 // Streaming URLs
 async function getMovieStreamPaths() {
-  const movies = await fetchTMDBPages('movie/popular', 100);
+  const movies = await fetchTMDBPages('movie/popular', 1000);
   return movies.map(movie => `/stream/movie/${slugify(movie.title)}/${movie.id}`);
 }
 
 async function getTVStreamPaths() {
-  const tvShows = await fetchTMDBPages('tv/popular', 100);
+  const tvShows = await fetchTMDBPages('tv/popular', 1000);
   return tvShows.map(tv => `/stream/tv/${slugify(tv.name)}/${tv.id}/1/1`);
 }
 
 // Trailer URLs with real YouTube IDs
 async function getTrailerPaths() {
-  const movies = await fetchTMDBPages('movie/popular', 100);
+  const movies = await fetchTMDBPages('movie/popular', 1000);
   const paths = [];
 
   for (const movie of movies) {

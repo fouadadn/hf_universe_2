@@ -9,15 +9,26 @@ import {
   CirclePlay,
   Dot,
   ExternalLink,
+  Facebook,
+  Instagram,
+  Link as LinkIcon,
+  Mail,
+  MessageSquare,
   Play,
+  Share2,
   Star,
+  Twitter,
   TvMinimalPlay,
+  Send,
   UserRound,
+  X,
+  Smile,
+  CheckCircle,
 } from "lucide-react";
 import Link from "next/link";
 import BackdropSlide from "../Home/backdropSlide";
 import Footer from "../Home/footer";
-import { useTvContext } from "@/app/context/idContext";
+import { useTvContext } from "@/app/context/idContext"; 
 import { useRouter } from "next/navigation";
 import useAddToWishList from "@/app/Hooks/useAddToWishList";
 import { GoBookmarkSlash } from "react-icons/go";
@@ -25,7 +36,26 @@ import UseDeleteFromWishList from "@/app/Hooks/useDeleteFromWishList";
 import authe from "@/app/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import apiForHf from "@/app/utils/axiosInstanceForHfApi";
+import { FaReddit } from "react-icons/fa";
+import Toast from "./Toast";
 import { useCarouselScroll } from "@/app/Hooks/useCarouselScroll";
+
+const socialPlatforms = [
+  { name: 'Twitter', icon: Twitter, platform: 'twitter', color: 'group-hover:text-[#1DA1F2]' },
+  { name: 'Facebook', icon: Facebook, platform: 'facebook', color: 'group-hover:text-[#1877F2]' },
+  { name: 'WhatsApp', icon: MessageSquare, platform: 'whatsapp', color: 'group-hover:text-[#25D366]' },
+  { name: 'Instagram', icon: Instagram, platform: 'instagram', color: 'group-hover:text-[#E4405F]' },
+  { name: 'Reddit', icon: FaReddit, platform: 'reddit', color: 'group-hover:text-[#FF4500]' },
+  { name: 'Telegram', icon: Send, platform: 'telegram', color: 'group-hover:text-[#26A5E4]' },
+];
+
+const SocialButton = ({ name, icon: Icon, platform, color, onClick }) => (
+  <div onClick={() => onClick(platform)} className="flex  flex-col items-center justify-center gap-2 w-20 h-20 rounded-lg hover:bg-white/10 cursor-pointer transition-colors group">
+    <Icon size={30} className={`text-gray-300 group-hover:scale-110 transition-transform duration-200 ${color}`} />
+    <span className="text-xs text-gray-400 group-hover:text-white transition-colors">{name}</span>
+  </div>
+);
+
 
 const useShowData = (id, type, preloadedShowData) => {
   const [state, setState] = useState({
@@ -147,6 +177,9 @@ const Details = ({ slug, type, id, preloadedShowData }) => {
   const { currentUser, slugify } = useTvContext();
   const router = useRouter();
   const itemRefs = useRef({});
+  const [showSharePopup, setShowSharePopup] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [isCopied, setIsCopied] = useState(false);
 
   const UseAddToWishList = useAddToWishList();
   const useDeleteFromWishList = UseDeleteFromWishList();
@@ -162,6 +195,80 @@ const Details = ({ slug, type, id, preloadedShowData }) => {
       return () => window.removeEventListener("resize", handleResize);
     }
   }, []);
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage('');
+      }, 3000); // Toast disappears after 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
+
+  const handleCopyLink = async () => {
+    try {
+      if (isCopied) return;
+      await navigator.clipboard.writeText(window.location.href);
+      setToastMessage('Link copied to clipboard!');
+      setIsCopied(true);
+      setTimeout(() => {
+        setShowSharePopup(false);
+        setIsCopied(false); // Reset after closing
+      }, 1000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
+  const handleSocialShare = async (platform) => {
+    const url = window.location.href;
+    const text = `Check out ${show?.title || show?.name}!`;
+    let shareUrl = '';
+
+    if (platform === 'twitter') {
+      shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+    } else if (platform === 'facebook') {
+      shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    } else if (platform === 'whatsapp') {
+      shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text + ' ' + url)}`;
+    } else if (platform === 'instagram') {
+      await navigator.clipboard.writeText(url);
+      setToastMessage('Link copied! Now you can paste it on Instagram.');
+    } else if (platform === 'reddit') {
+      shareUrl = `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`;
+    } else if (platform === 'telegram') {
+      shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+    }
+
+    try {
+      window.open(shareUrl, '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      console.error('Error sharing:', err);
+      // Handle errors, e.g., user canceled share.
+    }
+    setShowSharePopup(false);
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: show?.title || show?.name,
+      text: `Check out ${show?.title || show?.name}!`,
+      url: window.location.href,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback for browsers that don't support the Web Share API
+        await navigator.clipboard.writeText(window.location.href);
+        setToastMessage('Link copied to clipboard!');
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
+      // Handle errors, e.g., user canceled share.
+    }
+    setShowSharePopup(false);
+  };
 
   function formatTime(time) {
     const hour = parseInt(time) / 60;
@@ -273,6 +380,13 @@ const Details = ({ slug, type, id, preloadedShowData }) => {
     }
   }, [selectedSeason]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSharePopup(true);
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, []);
   return (
     <>
       <div className="-mt-32">
@@ -358,12 +472,12 @@ const Details = ({ slug, type, id, preloadedShowData }) => {
                     </div>
                   ))}
                 </div>
-                <div className="flex gap-3 mt-2">
+                <div className="flex gap-3 mt-2 flex-wrap">
                   <Link onClick={() => type === "movie" && handleAddToHistory({ vote_average: show?.vote_average })}
                     href={type === "movie" ? `/stream/${type}/${slug}/${id}` : '#seasons'}
                     className={` ${compareDate(show?.release_date
                       ? show?.release_date
-                      : show?.first_air_date) ? "block" : 'hidden'} rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]`}>
+                      : show?.first_air_date) ? "block" : 'hidden'} rounded-xl px-3 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 bg-[#5c00cc]`}>
                     <Play /> <span>Play Now</span>{" "}
                   </Link>
                   <Link href={`/watch/${slugify(show?.name ? show?.name : show?.title)}/${videos?.key}`}>
@@ -387,9 +501,13 @@ const Details = ({ slug, type, id, preloadedShowData }) => {
                       }
                     }
                   } style={{ backgroundColor: "#ffffff20" }} className='cursor-pointer rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200'>
-                    {
+                    { 
                       show?.ifSaved ? <GoBookmarkSlash size={24} /> : <Bookmark />}
 
+                  </button>
+                  <button onClick={handleShare} style={{ backgroundColor: "#ffffff20" }} className='cursor-pointer w-full sm:w-fit rounded-xl px-2 md:px-5 py-2 md:py-3 flex gap-2 hover:opacity-80 duration-200 justify-center items-center'>
+                    <Share2 />
+                    <span className="sm:hidden">Share What You Watching</span>
                   </button>
                 </div>
               </div>
@@ -400,6 +518,46 @@ const Details = ({ slug, type, id, preloadedShowData }) => {
             <div style={{ border: "1px solid white", borderTopWidth: "0", borderLeftWidth: "0", }} className="border-[1px] animate-spin w-10 h-10 rounded-full border-t-0 border-l-0"></div>
           </div>
         )}
+
+        {/* sharing  */}
+        {showSharePopup && (
+          <div className="fixed inset-0 bg-black/60 z-[99999999] flex justify-center items-center backdrop-blur-md" onClick={() => setShowSharePopup(false)}>
+            <div className="bg-[#1a1d20] relative border border-gray-700 p-6 rounded-2xl shadow-2xl shadow-[#5c00cc50] text-center max-w-lg w-11/12 mx-4 animate-in fade-in-0 zoom-in-95" onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => setShowSharePopup(false)} className="absolute top-2 right-2 text-gray-500 hover:text-white transition-colors p-2 rounded-full">
+                <X size={20} />
+              </button>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold">Sharing is caring</h2>
+                <p className="text-gray-400 mt-1">Let your friends know what you're watching!</p>
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-x-2 gap-y-4 sm:gap-x-4 mb-8">
+                {socialPlatforms.map((social) => (
+                  <SocialButton key={social.name} {...social} onClick={handleSocialShare} />
+                ))}
+              </div>
+
+              <div className="relative flex items-center justify-center my-4">
+                <div className="w-full border-t border-gray-700"></div>
+                <span className="absolute px-3 text-xs text-gray-500 bg-[#1a1d20]">OR</span>
+              </div>
+
+              <div className="space-y-2 text-left mt-6">
+                <p className="text-sm font-medium text-gray-300">Copy link</p>
+                <div className="flex items-center gap-2">
+                  <input type="text" readOnly value={window.location.href} className="w-full truncate bg-black/40 border border-gray-600 rounded-lg p-2 text-gray-400 text-sm" />
+                  <button onClick={handleCopyLink} className={`w-32 text-nowrap flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200 ${isCopied ? 'bg-green-600' : 'bg-[#5c00cc] hover:opacity-90'}`}>
+                    {isCopied ? <CheckCircle size={18} /> : <LinkIcon size={16} />}
+                    {isCopied ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        <Toast message={toastMessage} show={!!toastMessage} />
 
         <div className=" mt-2">
 

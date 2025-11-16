@@ -3,7 +3,6 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/react"
 import { TvProvider } from "./context/idContext";
 import Script from "next/script";
-import authe from "./firebase";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
