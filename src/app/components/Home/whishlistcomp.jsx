@@ -46,7 +46,7 @@ const Whishlist = ({ filter, check, poster }) => {
         window.location.reload()
     }
 
-
+ 
     useEffect(() => {
         try {
             async function fetchData() {

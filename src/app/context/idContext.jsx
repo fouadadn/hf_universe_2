@@ -45,7 +45,7 @@ export const TvProvider = ({ children }) => {
         localStorage.providerId = id
         setProviderId(id)
     }
-
+ 
     function slugify(str) {
         return String(str)
             .toLowerCase()

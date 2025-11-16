@@ -11,7 +11,7 @@ const Footer = () => {
                         Stream the latest movies and series for free. Unlimited entertainment at your fingertips.
                     </p>
                 </div>
-
+ 
                 {/* Navigation */}
                 <div className="">
                     {/* <h2 className="text-lg font-semibold text-white mb-2">Quick Links</h2> */}

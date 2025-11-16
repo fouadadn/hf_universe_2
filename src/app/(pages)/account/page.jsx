@@ -9,7 +9,7 @@ import { EmailAuthProvider, getAuth, onAuthStateChanged, reauthenticateWithCrede
 import { AlertTriangle, History, LogOut, Mail, Shield, X } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-
+ 
 const page = () => {
     const { currentUser } = useTvContext();
     const [userData, setUserData] = useState({ displayName: "", email: "" })

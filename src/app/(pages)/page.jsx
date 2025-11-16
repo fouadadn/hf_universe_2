@@ -17,7 +17,7 @@ export default function Home() {
       <div className=" xl:min-h-[115vh] ">
         <HomePageSlider />
       </div>
-
+ 
       <div className="bg-black mt-6 lg:-mt-28 z-[9999] relative ">
 
         <div className="mx-2 ">

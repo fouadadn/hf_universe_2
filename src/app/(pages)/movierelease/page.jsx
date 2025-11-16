@@ -45,7 +45,7 @@ const getUpcomingMovies = async () => {
   };
 
   const upcomingMovies = await fetchNetflixMovies();
-
+ 
   const filterByMonth = (month, data) => {
     return data.filter((movie) => {
       const releaseDate = new Date(movie.release_date);

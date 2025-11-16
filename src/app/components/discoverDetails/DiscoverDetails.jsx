@@ -10,7 +10,7 @@ import api from "@/app/utils/axiosInstance";
 
 export default function DiscoverDetails({ provider, p_id }) {
     const date = new Date();
-
+ 
     const [show, setShows] = useState([])
     const [movies, setMovies] = useState([])
     const [providerMovies, setProviderMovies] = useState([])

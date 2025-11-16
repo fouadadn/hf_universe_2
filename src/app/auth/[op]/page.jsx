@@ -8,7 +8,7 @@ const Auth = async ({ params }) => {
 
   const { op } = await params;
 
-
+ 
   return <div>
     {
       op === 'login' && <Login />

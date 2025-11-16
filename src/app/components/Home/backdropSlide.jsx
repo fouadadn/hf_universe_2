@@ -19,7 +19,7 @@ const BackdropSlide = ({ media_type, is_korean, show, title = "Your WatchList", 
   const date = new Date()
   const deleteFromHistory = useDeleteFromhistory();
 
-
+ 
   useEffect(() => {
     // console.log(show)
     async function fetchgenresAndCombineData() {

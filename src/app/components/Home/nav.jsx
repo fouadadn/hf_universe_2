@@ -10,7 +10,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import authe from '@/app/firebase';
 
 const Nav = () => {
-
+ 
     const [searchOpen, setSearchOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [searchData, setSearchData] = useState([])

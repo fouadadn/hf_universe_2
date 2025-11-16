@@ -9,7 +9,7 @@ import { useTvContext } from "@/app/context/idContext";
 import authe from "@/app/firebase";
 import apiForHf from "@/app/utils/axiosInstanceForHfApi";
 import BackdropSlide from "./backdropSlide";
-
+ 
 const PosterSlide = ({ movie, tv }) => {
   const [media, setMedia] = useState([]);
   const [imgSrc, setImgSrc] = useState(`https://image.tmdb.org/t/p/w500`);

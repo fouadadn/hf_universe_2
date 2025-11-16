@@ -10,7 +10,7 @@ import { Eye, EyeClosed } from "lucide-react";
 import { doc, setDoc } from "firebase/firestore";
 
 const SignUp = () => {
-
+ 
   const { currentUser } = useTvContext();
   const [height, setHeight] = useState(0)
   const [loading, setLoading] = useState(false);

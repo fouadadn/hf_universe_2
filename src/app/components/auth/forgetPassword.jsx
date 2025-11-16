@@ -7,7 +7,7 @@ import { redirect, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 const ForgetPassword = () => {
-
+ 
     const [errors, setErrors] = useState('');
     const [loading, setLoading] = useState(false);
     const [height, setHeight] = useState(0)

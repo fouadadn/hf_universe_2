@@ -10,5 +10,5 @@ const Discover = async ({ params }) => {
         </div>
     )
 }
-
+ 
 export default Discover

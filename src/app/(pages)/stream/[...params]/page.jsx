@@ -32,7 +32,7 @@ const page = async ({ params }) => {
         </div>
     )
 }
-
+ 
 export default page
 export async function generateMetadata({ params }) {
     const paramsArr =(await params).params;

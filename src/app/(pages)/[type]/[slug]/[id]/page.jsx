@@ -17,7 +17,7 @@ const getShowData = async (type, id) => {
       (vid) => vid.type === "Trailer" && vid.site === "YouTube"
     ),
   };
-};
+}; 
 
 const Movie = async ({ params }) => {
   const { slug, type, id } = await params;

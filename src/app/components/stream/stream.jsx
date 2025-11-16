@@ -10,7 +10,7 @@ const Stream = ({ type, season, episode, id }) => {
 
     // Add to history
     useStreamHistory(type, id, season, episode);
-
+ 
     return (
         <div >
             <div >

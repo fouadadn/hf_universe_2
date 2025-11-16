@@ -8,7 +8,7 @@ const Trailer = async ({ params }) => {
 };
 
 export default Trailer;
-
+ 
 export async function generateMetadata({ params }) {
   const { slug, key } = await params;
 

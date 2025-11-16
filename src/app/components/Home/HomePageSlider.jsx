@@ -105,7 +105,7 @@ const HomePageSlider = ({ shows }) => {
       //   const { data } = await api.get("/movie/1233575")
       //   // console.log(data)
       // }}
-      >
+      >  
         {
           (show5WithTrailler.length > 0 ? show5WithTrailler : data).length > 0 ? (show5WithTrailler.length > 0 ? show5WithTrailler : data.slice(0, 5)).map((show) =>
             <SwiperSlide >

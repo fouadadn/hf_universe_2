@@ -17,7 +17,7 @@ const page = () => {
     return () => {
       unsubscribe();
     };
-  }, [])
+  }, []) 
   return (
     <>
       <div className='mx-3'>
