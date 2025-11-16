@@ -177,7 +177,7 @@ const Details = ({ slug, type, id, preloadedShowData }) => {
   const { currentUser, slugify } = useTvContext();
   const router = useRouter();
   const itemRefs = useRef({});
-  const [showSharePopup, setShowSharePopup] = useState(true);
+  const [showSharePopup, setShowSharePopup] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [isCopied, setIsCopied] = useState(false);
 
