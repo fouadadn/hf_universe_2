@@ -121,7 +121,7 @@ const Nav = () => {
                                     </div>
 
                                     <div className={`${searchOpen ? 'order-1 relative md:left-[4px] w-[92%] md:w-fit' : "glbo order-2 "} `}>
-                                        <input value={searchQuery} onChange={(e) => {
+                                        <input  value={searchQuery} onChange={(e) => {
                                             setNoResults(false)
                                             setSearchData([]);
                                             setDisplayAccount(false)
@@ -132,7 +132,7 @@ const Nav = () => {
                                                 }
                                             }, 2000);
                                         }} onFocus={() => { setSearchOpen(true); setIsFocused(true) }}
-                                            onBlur={() => { setIsFocused(false); }} ref={inpurRef} type="search" name=""
+                                            onBlur={() => { setIsFocused(false); }} ref={inpurRef} type="search" name="query-input"
                                             className={` [&::-webkit-search-cancel-button]:appearance-none w-full md:w-[240px] px-1 outline-0  `} id="" placeholder='Search' />
                                     </div>
                                 </div>

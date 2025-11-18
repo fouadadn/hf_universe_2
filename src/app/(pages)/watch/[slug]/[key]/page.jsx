@@ -1,18 +1,17 @@
 import Trailler from "@/app/components/watch/trailler";
 
 const Trailer = async ({ params }) => {
-  const { key } = await params;
-  // const { slug } = await params;
+  const { key, slug } = params;
 
   return <Trailler keyID={key} />;
 };
 
 export default Trailer;
- 
-export async function generateMetadata({ params }) {
-  const { slug, key } = await params;
 
-  // Capitalize the first letter of each word in the slug for a clean title
+export async function generateMetadata({ params }) {
+  const { key, slug = "trailer" } = params;
+
+  // Capitalize the first letter of each word in slug
   const title = slug
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -24,23 +23,36 @@ export async function generateMetadata({ params }) {
 
   return {
     title: pageTitle,
-    description: description,
+    description,
     alternates: {
       canonical: url,
     },
     openGraph: {
       title: pageTitle,
-      description: description,
-      url: url,
+      description,
+      url,
       type: "video.other",
-      videos: [{
+      videos: [
+        {
+          url: `https://www.youtube.com/embed/${key}`,
+          secure_url: `https://www.youtube.com/embed/${key}`,
+          type: "text/html",
+          width: 1280,
+          height: 720,
+        },
+      ],
+      images: [`https://i.ytimg.com/vi/${key}/maxresdefault.jpg`],
+    },
+    twitter: {
+      card: "player",
+      title: pageTitle,
+      description,
+      images: [`https://i.ytimg.com/vi/${key}/maxresdefault.jpg`],
+      player: {
         url: `https://www.youtube.com/embed/${key}`,
-        secure_url: `https://www.youtube.com/embed/${key}`,
-        type: 'text/html',
         width: 1280,
         height: 720,
-      }],
-      images: [`https://i.ytimg.com/vi/${key}/maxresdefault.jpg`],
+      },
     },
   };
 }
